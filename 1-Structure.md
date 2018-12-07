@@ -21,6 +21,7 @@ void merge(int a, int b) {
 
 ```cpp
 // 下标从0开始
+// 一维
 struct RMQ {
     int st[MAXN][22]; // 22 = ((int)log2(MAXN) + 1)
 
@@ -40,6 +41,45 @@ struct RMQ {
     int query(int l, int r) {
         int x = xlog(r - l + 1);
         return max(st[l][x], st[r - (1 << x) + 1][x]);
+    }
+};
+
+// 二维
+struct RMQ {
+    int st[MAXN][MAXN][11][11]; // 11 = ((int)log2(MAXN) + 1)
+
+    int xlog(int x) { return 31 - __builtin_clz(x); }
+
+    void init(int n, int m) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                st[i][j][0][0] = a[i][j];
+            }
+        }
+        for (int i = 0; (1 << i) <= n; i++) {
+            for (int j = 0; (1 << j) <= m; j++) {
+                if (i == 0 && j == 0) continue;
+                for (int r = 0; r + (1 << i) - 1 < n; r++) {
+                    for (int c = 0; c + (1 << j) - 1 < m; c++) {
+                        if (i == 0) {
+                            st[r][c][i][j] = max(st[r][c][i][j - 1], st[r][c + (1 << (j - 1))][i][j - 1]);
+                        } else {
+                            st[r][c][i][j] = max(st[r][c][i - 1][j], st[r + (1 << (i - 1))][c][i - 1][j]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int query(int r1, int c1, int r2, int c2) {
+        int x = xlog(r2 - r1 + 1);
+        int y = xlog(c2 - c1 + 1);
+        int m1 = st[r1][c1][x][y];
+        int m2 = st[r1][c2 - (1 << y) + 1][x][y];
+        int m3 = st[r2 - (1 << x) + 1][c1][x][y];
+        int m4 = st[r2 - (1 << x) + 1][c2 - (1 << y) + 1][x][y];
+        return max({m1, m2, m3, m4});
     }
 };
 ```
