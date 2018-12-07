@@ -364,16 +364,15 @@ void modify(int p, int l, int r, int val) {
     t[p].val = min(t[lc].val, t[rc].val);
 }
 
-// 待验证
 // 修改：区间赋值
 // 查询：区间和
 void pushdown(int p) {
-    if (!t[p].lazy) return;
+    if (t[p].lazy == -1) return; // 选取一个数据范围外的值
     t[lc].val = t[p].lazy * (t[lc].r - t[lc].l + 1);
     t[rc].val = t[p].lazy * (t[rc].r - t[rc].l + 1);
     t[lc].lazy = t[p].lazy;
     t[rc].lazy = t[p].lazy;
-    t[p].lazy = 0;
+    t[p].lazy = -1;
 }
 
 long long ask(int p, int l, int r) {
