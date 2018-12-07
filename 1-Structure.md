@@ -364,6 +364,7 @@ void modify(int p, int l, int r, int val) {
     t[p].val = min(t[lc].val, t[rc].val);
 }
 
+// 待验证
 // 修改：区间赋值
 // 查询：区间和
 void pushdown(int p) {
