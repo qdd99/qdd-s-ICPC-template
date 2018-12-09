@@ -253,7 +253,7 @@ struct SegT {
 #define lc (p << 1)
 #define rc (p << 1 | 1)
 
-    const int INF = 0x3f3f3f3f;
+    static const int INF = 0x3f3f3f3f;
 
     int size;
     Node *t;
@@ -371,7 +371,7 @@ struct SegT {
 
 // 修改：区间加
 // 查询：RMQ
-const long long INF = 0x3f3f3f3f3f3f3f3f;
+static const long long INF = 0x3f3f3f3f3f3f3f3f;
 
 void pushdown(int p) {
     if (!t[p].lazy) return;
