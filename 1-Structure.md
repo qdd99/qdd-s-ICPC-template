@@ -237,6 +237,21 @@ struct Tbit {
         add(r + 1, -val);
     }
 };
+
+// 修改：区间加
+// 查询：区间和
+Tbit t1, t2;
+
+void range_add(int l, int r, long long val) {
+    t1.add(l, val);
+    t2.add(l, l * val);
+    t1.add(r + 1, -val);
+    t2.add(r + 1, (r + 1) * -val);
+}
+
+long long range_sum(int l, int r) {
+    return (r + 1) * t1.get(r) - t2.get(r) - l * t1.get(l - 1) + t2.get(l - 1);
+}
 ```
 
 ### 线段树
