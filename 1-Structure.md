@@ -167,6 +167,7 @@ struct Block {
 ### 树状数组
 
 ```cpp
+// 支持第k大的BIT
 // 下标从1开始
 // 修改：单点
 // 查询：区间和
@@ -177,8 +178,8 @@ struct Tbit {
     int lowbit(int x) { return x & (-x); }
 
     void init(int sz) {
-        size = sz;
-        memset(t, 0, (sz + 1) * sizeof(long long));
+        size = sz + 1;
+        memset(t, 0, (sz + 2) * sizeof(long long));
     }
 
     void add(int pos, long long val) {
@@ -200,6 +201,18 @@ struct Tbit {
 
     void update(int pos, long long val) { add(pos, val - query(pos, pos)); }
     long long query(int l, int r) { return get(r) - get(l - 1); }
+
+    int kth(long long k) {
+        int p = 0;
+        for (int i = 20; i >= 0; i--) {
+            int p_ = p + (1 << i);
+            if (p_ <= size && t[p_] < k) {
+                k -= t[p_];
+                p = p_;
+            }
+        }
+        return p + 1;
+    }
 };
 
 // 修改：区间加
