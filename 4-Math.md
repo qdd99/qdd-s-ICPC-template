@@ -188,17 +188,14 @@ void getf(vector<int> &v, int x) {
 ### 欧拉函数
 
 ```cpp
-// O(loglogn)
+// O(nloglogn)
 int phi[MAXN];
-void get_phi()
-{
+
+void get_phi() {
     phi[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++)
-    {
-        if (!phi[i])
-        {
-            for (int j = i; j < MAXN - 5; j += i)
-            {
+    for (int i = 2; i < MAXN - 5; i++) {
+        if (!phi[i]) {
+            for (int j = i; j < MAXN - 5; j += i) {
                 if (!phi[j]) phi[j] = j;
                 phi[j] = phi[j] / i * (i - 1);
             }
