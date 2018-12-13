@@ -1,5 +1,23 @@
 ## 4.6 其他经典问题
 
+### 二分答案
+
+```cpp
+// 可行下界
+while (l < r) {
+    mid = (l + r) / 2;
+    if (check(mid)) r = mid;
+    else l = mid + 1;
+}
+
+// 可行上界
+while (l < r) {
+    mid = (l + r + 1) / 2;
+    if (check(mid)) l = mid;
+    else r = mid - 1;
+}
+```
+
 ### 日期
 
 ```cpp
