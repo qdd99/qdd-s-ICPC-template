@@ -18,6 +18,18 @@ while (l < r) {
 }
 ```
 
+### 三分
+
+```cpp
+double l, r, mid1, mid2;
+for (int i = 0; i < 75; i++) {
+    mid1 = (l * 5 + r * 4) / 9;
+    mid2 = (l * 4 + r * 5) / 9;
+    if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
+    else l = mid1;
+}
+```
+
 ### 日期
 
 ```cpp
