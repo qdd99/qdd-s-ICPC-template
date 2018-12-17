@@ -276,7 +276,7 @@ long long exgcd(long long a, long long b, long long &x, long long &y) {
 ### 逆元
 
 ```cpp
-long long inv(long long x) { return pow(x, MOD - 2); }
+long long inv(long long x) { return powMod(x, MOD - 2); }
 
 // EXGCD
 // gcd(a, p) = 1时有逆元
