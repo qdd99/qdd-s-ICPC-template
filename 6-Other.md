@@ -21,6 +21,7 @@ while (l < r) {
 ### 三分
 
 ```cpp
+// 实数范围
 double l, r, mid1, mid2;
 for (int i = 0; i < 75; i++) {
     mid1 = (l * 5 + r * 4) / 9;
