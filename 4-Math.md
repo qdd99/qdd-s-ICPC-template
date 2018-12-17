@@ -220,31 +220,34 @@ void get_phi() {
             phi[i] = i - 1;
         }
         for (int j = 0; j < tot; j++) {
-            if (i * prime[j] >= MAXN - 5) break;
-            vis[i * prime[j]] = true;
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
             if (i % prime[j] == 0) {
-                phi[i * prime[j]] = phi[i] * prime[j];
+                phi[d] = phi[i] * prime[j];
                 break;
             }
-            else phi[i * prime[j]] = phi[i] * (prime[j] - 1);
+            else phi[d] = phi[i] * (prime[j] - 1);
         }
     }
 }
 
-// 莫比乌斯线性筛 待验证
-const LL p_max = 1E5 + 100;
-LL mu[p_max] = {-1, 1};
+// 莫比乌斯线性筛
+bool vis[MAXN];
+int mu[MAXN], prime[MAXN];
+
 void get_mu() {
-    static bool vis[p_max];
-    static LL prime[p_max], p_sz, d;
+    int tot = 0;
     mu[1] = 1;
-    FOR (i, 2, p_max) {
+    for (int i = 2; i < MAXN - 5; i++) {
         if (!vis[i]) {
-            prime[p_sz++] = i;
+            prime[tot++] = i;
             mu[i] = -1;
         }
-        for (LL j = 0; j < p_sz && (d = i * prime[j]) < p_max; ++j) {
-            vis[d] = 1;
+        for (int j = 0; j < tot; j++) {
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
             if (i % prime[j] == 0) {
                 mu[d] = 0;
                 break;
