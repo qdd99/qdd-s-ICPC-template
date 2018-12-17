@@ -332,13 +332,10 @@ long long C(int n, int m) {
     return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
 }
 
-// 大组合数取模 待验证
-//lucas定理 C(n,m)%p = C(n/p,m/p)*C(n%p,m%p)%p
-ll C(ll n, ll m, ll mod) {
-	if (n < m) return 0;
-	if (n < mod &&m < mod)
-		return jiecheng[n] * pow(jiecheng[m] * jiecheng[n - m]
-			% mod, mod - 2, mod) % mod;
-	else return C(n / mod, m / mod, mod)*C(n%mod, m%mod, mod);
+// Lucas
+long long C(long long n, long long m) {
+    if (n < m || m < 0) return 0;
+    if (n < MOD && m < MOD) return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
+    return C(n / MOD, m / MOD) * C(n % MOD, m % MOD) % MOD;
 }
 ```
