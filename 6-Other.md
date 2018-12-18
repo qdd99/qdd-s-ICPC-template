@@ -29,6 +29,19 @@ for (int i = 0; i < 75; i++) {
     if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
     else l = mid1;
 }
+
+// 整数范围
+int l, r, mid1, mid2;
+while (l < r - 2) {
+    mid1 = (l + r) / 2;
+    mid2 = mid1 + 1;
+    if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
+    else l = mid1;
+}
+int maxval = f(l), ans = l;
+for (int i = l + 1; i <= r; i++) {
+    if (updmax(maxval, f(i))) ans = i;
+}
 ```
 
 ### 日期
