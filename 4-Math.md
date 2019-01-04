@@ -124,11 +124,26 @@ void init_prime() {
 }
 ```
 
-### 质因数分解
+### 找因数
+
+```cpp
+// O(sqrt(n))
+void getf(int x, vector<int> &v) {
+    for (int i = 1; i * i <= x; i++) {
+        if (x % i == 0) {
+            v.push_back(i);
+            if (x / i != i) v.push_back(x / i);
+        }
+    }
+    sort(v.begin(), v.end());
+}
+```
+
+### 找质因数
 
 ```cpp
 // O(sqrt(n))，无重复
-void getf(vector<int> &v, int x) {
+void getf(int x, vector<int> &v) {
     for (int i = 2; i * i <= x; i++) {
         if (x % i == 0) {
             v.push_back(i);
@@ -140,7 +155,7 @@ void getf(vector<int> &v, int x) {
 }
 
 // O(sqrt(n))，有重复
-void getf(vector<int> &v, int x) {
+void getf(int x, vector<int> &v) {
     for (int i = 2; i * i <= x; i++) {
         while (x % i == 0) {
             v.push_back(i);
@@ -165,7 +180,7 @@ void init_spf() {
 }
 
 // O(logn)，无重复
-void getf(vector<int> &v, int x) {
+void getf(int x, vector<int> &v) {
     while (x > 1) {
         int p = spf[x];
         v.push_back(p);
@@ -174,7 +189,7 @@ void getf(vector<int> &v, int x) {
 }
 
 // O(logn)，有重复
-void getf(vector<int> &v, int x) {
+void getf(int x, vector<int> &v) {
     while (x > 1) {
         int p = spf[x];
         while (x % p == 0) {
