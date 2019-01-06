@@ -149,7 +149,6 @@ void getf(int x, vector<int> &v) {
             v.push_back(i);
             while (x % i == 0) x /= i;
         }
-        if (x == 1) break;
     }
     if (x != 1) v.push_back(x);
 }
@@ -161,7 +160,6 @@ void getf(int x, vector<int> &v) {
             v.push_back(i);
             x /= i;
         }
-        if (x == 1) break;
     }
     if (x != 1) v.push_back(x);
 }
