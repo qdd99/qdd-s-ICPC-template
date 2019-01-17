@@ -19,7 +19,7 @@ cin.tie(0);
 ### 程序计时
 
 ```cpp
-printf("%.5lf\n", (double)clock() / CLOCKS_PER_SEC);
+printf("%f\n", (double)clock() / CLOCKS_PER_SEC);
 ```
 
 ### 整行读入
