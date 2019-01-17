@@ -61,6 +61,7 @@ inline void print128(__int128 x) {
 ### 读入挂
 
 ```cpp
+// 本机测试需要EOF才能看到输出结果
 #define BUF_SIZE 1048576
 
 inline char nc() {
