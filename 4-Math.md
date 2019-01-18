@@ -41,11 +41,7 @@ long long mul(long long a, long long b) {
 struct Mat {
     long long m[3][3] = {0};
     long long * operator [] (int i) { return m[i]; }
-    void one() {
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                m[i][j] = (i == j) ? 1 : 0;
-    }
+    void one() { for (int i = 0; i < 3; i++) m[i][i] = 1; }
 };
 
 Mat mul(Mat &a, Mat &b) {
