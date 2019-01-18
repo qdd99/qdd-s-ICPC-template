@@ -35,8 +35,7 @@ bool vis[MAXN];
 
 struct Edge {
     int to, nxt;
-    Edge() {};
-    Edge(int to, int nxt) : to(to), nxt(nxt) {};
+    Edge(int to = 0, int nxt = 0) : to(to), nxt(nxt) {};
 } es[MAXN];
 
 void mp_init() {
@@ -75,6 +74,7 @@ void bfs(int s) {
 // MAXN开点数
 struct Edge {
     int to, val;
+    Edge(int to = 0, int val = 0) : to(to), val(val) {};
 };
 vector<Edge> G[MAXN];
 long long dist[MAXN];
@@ -108,8 +108,7 @@ long long dist[MAXN];
 
 struct Edge {
     int to, nxt, val;
-    Edge() {};
-    Edge(int to, int nxt, int val) : to(to), nxt(nxt), val(val) {};
+    Edge(int to = 0, int nxt = 0, int val = 0) : to(to), nxt(nxt), val(val) {};
 } es[MAXN];
 
 void mp_init() {
