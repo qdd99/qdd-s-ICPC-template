@@ -351,3 +351,21 @@ long long C(long long n, long long m) {
     return C(n / MOD, m / MOD) * C(n % MOD, m % MOD) % MOD;
 }
 ```
+
+### 自适应Simpson积分
+
+```cpp
+double simpson(double l, double r) {
+    double c = (l + r) / 2;
+    return (f(l) + 4 * f(c) + f(r)) * (r - l) / 6;
+}
+
+double asr(double l, double r, double eps, double S) {
+    double mid = (l + r) / 2;
+    double L = simpson(l, mid), R = simpson(mid, r);
+    if (fabs(L + R - S) < 15 * eps) return L + R + (L + R - S) / 15;
+    return asr(l, mid, eps / 2, L) + asr(mid, r, eps / 2, R);
+}
+
+double asr(double l, double r) { return asr(l, r, EPS, simpson(l, r)); }
+```
