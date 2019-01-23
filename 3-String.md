@@ -29,7 +29,7 @@ void init_hash() {
     }
 }
 
-ull get_substring_hash(int l, int r) {
+ull get_hash(int l, int r) {
     r++;
     int len = r - l;
     unsigned int mask32 = ~(0u);
