@@ -22,10 +22,10 @@ void init_xp() {
 void init_hash() {
     ull res1 = 0, res2 = 0;
     h[n + 1] = 0;
-    for (int j = n; j >= 0; j--) {
-        res1 = (res1 * x + s[j]) % p1;
-        res2 = (res2 * x + s[j]) % p2;
-        h[j] = (res1 << 32) | res2;
+    for (int i = n; i >= 0; i--) {
+        res1 = (res1 * x + s[i]) % p1;
+        res2 = (res2 * x + s[i]) % p2;
+        h[i] = (res1 << 32) | res2;
     }
 }
 
