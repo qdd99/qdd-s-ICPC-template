@@ -177,3 +177,79 @@ int lca(int u, int v) {
     return up[u][0];
 }
 ```
+
+### 网络流
+
+```cpp
+// 最大流
+const int INF = 0x7fffffff;
+
+struct Edge {
+    int to, cap;
+    Edge(int to, int cap) : to(to), cap(cap) {}
+};
+
+struct Dinic {
+    int n, s, t;
+    vector<Edge> es;
+    vector<vector<int> > G;
+    vector<int> dist, cur;
+
+    Dinic(int n, int s, int t) : n(n), s(s), t(t) {
+        G.resize(n + 1);
+        dist.resize(n + 1);
+        cur.resize(n + 1);
+    }
+
+    void addEdge(int u, int v, int cap) {
+        G[u].push_back(es.size());
+        es.emplace_back(v, cap);
+        G[v].push_back(es.size());
+        es.emplace_back(u, 0);
+    }
+
+    bool bfs() {
+        dist.assign(n + 1, 0);
+        queue<int> q;
+        q.push(s);
+        dist[s] = 1;
+        while (!q.empty()) {
+            int now = q.front();
+            q.pop();
+            for (int i : G[now]) {
+                Edge& e = es[i];
+                if (!dist[e.to] && e.cap > 0) {
+                    dist[e.to] = dist[now] + 1;
+                    q.push(e.to);
+                }
+            }
+        }
+        return dist[t];
+    }
+
+    int dfs(int now, int cap) {
+        if (now == t || cap == 0) return cap;
+        int tmp = cap, f;
+        for (int& i = cur[now]; i < G[now].size(); i++) {
+            Edge& e = es[G[now][i]];
+            if (dist[e.to] == dist[now] + 1) {
+                f = dfs(e.to, min(cap, e.cap));
+                e.cap -= f;
+                es[G[now][i] ^ 1].cap += f;
+                cap -= f;
+                if (cap == 0) break;
+            }
+        }
+        return tmp - cap;
+    }
+
+    long long solve() {
+        long long flow = 0;
+        while (bfs()) {
+            cur.assign(n + 1, 0);
+            flow += dfs(s, INF);
+        }
+        return flow;
+    }
+};
+```
