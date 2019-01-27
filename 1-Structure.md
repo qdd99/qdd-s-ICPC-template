@@ -277,6 +277,7 @@ struct Node {
     int val;
     int l, r;
 };
+
 struct SegT {
 #define lc (p << 1)
 #define rc (p << 1 | 1)
@@ -324,6 +325,25 @@ struct SegT {
 #undef lc
 #undef rc
 };
+
+// 权值线段树
+// 修改：单点加
+// 查询：第 k 大
+void add(int x, long long val) {
+    int p = size + x - 1;
+    t[p].val += val;
+    for (p >>= 1; p > 0; p >>= 1) {
+        t[p].val += val;
+    }
+}
+
+int ask(int p, long long k) {
+    if (t[p].l == t[p].r) return t[p].l;
+    if (k <= t[lc].val) return ask(lc, k);
+    else return ask(rc, k - t[lc].val);
+}
+
+int query(long long k) { return ask(1, k); }
 
 // 修改：区间加
 // 查询：区间和
