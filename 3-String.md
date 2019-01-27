@@ -3,6 +3,7 @@
 ### 哈希
 
 ```cpp
+// open hack不要用哈希
 using ull = unsigned long long;
 
 const int x = 135, p1 = 1e9 + 7, p2 = 1e9 + 9;
