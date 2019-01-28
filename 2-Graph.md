@@ -265,7 +265,7 @@ struct MCMF {
     int n, s, t, flow, cost;
     vector<Edge> es;
     vector<vector<int> > G;
-    vector<int> d, p, a;
+    vector<int> d, p, a;  // dist, prev, add
     deque<bool> in;
 
     MCMF(int n, int s, int t) : n(n), s(s), t(t) {
