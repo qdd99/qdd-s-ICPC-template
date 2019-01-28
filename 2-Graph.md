@@ -252,4 +252,75 @@ struct Dinic {
         return flow;
     }
 };
+
+// 最小费用流
+const int INF = 0x7fffffff;
+
+struct Edge {
+    int from, to, cap, cost;
+    Edge(int from, int to, int cap, int cost) : from(from), to(to), cap(cap), cost(cost) {}
+};
+
+struct MCMF {
+    int n, s, t, flow, cost;
+    vector<Edge> es;
+    vector<vector<int> > G;
+    vector<int> d, p, a;
+    deque<bool> in;
+
+    MCMF(int n, int s, int t) : n(n), s(s), t(t) {
+        G.resize(n + 1);
+        p.resize(n + 1);
+        a.resize(n + 1);
+        flow = cost = 0;
+    }
+
+    void addEdge(int u, int v, int cap, int cost) {
+        G[u].push_back(es.size());
+        es.emplace_back(u, v, cap, cost);
+        G[v].push_back(es.size());
+        es.emplace_back(v, u, 0, -cost);
+    }
+
+    bool spfa() {
+        d.assign(n + 1, INF);
+        in.assign(n + 1, false);
+        d[s] = 0;
+        in[s] = 1;
+        a[s] = INF;
+        queue<int> q;
+        q.push(s);
+        while (!q.empty()) {
+            int now = q.front();
+            q.pop();
+            in[now] = false;
+            for (int& i : G[now]) {
+                Edge& e = es[i];
+                if (e.cap && d[e.to] > d[now] + e.cost) {
+                    d[e.to] = d[now] + e.cost;
+                    p[e.to] = i;
+                    a[e.to] = min(a[now], e.cap);
+                    if (!in[e.to]) {
+                        q.push(e.to);
+                        in[e.to] = true;
+                    }
+                }
+            }
+        }
+        return d[t] != INF;
+    }
+
+    void solve() {
+        while (spfa()) {
+            flow += a[t];
+            cost += a[t] * d[t];
+            int u = t;
+            while (u != s) {
+                es[p[u]].cap -= a[t];
+                es[p[u] ^ 1].cap += a[t];
+                u = es[p[u]].from;
+            }
+        }
+    }
+};
 ```
