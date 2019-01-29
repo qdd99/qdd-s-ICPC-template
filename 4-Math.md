@@ -13,10 +13,8 @@ long long lcm(long long a, long long b) { return a / gcd(a, b) * b; }
 // 注意 b = 0, MOD = 1 的情况
 long long powMod(long long a, long long b) {
     long long ans = 1;
-    a %= MOD;
-    while (b) {
+    for (a %= MOD; b; b >>= 1) {
         if (b & 1) ans = ans * a % MOD;
-        b >>= 1;
         a = a * a % MOD;
     }
     return ans;
@@ -25,10 +23,8 @@ long long powMod(long long a, long long b) {
 // 模数爆int时使用
 long long mul(long long a, long long b) {
     long long ans = 0;
-    a %= MOD;
-    while (b) {
+    for (a %= MOD; b; b >>= 1) {
         if (b & 1) ans = (ans + a) % MOD;
-        b >>= 1;
         a = (a << 1) % MOD;
     }
     return ans;
