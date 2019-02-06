@@ -615,3 +615,52 @@ struct FST {
 #undef mid
 };
 ```
+
+### Splay
+
+```cpp
+// 正常Splay
+struct Node {
+    int val, size;
+    Node *pa, *lc, *rc;
+    Node(int val = 0, Node *pa = nullptr) : val(val), size(1), pa(pa), lc(nullptr), rc(nullptr) {}
+    Node*& c(bool x) { return x ? lc : rc; }
+    bool d() { return pa ? this == pa->lc : 0; }
+} pool[MAXN], *tail = pool;
+
+struct Splay {
+    Node *root;
+
+    Splay() : root(nullptr) {}
+
+    Node* N(int val, Node *pa) {
+        return new (tail++) Node(val, pa);
+    }
+
+    void pushup(Node *o) {
+        o->size = (o->lc ? o->lc->size : 0) + (o->rc ? o->rc->size : 0) + 1;
+    }
+
+    void link(Node *x, Node *y, bool d) {
+        if (x) x->pa = y;
+        if (y) y->c(d) = x;
+    }
+
+    void rotate(Node *o) {
+        bool dd = o->d();
+        Node *x = o->pa, *xx = x->pa, *y = o->c(!dd);
+        link(o, xx, x->d());
+        link(y, x, dd);
+        link(x, o, !dd);
+        pushup(x);
+        pushup(o);
+    }
+
+    void splay(Node *o) {
+        for (Node *x = o->pa; x = o->pa, x; rotate(o)) {
+            if (x->pa) rotate(o->d() == x->d() ? x : o);
+        }
+        root = o;
+    }
+};
+```
