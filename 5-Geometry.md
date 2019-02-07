@@ -32,6 +32,7 @@ struct V {
 double dist(const V& a, const V& b) { return (b - a).len(); }
 double dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
 double det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
+double cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
 ```
 
 ### 多边形
@@ -46,12 +47,12 @@ vector<V> convex_hull(vector<V>& s) {
     vector<V> ret(2 * s.size());
     int sz = 0;
     for (int i = 0; i < s.size(); i++) {
-        while (sz > 1 && leq(det(V(ret[sz - 2], ret[sz - 1]), V(ret[sz - 2], s[i])), 0)) sz--;
+        while (sz > 1 && leq(cross(ret[sz - 1], s[i], ret[sz - 2]), 0)) sz--;
         ret[sz++] = s[i];
     }
     int k = sz;
     for (int i = s.size() - 2; i >= 0; i--) {
-        while (sz > k && leq(det(V(ret[sz - 2], ret[sz - 1]), V(ret[sz - 2], s[i])), 0)) sz--;
+        while (sz > k && leq(cross(ret[sz - 1], s[i], ret[sz - 2]), 0)) sz--;
         ret[sz++] = s[i];
     }
     ret.resize(sz - (s.size() > 1));
