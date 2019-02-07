@@ -36,10 +36,8 @@ double det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
 
 ### 多边形
 
-#### 凸包
-
 ```cpp
-// 点不可以重复
+// 构建凸包 点不可以重复
 // lt(det(...), 0) 边上可以有点 leq(det(...), 0) 则不能
 // 会改变输入点的顺序
 vector<V> convex_hull(vector<V>& s) {
