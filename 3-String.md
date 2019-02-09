@@ -41,3 +41,31 @@ ull get_hash(int l, int r) {
     return (res1 << 32) | res2;
 }
 ```
+
+### Manacher
+
+```cpp
+// "aba" => "#a#b#a#"
+string make(string& s) {
+    string t = "#";
+    for (int i = 0; i < s.size(); i++) {
+        t.push_back(s[i]);
+        t.push_back('#');
+    }
+    return t;
+}
+
+void manacher(string& s, vector<int>& d) {
+    int n = s.size();
+    d.resize(n);
+    for (int i = 0, l = 0, r = -1; i < n; i++) {
+        int k = (i > r) ? 1 : min(d[l + r - i], r - i);
+        while (i - k >= 0 && i + k < n && s[i - k] == s[i + k]) k++;
+        d[i] = --k;
+        if (i + k > r) {
+            l = i - k;
+            r = i + k;
+        }
+    }
+}
+```
