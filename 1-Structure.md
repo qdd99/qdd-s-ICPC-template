@@ -409,7 +409,7 @@ long long ask(int p, int l, int r, int pl, int pr) {
 void modify(int p, int l, int r, int a, int b, int pl, int pr) {
     if (l > pr || r < pl) return;
     if (l <= pl && r >= pr) {
-        t[p].val = (t[p].val * a % MOD + (pr - pl + 1) * b % MOD) % MOD;
+        t[p].val = (t[p].val * a % MOD + 1LL * (pr - pl + 1) * b % MOD) % MOD;
         t[p].mul = t[p].mul * a % MOD;
         t[p].add = (t[p].add * a % MOD + b) % MOD;
         return;
