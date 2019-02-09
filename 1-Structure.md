@@ -275,14 +275,12 @@ long long range_sum(int l, int r) {
 // 查询：RMQ
 struct Node {
     int val;
-    int l, r;
 };
 
 struct SegT {
 #define lc (p << 1)
 #define rc (p << 1 | 1)
-
-    static const int INF = 0x3f3f3f3f;
+#define mid (pl + pr >> 1)
 
     int size;
     Node *t;
@@ -290,40 +288,34 @@ struct SegT {
     SegT(int sz) {
         size = 1;
         while (size < sz) size <<= 1;
-        t = new Node[2 * size];
-        for (int i = 1, p = size; i <= size; i++, p++) {
-            t[p].l = t[p].r = i;
-        }
-        for (int p = size - 1; p > 0; p--) {
-            t[p].l = t[lc].l;
-            t[p].r = t[rc].r;
-        }
+        t = new Node[2 * size]();
     }
 
     ~SegT() {
         delete [] t;
     }
 
-    int ask(int p, int l, int r) {
-        if (l > t[p].r || r < t[p].l) return INF;
-        if (l <= t[p].l && r >= t[p].r) return t[p].val;
-        int vl = ask(lc, l, r);
-        int vr = ask(rc, l, r);
-        return min(vl, vr);
+    int ask(int p, int l, int r, int pl, int pr) {
+        if (l > pr || r < pl) return -INF;
+        if (l <= pl && r >= pr) return t[p].val;
+        int vl = ask(lc, l, r, pl, mid);
+        int vr = ask(rc, l, r, mid + 1, pr);
+        return max(vl, vr);
     }
 
     void update(int k, int val) {
         int p = size + k - 1;
         t[p].val = val;
         for (p >>= 1; p > 0; p >>= 1) {
-            t[p].val = min(t[lc].val, t[rc].val);
+            t[p].val = max(t[lc].val, t[rc].val);
         }
     }
 
-    int query(int l, int r) { return ask(1, l, r); }
+    int query(int l, int r) { return ask(1, l, r, 1, size); }
 
 #undef lc
 #undef rc
+#undef mid
 };
 
 // 权值线段树
@@ -337,231 +329,99 @@ void add(int x, long long val) {
     }
 }
 
-int ask(int p, long long k) {
-    if (t[p].l == t[p].r) return t[p].l;
-    if (k <= t[lc].val) return ask(lc, k);
-    return ask(rc, k - t[lc].val);
+int ask(int p, long long k, int pl, int pr) {
+    if (pl == pr) return pl;
+    if (k <= t[lc].val) return ask(lc, k, pl, mid);
+    return ask(rc, k - t[lc].val, mid + 1, pr);
 }
 
-int query(long long k) { return ask(1, k); }
+int query(long long k) { return ask(1, k, 1, size); }
 
 // 修改：区间加
 // 查询：区间和
 struct Node {
-    int l, r;
-    long long val;
-    long long lazy;
+    long long val, lazy;
 };
 
-struct SegT {
-#define lc (p << 1)
-#define rc (p << 1 | 1)
-
-    int size;
-    Node *t;
-
-    SegT(int sz) {
-        size = 1;
-        while (size < sz) size <<= 1;
-        t = new Node[2 * size];
-        for (int i = 1, p = size; i <= size; i++, p++) {
-            t[p].l = t[p].r = i;
-            t[p].val = t[p].lazy = 0;
-        }
-        for (int p = size - 1; p > 0; p--) {
-            t[p].l = t[lc].l;
-            t[p].r = t[rc].r;
-            t[p].val = t[p].lazy = 0;
-        }
-    }
-
-    ~SegT() {
-        delete [] t;
-    }
-
-    void pushdown(int p) {
-        if (!t[p].lazy) return;
-        t[lc].val += t[p].lazy * (t[lc].r - t[lc].l + 1);
-        t[rc].val += t[p].lazy * (t[rc].r - t[rc].l + 1);
-        t[lc].lazy += t[p].lazy;
-        t[rc].lazy += t[p].lazy;
-        t[p].lazy = 0;
-    }
-
-    long long ask(int p, int l, int r) {
-        if (l > t[p].r || r < t[p].l) return 0;
-        if (l <= t[p].l && r >= t[p].r) return t[p].val;
-        pushdown(p);
-        long long vl = ask(lc, l, r);
-        long long vr = ask(rc, l, r);
-        return vl + vr;
-    }
-
-    void modify(int p, int l, int r, int val) {
-        if (l > t[p].r || r < t[p].l) return;
-        if (l <= t[p].l && r >= t[p].r) {
-            t[p].val += 1LL * val * (t[p].r - t[p].l + 1);
-            t[p].lazy += val;
-            return;
-        }
-        pushdown(p);
-        modify(lc, l, r, val);
-        modify(rc, l, r, val);
-        t[p].val = t[lc].val + t[rc].val;
-    }
-
-    void update(int l, int r, int val) { modify(1, l, r, val); }
-    long long query(int l, int r) { return ask(1, l, r); }
-
-#undef lc
-#undef rc
-};
-
-// 修改：区间加
-// 查询：RMQ
-static const long long INF = 0x3f3f3f3f3f3f3f3f;
-
-void pushdown(int p) {
-    if (!t[p].lazy) return;
-    t[lc].val += t[p].lazy;
-    t[rc].val += t[p].lazy;
+void pushdown(int p, int pl, int pr) {
+    if (!t[p].lazy) return;  // 如果是区间赋值，选取一个数据范围外的值
+    t[lc].val += t[p].lazy * (mid - pl + 1);
+    t[rc].val += t[p].lazy * (pr - mid);
     t[lc].lazy += t[p].lazy;
     t[rc].lazy += t[p].lazy;
     t[p].lazy = 0;
 }
 
-long long ask(int p, int l, int r) {
-    if (l > t[p].r || r < t[p].l) return INF;
-    if (l <= t[p].l && r >= t[p].r) return t[p].val;
-    pushdown(p);
-    long long vl = ask(lc, l, r);
-    long long vr = ask(rc, l, r);
-    return min(vl, vr);
-}
-
-void modify(int p, int l, int r, int val) {
-    if (l > t[p].r || r < t[p].l) return;
-    if (l <= t[p].l && r >= t[p].r) {
-        t[p].val += val;
-        t[p].lazy += val;
-        return;
-    }
-    pushdown(p);
-    modify(lc, l, r, val);
-    modify(rc, l, r, val);
-    t[p].val = min(t[lc].val, t[rc].val);
-}
-
-// 修改：区间赋值
-// 查询：区间和
-void pushdown(int p) {
-    if (t[p].lazy == -1) return; // 选取一个数据范围外的值
-    t[lc].val = t[p].lazy * (t[lc].r - t[lc].l + 1);
-    t[rc].val = t[p].lazy * (t[rc].r - t[rc].l + 1);
-    t[lc].lazy = t[p].lazy;
-    t[rc].lazy = t[p].lazy;
-    t[p].lazy = -1;
-}
-
-long long ask(int p, int l, int r) {
-    if (l > t[p].r || r < t[p].l) return 0;
-    if (l <= t[p].l && r >= t[p].r) return t[p].val;
-    pushdown(p);
-    long long vl = ask(lc, l, r);
-    long long vr = ask(rc, l, r);
+long long ask(int p, int l, int r, int pl, int pr) {
+    if (l > pr || r < pl) return 0;
+    if (l <= pl && r >= pr) return t[p].val;
+    pushdown(p, pl, pr);
+    long long vl = ask(lc, l, r, pl, mid);
+    long long vr = ask(rc, l, r, mid + 1, pr);
     return vl + vr;
 }
 
-void modify(int p, int l, int r, int val) {
-    if (l > t[p].r || r < t[p].l) return;
-    if (l <= t[p].l && r >= t[p].r) {
-        t[p].val = 1LL * val * (t[p].r - t[p].l + 1);
-        t[p].lazy = val;
+void modify(int p, int l, int r, int val, int pl, int pr) {
+    if (l > pr || r < pl) return;
+    if (l <= pl && r >= pr) {
+        t[p].val += 1LL * val * (pr - pl + 1);
+        t[p].lazy += val;
         return;
     }
-    pushdown(p);
-    modify(lc, l, r, val);
-    modify(rc, l, r, val);
+    pushdown(p, pl, pr);
+    modify(lc, l, r, val, pl, mid);
+    modify(rc, l, r, val, mid + 1, pr);
     t[p].val = t[lc].val + t[rc].val;
 }
+
+void update(int l, int r, int val) { modify(1, l, r, val, 1, size); }
+long long query(int l, int r) { return ask(1, l, r, 1, size); }
  
 // 修改：区间乘混加
 // 查询：区间和取模
 struct Node {
-    int l, r;
     long long val, mul, add;
+    Node() : val(0), add(0), mul(1) {}
 };
 
-struct SegT {
-#define lc (p << 1)
-#define rc (p << 1 | 1)
+void pushdown(int p, int pl, int pr) {
+    if (t[p].mul == 1 && t[p].add == 0) return;
+    t[lc].val = (t[lc].val * t[p].mul % MOD + (mid - pl + 1) * t[p].add % MOD) % MOD;
+    t[rc].val = (t[rc].val * t[p].mul % MOD + (pr - mid) * t[p].add % MOD) % MOD;
+    t[lc].mul = t[p].mul * t[lc].mul % MOD;
+    t[rc].mul = t[p].mul * t[rc].mul % MOD;
+    t[lc].add = (t[lc].add * t[p].mul % MOD + t[p].add) % MOD;
+    t[rc].add = (t[rc].add * t[p].mul % MOD + t[p].add) % MOD;
+    t[p].mul = 1;
+    t[p].add = 0;
+}
 
-    int size;
-    Node *t;
+long long ask(int p, int l, int r, int pl, int pr) {
+    if (l > pr || r < pl) return 0;
+    if (l <= pl && r >= pr) return t[p].val;
+    pushdown(p, pl, pr);
+    long long vl = ask(lc, l, r, pl, mid);
+    long long vr = ask(rc, l, r, mid + 1, pr);
+    return (vl + vr) % MOD;
+}
 
-    SegT(int sz) {
-        size = 1;
-        while (size < sz) size <<= 1;
-        t = new Node[2 * size];
-        for (int i = 1, p = size; i <= size; i++, p++) {
-            t[p].l = t[p].r = i;
-            t[p].val = t[p].add = 0;
-            t[p].mul = 1;
-        }
-        for (int p = size - 1; p > 0; p--) {
-            t[p].l = t[lc].l;
-            t[p].r = t[rc].r;
-            t[p].val = t[p].add = 0;
-            t[p].mul = 1;
-        }
+// x' = ax + b
+void modify(int p, int l, int r, int a, int b, int pl, int pr) {
+    if (l > pr || r < pl) return;
+    if (l <= pl && r >= pr) {
+        t[p].val = (t[p].val * a % MOD + 1LL * (pr - pl + 1) * b % MOD) % MOD;
+        t[p].mul = t[p].mul * a % MOD;
+        t[p].add = (t[p].add * a % MOD + b) % MOD;
+        return;
     }
+    pushdown(p, pl, pr);
+    modify(lc, l, r, a, b, pl, mid);
+    modify(rc, l, r, a, b, mid + 1, pr);
+    t[p].val = (t[lc].val + t[rc].val) % MOD;
+}
 
-    ~SegT() {
-        delete [] t;
-    }
-
-    void pushdown(int p) {
-        if (t[p].mul == 1 && t[p].add == 0) return;
-        t[lc].val = (t[lc].val * t[p].mul % MOD + (t[lc].r - t[lc].l + 1) * t[p].add % MOD) % MOD;
-        t[rc].val = (t[rc].val * t[p].mul % MOD + (t[rc].r - t[rc].l + 1) * t[p].add % MOD) % MOD;
-        t[lc].mul = t[p].mul * t[lc].mul % MOD;
-        t[rc].mul = t[p].mul * t[rc].mul % MOD;
-        t[lc].add = (t[lc].add * t[p].mul % MOD + t[p].add) % MOD;
-        t[rc].add = (t[rc].add * t[p].mul % MOD + t[p].add) % MOD;
-        t[p].mul = 1;
-        t[p].add = 0;
-    }
-
-    long long ask(int p, int l, int r) {
-        if (l > t[p].r || r < t[p].l) return 0;
-        if (l <= t[p].l && r >= t[p].r) return t[p].val;
-        pushdown(p);
-        long long vl = ask(lc, l, r);
-        long long vr = ask(rc, l, r);
-        return (vl + vr) % MOD;
-    }
-
-    // x' = ax + b
-    void modify(int p, int l, int r, int a, int b) {
-        if (l > t[p].r || r < t[p].l) return;
-        if (l <= t[p].l && r >= t[p].r) {
-            t[p].val = (t[p].val * a % MOD + (t[p].r - t[p].l + 1) * b % MOD) % MOD;
-            t[p].mul = t[p].mul * a % MOD;
-            t[p].add = (t[p].add * a % MOD + b) % MOD;
-            return;
-        }
-        pushdown(p);
-        modify(lc, l, r, a, b);
-        modify(rc, l, r, a, b);
-        t[p].val = (t[lc].val + t[rc].val) % MOD;
-    }
-
-    void update(int l, int r, int a, int b) { modify(1, l, r, a, b); }
-    long long query(int l, int r) { return ask(1, l, r); }
-
-#undef lc
-#undef rc
-};
+void update(int l, int r, int a, int b) { modify(1, l, r, a, b, 1, size); }
+long long query(int l, int r) { return ask(1, l, r, 1, size); }
 ```
 
 ### 主席树
