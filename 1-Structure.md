@@ -329,13 +329,13 @@ void add(int x, long long val) {
     }
 }
 
-int ask(int p, long long k) {
-    if (t[p].l == t[p].r) return t[p].l;
-    if (k <= t[lc].val) return ask(lc, k);
-    return ask(rc, k - t[lc].val);
+int ask(int p, long long k, int pl, int pr) {
+    if (pl == pr) return pl;
+    if (k <= t[lc].val) return ask(lc, k, pl, mid);
+    return ask(rc, k - t[lc].val, mid + 1, pr);
 }
 
-int query(long long k) { return ask(1, k); }
+int query(long long k) { return ask(1, k, 1, size); }
 
 // 修改：区间加
 // 查询：区间和
