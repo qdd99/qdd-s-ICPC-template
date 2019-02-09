@@ -275,14 +275,12 @@ long long range_sum(int l, int r) {
 // 查询：RMQ
 struct Node {
     int val;
-    int l, r;
 };
 
 struct SegT {
 #define lc (p << 1)
 #define rc (p << 1 | 1)
-
-    static const int INF = 0x3f3f3f3f;
+#define mid (pl + pr >> 1)
 
     int size;
     Node *t;
@@ -290,40 +288,34 @@ struct SegT {
     SegT(int sz) {
         size = 1;
         while (size < sz) size <<= 1;
-        t = new Node[2 * size];
-        for (int i = 1, p = size; i <= size; i++, p++) {
-            t[p].l = t[p].r = i;
-        }
-        for (int p = size - 1; p > 0; p--) {
-            t[p].l = t[lc].l;
-            t[p].r = t[rc].r;
-        }
+        t = new Node[2 * size]();
     }
 
     ~SegT() {
         delete [] t;
     }
 
-    int ask(int p, int l, int r) {
-        if (l > t[p].r || r < t[p].l) return INF;
-        if (l <= t[p].l && r >= t[p].r) return t[p].val;
-        int vl = ask(lc, l, r);
-        int vr = ask(rc, l, r);
-        return min(vl, vr);
+    int ask(int p, int l, int r, int pl, int pr) {
+        if (l > pr || r < pl) return -INF;
+        if (l <= pl && r >= pr) return t[p].val;
+        int vl = ask(lc, l, r, pl, mid);
+        int vr = ask(rc, l, r, mid + 1, pr);
+        return max(vl, vr);
     }
 
     void update(int k, int val) {
         int p = size + k - 1;
         t[p].val = val;
         for (p >>= 1; p > 0; p >>= 1) {
-            t[p].val = min(t[lc].val, t[rc].val);
+            t[p].val = max(t[lc].val, t[rc].val);
         }
     }
 
-    int query(int l, int r) { return ask(1, l, r); }
+    int query(int l, int r) { return ask(1, l, r, 1, size); }
 
 #undef lc
 #undef rc
+#undef mid
 };
 
 // 权值线段树
