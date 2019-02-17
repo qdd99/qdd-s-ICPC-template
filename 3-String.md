@@ -78,7 +78,7 @@ struct Trie {
     int t[31 * MAXN][2], sz;
 
     void init() {
-        memset(t, 0, sizeof(t));
+        memset(t, 0, 2 * (sz + 2) * sizeof(int));
         sz = 2;
     }
 
