@@ -69,3 +69,26 @@ void manacher(string& s, vector<int>& d) {
     }
 }
 ```
+
+### Trie
+
+```cpp
+// 01 Trie
+struct Trie {
+    int t[31 * MAXN][2], sz;
+
+    void init() {
+        memset(t, 0, sizeof(t));
+        sz = 2;
+    }
+
+    void insert(int x) {
+        int p = 1;
+        for (int i = 30; i >= 0; i--) {
+            bool d = (x >> i) & 1;
+            if (!t[p][d]) t[p][d] = sz++;
+            p = t[p][d];
+        }
+    }
+};
+```
