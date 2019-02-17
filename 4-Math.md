@@ -365,3 +365,29 @@ double asr(double l, double r, double eps, double S) {
 
 double asr(double l, double r) { return asr(l, r, EPS, simpson(l, r)); }
 ```
+
+### 拉格朗日插值
+
+```cpp
+vector<double> La(vector<pair<double, double> > v) {
+    int n = v.size(), t;
+    vector<double> ret(n);
+    double p, q;
+    for (int i = 0; i < n; i++) {
+        p = v[i].second;
+        for (int j = 0; j < n; j++) {
+            p /= (i == j) ? 1 : (v[i].first - v[j].first);
+        }
+        for (int j = 0; j < (1 << n); j++) {
+            q = 1, t = 0;
+            for (int k = 0; k < n; k++) {
+                if (i == k) continue;
+                if ((j >> k) & 1) q *= -v[k].first;
+                else t++;
+            }
+            ret[t] += p * q / 2;
+        }
+    }
+    return ret;
+}
+```
