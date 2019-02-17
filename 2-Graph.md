@@ -324,3 +324,61 @@ struct MCMF {
     }
 };
 ```
+
+### 树链剖分
+
+```cpp
+// 点权
+vector<int> G[MAXN];
+int pa[MAXN], sz[MAXN], dep[MAXN], dfn[MAXN], maxc[MAXN], top[MAXN];
+
+void dfs1(int now) {
+    sz[now] = 1;
+    maxc[now] = -1;
+    int maxs = 0;
+    for (int& nxt : G[now]) {
+        if (nxt != pa[now]) {
+            pa[nxt] = now;
+            dep[nxt] = dep[now] + 1;
+            dfs1(nxt);
+            sz[now] += sz[nxt];
+            if (updmax(maxs, sz[nxt])) maxc[now] = nxt;
+        }
+    }
+}
+
+void dfs2(int now, int tp) {
+    static int cnt = 0;
+    top[now] = tp;
+    dfn[now] = ++cnt;
+    if (maxc[now] != -1) dfs2(maxc[now], tp);
+    for (int& nxt : G[now]) {
+        if (nxt != pa[now] && nxt != maxc[now]) {
+            dfs2(nxt, nxt);
+        }
+    }
+}
+
+void init() {
+    dep[1] = 1;
+    dfs1(1);
+    dfs2(1, 1);
+}
+
+long long go(int u, int v) {
+    int uu = top[u], vv = top[v];
+    long long res = 0;
+    while (uu != vv) {
+        if (dep[uu] < dep[vv]) {
+            swap(u, v);
+            swap(uu, vv);
+        }
+        res += segt.query(dfn[uu], dfn[u]);
+        u = pa[uu];
+        uu = top[u];
+    }
+    if (dep[u] > dep[v]) swap(u, v);
+    res += segt.query(dfn[u], dfn[v]);
+    return res;
+}
+```
