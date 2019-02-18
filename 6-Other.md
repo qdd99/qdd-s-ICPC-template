@@ -71,7 +71,7 @@ void int_to_date(int jd, int &y, int &m, int &d) {
 }
 ```
 
-### upd
+### updmax/min
 
 ```cpp
 template<typename T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
