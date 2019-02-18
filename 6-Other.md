@@ -70,3 +70,108 @@ void int_to_date(int jd, int &y, int &m, int &d) {
     y = 100 * (n - 49) + i + x;
 }
 ```
+
+### Debug
+
+```cpp
+// 标准版
+#define dbg(x) cerr << #x << " = ", dprint(x), cerr << endl
+
+void dprint(string s) { cerr << '"' << s << '"'; }
+
+template <class T> void dprint(T x) { cerr << x; }
+
+template <class T1, class T2>
+void dprint(pair<T1, T2> p) {
+    cerr << "(";
+    dprint(p.first);
+    cerr << ", ";
+    dprint(p.second);
+    cerr << ")";
+}
+
+template <template <class...> class T, class t>
+void dprint(T<t> v) {
+    bool first = true;
+    cerr << "{";
+    for (auto it : v) {
+        if (!first) cerr << ", ";
+        first = false;
+        dprint(it);
+    }
+    cerr << "}";
+}
+
+template <class T1, class T2>
+void dprint(map<T1, T2> v) {
+    bool first = true;
+    cerr << "{";
+    for (auto it : v) {
+        if (!first) cerr << ", ";
+        first = false;
+        dprint(it);
+    }
+    cerr << "}";
+}
+
+template <class T>
+void dprint(priority_queue<T> q) {
+    cerr << "{";
+    while (!q.empty()) {
+        dprint(q.top());
+        cerr << (q.size() > 1 ? ", " : "");
+        q.pop();
+    }
+    cerr << "}";
+}
+
+template <class T>
+void dprint(priority_queue<T, vector<T>, greater<T> > q) {
+    cerr << "{";
+    while (!q.empty()) {
+        dprint(q.top());
+        cerr << (q.size() > 1 ? ", " : "");
+        q.pop();
+    }
+    cerr << "}";
+}
+
+template <class T>
+void dprint(queue<T> q) {
+    cerr << "{";
+    while (!q.empty()) {
+        dprint(q.front());
+        cerr << (q.size() > 1 ? ", " : "");
+        q.pop();
+    }
+    cerr << "}";
+}
+
+template <class T>
+void dprint(stack<T> q_) {
+    stack<T> q;
+    while (!q_.empty()) {
+        q.push(q_.top());
+        q_.pop();
+    }
+    cerr << "{";
+    while (!q.empty()) {
+        dprint(q.top());
+        cerr << (q.size() > 1 ? ", " : "");
+        q.pop();
+    }
+    cerr << "}";
+}
+
+// 压行版
+#define dbg(x) cerr << #x << " = ", dprint(x), cerr << endl
+void dprint(string s) { cerr << '"' << s << '"'; }
+template<class T> void dprint(T x) { cerr << x; }
+template<class T1, class T2> void dprint(pair<T1, T2> p) { cerr << "("; dprint(p.first); cerr << ", "; dprint(p.second); cerr << ")"; }
+template<template<class...> class T, class t> void dprint(T<t> v) { bool first = true; cerr << "{"; for (auto it : v) { if (!first) cerr << ", "; first = false; dprint(it); } cerr << "}"; }
+template<class T1, class T2> void dprint(map<T1, T2> v) { bool first = true; cerr << "{"; for (auto it : v) { if (!first) cerr << ", "; first = false; dprint(it); } cerr << "}"; }
+template<class T> void dprint(priority_queue<T> q) { cerr << "{"; while (!q.empty()) { dprint(q.top()); cerr << (q.size() > 1 ? ", " : ""); q.pop(); } cerr << "}"; }
+template<class T> void dprint(priority_queue<T, vector<T>, greater<T> > q) { cerr << "{"; while (!q.empty()) { dprint(q.top()); cerr << (q.size() > 1 ? ", " : ""); q.pop(); } cerr << "}"; }
+template<class T> void dprint(queue<T> q) { cerr << "{"; while (!q.empty()) { dprint(q.front()); cerr << (q.size() > 1 ? ", " : ""); q.pop(); } cerr << "}"; }
+template<class T> void dprint(stack<T> q_) { stack<T> q; while (!q_.empty()) { q.push(q_.top()); q_.pop(); } cerr << "{"; while (!q.empty()) { dprint(q.top()); cerr << (q.size() > 1 ? ", " : ""); q.pop(); } cerr << "}"; }
+```
