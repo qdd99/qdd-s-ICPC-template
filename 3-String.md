@@ -91,4 +91,25 @@ struct Trie {
         }
     }
 };
+
+// 正常Trie
+struct Trie {
+    int t[MAXN][26], sz, cnt[MAXN];
+
+    void init() {
+        memset(t, 0, 26 * (sz + 2) * sizeof(int));
+        memset(cnt, 0, (sz + 2) * sizeof(int));
+        sz = 2;
+    }
+
+    void insert(const string& s) {
+        int p = 1;
+        for (char c : s) {
+            int d = c - 'a';
+            if (!t[p][d]) t[p][d] = sz++;
+            p = t[p][d];
+        }
+        cnt[p]++;
+    }
+};
 ```
