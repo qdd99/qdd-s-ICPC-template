@@ -83,6 +83,18 @@ void get_pi(const string& s, vector<int>& a) {
         a[i] = j;
     }
 }
+
+void kmp(const string& s, vector<int>& a, const string& t) {
+    int j = 0;
+    for (int i = 0; i < t.size(); i++) {
+        while (j && s[j] != t[i]) j = a[j - 1];
+        if (s[j] == t[i]) j++;
+        if (j == s.size()) {
+            // ...
+            j = a[j - 1]; // 允许重叠匹配 j = 0 不允许
+        }
+    }
+}
 ```
 
 ### Trie
