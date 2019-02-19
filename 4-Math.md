@@ -29,6 +29,11 @@ long long mul(long long a, long long b) {
     }
     return ans;
 }
+
+// O(1)
+long long mul(long long a, long long b) {
+    return (long long)(__int128(a) * b % MOD);
+}
 ```
 
 ### 矩阵快速幂
