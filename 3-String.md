@@ -70,6 +70,21 @@ void manacher(string& s, vector<int>& d) {
 }
 ```
 
+### KMP
+
+```cpp
+// 前缀函数（每一个前缀的最长公共前后缀）
+void get_pi(const string& s, vector<int>& a) {
+    int n = s.size(), j = 0;
+    a.resize(n);
+    for (int i = 1; i < n; i++) {
+        while (j && s[j] != s[i]) j = a[j - 1];
+        if (s[j] == s[i]) j++;
+        a[i] = j;
+    }
+}
+```
+
 ### Trie
 
 ```cpp
