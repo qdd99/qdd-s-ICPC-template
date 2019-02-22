@@ -120,11 +120,11 @@ struct Trie {
 
     void init() {
         memset(t, 0, 2 * (sz + 2) * sizeof(int));
-        sz = 2;
+        sz = 1;
     }
 
     void insert(int x) {
-        int p = 1;
+        int p = 0;
         for (int i = 30; i >= 0; i--) {
             bool d = (x >> i) & 1;
             if (!t[p][d]) t[p][d] = sz++;
@@ -140,17 +140,64 @@ struct Trie {
     void init() {
         memset(t, 0, 26 * (sz + 2) * sizeof(int));
         memset(cnt, 0, (sz + 2) * sizeof(int));
-        sz = 2;
+        sz = 1;
     }
 
     void insert(const string& s) {
-        int p = 1;
+        int p = 0;
         for (char c : s) {
             int d = c - 'a';
             if (!t[p][d]) t[p][d] = sz++;
             p = t[p][d];
         }
         cnt[p]++;
+    }
+};
+```
+
+### AC 自动机
+
+```cpp
+struct ACA {
+    int t[MAXN][26], sz, fail[MAXN], nxt[MAXN], cnt[MAXN];
+
+    void init() {
+        memset(t, 0, 26 * (sz + 2) * sizeof(int));
+        memset(fail, 0, (sz + 2) * sizeof(int));
+        memset(nxt, 0, (sz + 2) * sizeof(int));
+        memset(cnt, 0, (sz + 2) * sizeof(int));
+        sz = 1;
+    }
+
+    void insert(const string& s) {
+        int p = 0;
+        for (char c : s) {
+            int d = c - 'a';
+            if (!t[p][d]) t[p][d] = sz++;
+            p = t[p][d];
+        }
+        cnt[p]++;
+    }
+
+    void build() {
+        queue<int> q;
+        for (int i = 0; i < 26; i++) {
+            if (t[0][i]) q.push(t[0][i]);
+        }
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (int i = 0; i < 26; i++) {
+                int& v = t[u][i];
+                if (v) {
+                    fail[v] = t[fail[u]][i];
+                    nxt[v] = cnt[fail[v]] ? fail[v] : nxt[fail[v]];
+                    q.push(v);
+                } else {
+                    v = t[fail[u]][i];
+                }
+            }
+        }
     }
 };
 ```
