@@ -271,6 +271,7 @@ void get_mu() {
 ### EXGCD
 
 ```cpp
+// ax + by = gcd(a, b)
 long long exgcd(long long a, long long b, long long &x, long long &y) {
     if (b == 0) {
         x = 1;
