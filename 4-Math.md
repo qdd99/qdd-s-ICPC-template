@@ -198,6 +198,15 @@ void getf(int x, vector<int> &v) {
 ### 欧拉函数
 
 ```cpp
+// 前置：找质因数（无重复）
+int phi(int x) {
+    int ret = x;
+    vector<int> v;
+    getf(x, v);
+    for (int f : v) ret = ret / f * (f - 1);
+    return ret;
+}
+
 // O(nloglogn)
 int phi[MAXN];
 
