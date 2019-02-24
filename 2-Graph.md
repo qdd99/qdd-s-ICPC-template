@@ -143,6 +143,34 @@ void dijkstra(int s) {
 }
 ```
 
+### 拓扑排序
+
+```cpp
+int n, deg[MAXN], dis[MAXN];
+vector<int> G[MAXN];
+
+bool topo(vector<int>& ans) {
+    queue<int> q;
+    for (int i = 1; i <= n; i++) {
+        if (deg[i] == 0) {
+            q.push(i);
+            dis[i] = 1;
+        }
+    }
+    while (!q.empty()) {
+        int now = q.front();
+        q.pop();
+        ans.push_back(now);
+        for (int nxt : G[now]) {
+            deg[nxt]--;
+            dis[nxt] = max(dis[nxt], dis[now] + 1);
+            if (deg[nxt] == 0) q.push(nxt);
+        }
+    }
+    return ans.size() == n;
+}
+```
+
 ### LCA
 
 ```cpp
