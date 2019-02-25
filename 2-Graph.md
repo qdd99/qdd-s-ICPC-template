@@ -171,6 +171,30 @@ bool topo(vector<int>& ans) {
 }
 ```
 
+### 最小生成树
+
+```cpp
+struct Edge {
+    int from, to, val;
+    Edge(int from = 0, int to = 0, int val = 0) : from(from), to(to), val(val) {};
+};
+
+vector<Edge> es;
+
+long long kruskal() {
+    sort(es.begin(), es.end(), [](Edge& x, Edge& y) { return x.val < y.val; });
+    iota(pa, pa + n + 1, 0);
+    long long ans = 0;
+    for (Edge& e : es) {
+        if (find(e.from) != find(e.to)) {
+            merge(e.from, e.to);
+            ans += e.val;
+        }
+    }
+    return ans;
+}
+```
+
 ### LCA
 
 ```cpp
