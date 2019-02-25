@@ -174,6 +174,7 @@ bool topo(vector<int>& ans) {
 ### 最小生成树
 
 ```cpp
+// 前置：并查集
 struct Edge {
     int from, to, val;
     Edge(int from = 0, int to = 0, int val = 0) : from(from), to(to), val(val) {};
