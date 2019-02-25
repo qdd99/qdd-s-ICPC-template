@@ -3,18 +3,8 @@
 ### 并查集
 
 ```cpp
-int pa[MAXN];
-
-int find(int x) {
-    if (x == pa[x]) return x;
-    return pa[x] = find(pa[x]);
-}
-
-void merge(int a, int b) {
-    int fa = find(a);
-    int fb = find(b);
-    if (fa != fb) pa[fa] = fb;
-}
+int find(int x) { return (x == pa[x]) ? x : pa[x] = find(pa[x]); }
+void merge(int a, int b) { pa[find(a)] = find(b); }
 ```
 
 ### RMQ
