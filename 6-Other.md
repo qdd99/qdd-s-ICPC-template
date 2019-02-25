@@ -71,6 +71,13 @@ void int_to_date(int jd, int &y, int &m, int &d) {
 }
 ```
 
+### 表达式求值
+
+```py
+print(input()) # Python2
+print(eval(input())) # Python3
+```
+
 ### updmax/min
 
 ```cpp
