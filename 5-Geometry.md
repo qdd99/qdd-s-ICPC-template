@@ -39,7 +39,7 @@ double cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t));
 
 ```cpp
 // 构建凸包 点不可以重复
-// lt(det(...), 0) 边上可以有点 leq(det(...), 0) 则不能
+// lt(cross(...), 0) 边上可以有点 leq(cross(...), 0) 则不能
 // 会改变输入点的顺序
 vector<V> convex_hull(vector<V>& s) {
     // assert(s.size() >= 3);
