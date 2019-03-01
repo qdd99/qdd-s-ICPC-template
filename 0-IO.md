@@ -14,6 +14,7 @@ cout << fixed << setprecision(15);
 
 ```cpp
 freopen("in.txt", "r", stdin);
+
 ios::sync_with_stdio(false);
 cin.tie(0);
 ```
