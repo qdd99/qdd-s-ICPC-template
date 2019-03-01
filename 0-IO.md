@@ -6,6 +6,8 @@
 long double %Lf
 unsigned int %u
 unsigned long long %llu
+
+cout << fixed << setprecision(15);
 ```
 
 ### 文件和流同步
