@@ -33,11 +33,38 @@ double dist(const V& a, const V& b) { return (b - a).len(); }
 double dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
 double det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
 double cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
+
+// 逆时针旋转 r 弧度
+V rot(const V& p, double r) {
+    return V(p.x * cos(r) - p.y * sin(r), p.x * sin(r) + p.y * cos(r));
+}
+V rot_ccw90(const V& p) { return V(-p.y, p.x); }
+V rot_cw90(const V& p) { return V(p.y, -p.x); }
+
+// 点在线段上 leq(dot(...), 0) 包含端点 lt(dot(...), 0) 则不包含
+bool p_on_seg(const V& p, const V& a, const V& b) {
+    return eq(det(p - a, b - a), 0) && leq(dot(p - a, p - b), 0);
+}
 ```
 
 ### 多边形
 
 ```cpp
+// 点是否在多边形中
+// 1 inside 0 on border -1 outside
+int inside(const vector<V>& s, const V& p) {
+    int cnt = 0;
+    for (int i = 0; i < s.size(); i++) {
+        V a = s[i], b = s[(i + 1) % s.size()];
+        if (p_on_seg(p, a, b)) return 0;
+        if (leq(a.y, b.y)) swap(a, b);
+        if (gt(p.y, a.y)) continue;
+        if (leq(p.y, b.y)) continue;
+        cnt += gt(cross(b, a, p), 0);
+    }
+    return (cnt & 1) ? 1 : -1;
+}
+
 // 构建凸包 点不可以重复
 // lt(cross(...), 0) 边上可以有点 leq(cross(...), 0) 则不能
 // 会改变输入点的顺序
