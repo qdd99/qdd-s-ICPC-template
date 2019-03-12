@@ -11,19 +11,19 @@ vector<int> G[MAXN];
 
 void bfs(int s) {
     queue<int> q;
+    q.push(s);
     vis[s] = true;
     dist[s] = 0;
-    q.push(s);
     while (!q.empty()) {
         int now = q.front();
-        for (int i = 0; i < G[now].size(); i++) {
-            if (!vis[G[now][i]]) {
-                vis[G[now][i]] = true;
-                q.push(G[now][i]);
-                dist[G[now][i]] = dist[now] + 1;
+        q.pop();
+        for (int nxt : G[now]) {
+            if (!vis[nxt]) {
+                q.push(nxt);
+                vis[nxt] = true;
+                dist[nxt] = dist[now] + 1;
             }
         }
-        q.pop();
     }
 }
  
