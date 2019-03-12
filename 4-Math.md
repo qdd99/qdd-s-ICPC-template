@@ -39,18 +39,20 @@ long long mul(long long a, long long b) {
 ### 矩阵快速幂
 
 ```cpp
+const int MAT_SZ = 3;
+
 struct Mat {
-    long long m[3][3] = {0};
+    long long m[MAT_SZ][MAT_SZ] = {0};
     long long * operator [] (int i) { return m[i]; }
-    void one() { for (int i = 0; i < 3; i++) m[i][i] = 1; }
+    void one() { for (int i = 0; i < MAT_SZ; i++) m[i][i] = 1; }
 };
 
 Mat mul(Mat &a, Mat &b) {
     Mat ans;
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
+    for (int i = 0; i < MAT_SZ; i++)
+        for (int j = 0; j < MAT_SZ; j++)
             if (a[i][j])
-                for (int k = 0; k < 3; k++)
+                for (int k = 0; k < MAT_SZ; k++)
                     ans[i][k] = (ans[i][k] + a[i][j] * b[j][k]) % MOD;
     return ans;
 }
