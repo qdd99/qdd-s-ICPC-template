@@ -84,3 +84,21 @@ void int_to_date(int jd, int &y, int &m, int &d) {
 print(input()) # Python2
 print(eval(input())) # Python3
 ```
+
+### pb_ds
+
+```cpp
+// 平衡树
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template<class T>
+using rank_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+template<class Key, class T>
+using rank_map = tree<Key, T, less<Key>, rb_tree_tag, tree_order_statistics_node_update>;
+
+// 优先队列
+#include <ext/pb_ds/priority_queue.hpp>
+using namespace __gnu_pbds;
+template<class T, class Cmp = less<T> >
+using pair_heap = __gnu_pbds::priority_queue<T, Cmp>;
+```
