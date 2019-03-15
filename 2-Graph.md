@@ -29,8 +29,7 @@ void bfs(int s) {
  
 // 前向星
 // MAXN开边数
-int ecnt;
-int mp[MAXN], dist[MAXN];
+int ecnt, mp[MAXN], dist[MAXN];
 bool vis[MAXN];
 
 struct Edge {
@@ -50,19 +49,19 @@ void mp_link(int u, int v) {
 
 void bfs(int s) {
     queue<int> q;
+    q.push(s);
     vis[s] = true;
     dist[s] = 0;
-    q.push(s);
     while (!q.empty()) {
         int now = q.front();
+        q.pop();
         for (int i = mp[now]; i != -1; i = es[i].nxt) {
             if (!vis[es[i].to]) {
-                vis[es[i].to] = true;
                 q.push(es[i].to);
+                vis[es[i].to] = true;
                 dist[es[i].to] = dist[now] + 1;
             }
         }
-        q.pop();
     }
 }
 ```
