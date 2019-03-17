@@ -50,6 +50,24 @@ bool p_on_seg(const V& p, const V& a, const V& b) {
 ### 多边形
 
 ```cpp
+// 多边形面积
+double area(const vector<V>& s) {
+    double ret = 0;
+    for (int i = 0; i < s.size(); i++) {
+        ret += det(s[i], s[(i + 1) % s.size()]);
+    }
+    return ret / 2;
+}
+
+// 多边形重心
+V centroid(const vector<V>& s) {
+    V c;
+    for (int i = 0; i < s.size(); i++) {
+        c = c + (s[i] + s[(i + 1) % s.size()]) * det(s[i], s[(i + 1) % s.size()]);
+    }
+    return c / 6.0 / area(s);
+}
+
 // 点是否在多边形中
 // 1 inside 0 on border -1 outside
 int inside(const vector<V>& s, const V& p) {
