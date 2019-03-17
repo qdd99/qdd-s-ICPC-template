@@ -103,6 +103,38 @@ print(input()) # Python2
 print(eval(input())) # Python3
 ```
 
+### 对拍
+
+```bash
+#!/bin/bash
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+g++ gen.cpp -o gen -O2 -std=c++11
+g++ my.cpp -o my -O2 -std=c++11
+g++ std.cpp -o std -O2 -std=c++11
+
+while true
+do
+    ./gen > in.txt
+    ./std < in.txt > stdout.txt
+    ./my < in.txt > myout.txt
+
+    if test $? -ne 0
+    then
+        printf "RE\n"
+        exit 0
+    fi
+
+    if diff stdout.txt myout.txt
+    then
+        printf "AC\n"
+    else
+        printf "WA\n"
+        exit 0
+    fi
+done
+```
+
 ### pb_ds
 
 ```cpp
