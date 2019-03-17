@@ -78,6 +78,24 @@ void int_to_date(int jd, int &y, int &m, int &d) {
 }
 ```
 
+### 子集枚举
+
+```cpp
+// 枚举真子集
+for (int t = (x - 1) & x; t; t = (t - 1) & x)
+
+// 枚举大小为 k 的子集
+// 注意 k 不能为 0
+void subset(int k, int n) {
+    int t = (1 << k) - 1;
+    while (t < (1 << n)) {
+        // do something
+        int x = t & -t, y = t + x;
+        t = ((t & ~y) / x >> 1) | y;
+    }
+}
+```
+
 ### 表达式求值
 
 ```py
