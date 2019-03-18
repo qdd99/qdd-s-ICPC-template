@@ -105,6 +105,8 @@ print(eval(input())) # Python3
 
 ### 对拍
 
++ *unix
+
 ```bash
 #!/bin/bash
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -135,7 +137,7 @@ do
 done
 ```
 
-### 对拍(Windows)
++ Windows
 
 ```
 @echo off
