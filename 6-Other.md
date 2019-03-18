@@ -135,6 +135,31 @@ do
 done
 ```
 
+```dos
+@echo off
+
+g++ gen.cpp -o gen.exe -O2 -std=c++11
+g++ my.cpp -o my.exe -O2 -std=c++11
+g++ std.cpp -o std.exe -O2 -std=c++11
+
+:loop
+    gen.exe > in.txt
+    std.exe < in.txt > stdout.txt
+    my.exe < in.txt > myout.txt
+    if errorlevel 1 (
+        echo RE
+        pause
+        exit
+    )
+    fc stdout.txt myout.txt
+    if errorlevel 1 (
+        echo WA
+        pause
+        exit
+    )
+goto loop
+```
+
 ### pb_ds
 
 ```cpp
