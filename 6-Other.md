@@ -135,7 +135,9 @@ do
 done
 ```
 
-```dos
+### 对拍(Windows)
+
+```
 @echo off
 
 g++ gen.cpp -o gen.exe -O2 -std=c++11
