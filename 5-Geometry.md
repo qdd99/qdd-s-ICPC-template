@@ -45,6 +45,18 @@ V rot_cw90(const V& p) { return V(p.y, -p.x); }
 bool p_on_seg(const V& p, const V& a, const V& b) {
     return eq(det(p - a, b - a), 0) && leq(dot(p - a, p - b), 0);
 }
+
+// 点到直线距离
+double dist_to_line(const V& p, const V& a, const V& b) {
+    return abs(cross(a, b, p) / dist(a, b));
+}
+
+// 点到线段距离
+double dist_to_seg(const V& p, const V& a, const V& b) {
+    if (lt(dot(b - a, p - a), 0)) return dist(p, a);
+    if (lt(dot(a - b, p - b), 0)) return dist(p, b);
+    return dist_to_line(p, a, b);
+}
 ```
 
 ### 多边形
