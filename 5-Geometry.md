@@ -104,6 +104,14 @@ vector<V> convex_hull(vector<V>& s) {
     return ret;
 }
 
+// 多边形是否为凸包
+bool is_convex(const vector<V>& s) {
+    for (int i = 0; i < s.size(); i++) {
+        if (lt(cross(s[(i + 1) % s.size()], s[(i + 2) % s.size()], s[i]), 0)) return false;
+    }
+    return true;
+}
+
 // 点是否在凸包中
 // 1 inside 0 on border -1 outside
 int inside(const vector<V>& s, const V& p) {
