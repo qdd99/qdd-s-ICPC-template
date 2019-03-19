@@ -103,6 +103,16 @@ vector<V> convex_hull(vector<V>& s) {
     ret.resize(sz - (s.size() > 1));
     return ret;
 }
+
+// 点是否在凸包中
+// 1 inside 0 on border -1 outside
+int inside(const vector<V>& s, const V& p) {
+    for (int i = 0; i < s.size(); i++) {
+        if (lt(cross(s[i], s[(i + 1) % s.size()], p), 0)) return -1;
+        if (p_on_seg(p, s[i], s[(i + 1) % s.size()])) return 0;
+    }
+    return 1;
+}
 ```
 
 ### 圆
