@@ -46,6 +46,11 @@ bool p_on_seg(const V& p, const V& a, const V& b) {
     return eq(det(p - a, b - a), 0) && leq(dot(p - a, p - b), 0);
 }
 
+// 点在射线上 geq(dot(...), 0) 包含端点 gt(dot(...), 0) 则不包含
+bool p_on_ray(const V& p, const V& a, const V& b) {
+    return eq(det(p - a, b - a), 0) && geq(dot(p - a, b - a), 0);
+}
+
 // 点到直线距离
 double dist_to_line(const V& p, const V& a, const V& b) {
     return abs(cross(a, b, p) / dist(a, b));
@@ -56,6 +61,12 @@ double dist_to_seg(const V& p, const V& a, const V& b) {
     if (lt(dot(b - a, p - a), 0)) return dist(p, a);
     if (lt(dot(a - b, p - b), 0)) return dist(p, b);
     return dist_to_line(p, a, b);
+}
+
+// 求直线交点
+V intersect(const V& a, const V& b, const V& c, const V& d) {
+    double s1 = cross(c, d, a), s2 = cross(c, d, b);
+    return (a * s2 - b * s1) / (s2 - s1);
 }
 ```
 
