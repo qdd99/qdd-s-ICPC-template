@@ -148,4 +148,13 @@ int inside(const vector<V>& s, const V& p) {
 
 ### 圆
 
+```cpp
+struct C {
+    V o;
+    double r;
+    C(double x = 0, double y = 0, double r = 0) : o(x, y), r(r) {}
+    C(const V& o, double r) : o(o), r(r) {}
+};
+```
+
 ### 三维几何
