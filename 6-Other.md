@@ -10,6 +10,7 @@ template<typename T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0
 ### 二分答案
 
 ```cpp
+// 二分闭区间[l, r]
 // 可行下界
 while (l < r) {
     mid = (l + r) / 2;
