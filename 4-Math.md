@@ -365,6 +365,38 @@ long long C(long long n, long long m) {
 }
 ```
 
+### 康托展开
+
+```cpp
+// 需要预处理阶乘
+int cantor(vector<int>& s) {
+    int n = s.size(), ans = 0;
+    for (int i = 0; i < n - 1; i++) {
+        int cnt = 0;
+        for (int j = i + 1; j < n; j++) {
+            if (s[j] < s[i]) cnt++;
+        }
+        ans += cnt * fac[n - i - 1];
+    }
+    return ans + 1;
+}
+
+vector<int> inv_cantor(int x, int n) {
+    x--;
+    vector<int> ans(n), rk(n);
+    iota(rk.begin(), rk.end(), 1);
+    for (int i = 0; i < n; i++) {
+        int t = x / fac[n - i - 1];
+        x %= fac[n - i - 1];
+        ans[i] = rk[t];
+        for (int j = t; rk[j] < n; j++) {
+            rk[j] = rk[j + 1];
+        }
+    }
+    return ans;
+}
+```
+
 ### 自适应Simpson积分
 
 ```cpp
