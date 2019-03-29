@@ -107,22 +107,6 @@ bool isPrime(long long x) {
 }
 ```
 
-### 素数筛
-
-```cpp
-bitset<MAXN> isprime;
-
-void init_prime() {
-    isprime.set();
-    isprime[0] = isprime[1] = 0;
-    for (int i = 2; i * i < MAXN - 5; i++) {
-        if (isprime[i]) {
-            for (int j = i * i; j < MAXN - 5; j += i) isprime[j] = 0;
-        }
-    }
-}
-```
-
 ### 找因数
 
 ```cpp
@@ -228,6 +212,22 @@ void get_phi() {
 ### 线性筛
 
 ```cpp
+// 线性筛
+bool vis[MAXN];
+int prime[MAXN];
+
+void get_prime() {
+    int tot = 0;
+    for (int i = 2; i < MAXN - 5; i++) {
+        if (!vis[i]) prime[tot++] = i;
+        for (int j = 0; j < tot; j++) {
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
+        }
+    }
+}
+
 // 欧拉线性筛
 bool vis[MAXN];
 int phi[MAXN], prime[MAXN];
