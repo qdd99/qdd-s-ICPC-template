@@ -1,44 +1,17 @@
 ## 图论
 
-### BFS
+### 链式前向星
 
 ```cpp
-// vector
-// MAXN开点数
-int dist[MAXN];
-bool vis[MAXN];
-vector<int> G[MAXN];
-
-void bfs(int s) {
-    queue<int> q;
-    q.push(s);
-    vis[s] = true;
-    dist[s] = 0;
-    while (!q.empty()) {
-        int now = q.front();
-        q.pop();
-        for (int nxt : G[now]) {
-            if (!vis[nxt]) {
-                q.push(nxt);
-                vis[nxt] = true;
-                dist[nxt] = dist[now] + 1;
-            }
-        }
-    }
-}
- 
-// 前向星
-// MAXN开边数
-int ecnt, mp[MAXN], dist[MAXN];
-bool vis[MAXN];
+int ecnt, mp[MAXN];
 
 struct Edge {
     int to, nxt;
-    Edge(int to = 0, int nxt = 0) : to(to), nxt(nxt) {};
-} es[MAXN];
+    Edge(int to = 0, int nxt = 0) : to(to), nxt(nxt) {}
+} es[MAXM];
 
 void mp_init() {
-    memset(mp, -1, sizeof(mp));
+    memset(mp, -1, (n + 2) * sizeof(int));
     ecnt = 0;
 }
 
@@ -47,33 +20,15 @@ void mp_link(int u, int v) {
     mp[u] = ecnt++;
 }
 
-void bfs(int s) {
-    queue<int> q;
-    q.push(s);
-    vis[s] = true;
-    dist[s] = 0;
-    while (!q.empty()) {
-        int now = q.front();
-        q.pop();
-        for (int i = mp[now]; i != -1; i = es[i].nxt) {
-            if (!vis[es[i].to]) {
-                q.push(es[i].to);
-                vis[es[i].to] = true;
-                dist[es[i].to] = dist[now] + 1;
-            }
-        }
-    }
-}
+for (int i = mp[now]; i != -1; i = es[i].nxt)
 ```
 
 ### Dijkstra
 
 ```cpp
-// vector
-// MAXN开点数
 struct Edge {
     int to, val;
-    Edge(int to = 0, int val = 0) : to(to), val(val) {};
+    Edge(int to = 0, int val = 0) : to(to), val(val) {}
 };
 vector<Edge> G[MAXN];
 long long dist[MAXN];
@@ -93,48 +48,6 @@ void dijkstra(int s) {
             int to = G[now][i].to;
             if (dist[to] > dist[now] + G[now][i].val) {
                 dist[to] = dist[now] + G[now][i].val;
-                q.push({dist[to], to});
-            }
-        }
-    }
-}
-
-// 前向星
-// MAXN开边数
-int ecnt;
-int mp[MAXN];
-long long dist[MAXN];
-
-struct Edge {
-    int to, nxt, val;
-    Edge(int to = 0, int nxt = 0, int val = 0) : to(to), nxt(nxt), val(val) {};
-} es[MAXN];
-
-void mp_init() {
-    memset(mp, -1, sizeof(mp));
-    ecnt = 0;
-}
-
-void mp_link(int u, int v, int val) {
-    es[ecnt] = Edge(v, mp[u], val);
-    mp[u] = ecnt++;
-}
-
-void dijkstra(int s) {
-    using pii = pair<long long, int>;
-    memset(dist, 0x3f, sizeof(dist));
-    priority_queue<pii, vector<pii>, greater<pii> > q;
-    dist[s] = 0;
-    q.push({0, s});
-    while (!q.empty()) {
-        pii p = q.top();
-        q.pop();
-        int now = p.second;
-        if (dist[now] < p.first) continue;
-        for (int i = mp[now]; i != -1; i = es[i].nxt) {
-            int to = es[i].to;
-            if (dist[to] > dist[now] + es[i].val) {
-                dist[to] = dist[now] + es[i].val;
                 q.push({dist[to], to});
             }
         }
@@ -176,7 +89,7 @@ bool topo(vector<int>& ans) {
 // 前置：并查集
 struct Edge {
     int from, to, val;
-    Edge(int from = 0, int to = 0, int val = 0) : from(from), to(to), val(val) {};
+    Edge(int from = 0, int to = 0, int val = 0) : from(from), to(to), val(val) {}
 };
 
 vector<Edge> es;
