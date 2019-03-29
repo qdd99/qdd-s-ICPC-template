@@ -225,6 +225,7 @@ void get_prime() {
             int d = i * prime[j];
             if (d >= MAXN - 5) break;
             vis[d] = true;
+            if (i % prime[j] == 0) break;
         }
     }
 }
