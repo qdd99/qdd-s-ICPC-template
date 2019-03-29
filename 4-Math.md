@@ -213,6 +213,7 @@ void get_phi() {
 
 ```cpp
 // 线性筛
+// 注意 0 和 1 不是素数
 bool vis[MAXN];
 int prime[MAXN];
 
