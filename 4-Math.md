@@ -107,6 +107,98 @@ bool isPrime(long long x) {
 }
 ```
 
+### 线性筛
+
+```cpp
+// 注意 0 和 1 不是素数
+bool vis[MAXN];
+int prime[MAXN];
+
+void get_prime() {
+    int tot = 0;
+    for (int i = 2; i < MAXN - 5; i++) {
+        if (!vis[i]) prime[tot++] = i;
+        for (int j = 0; j < tot; j++) {
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
+            if (i % prime[j] == 0) break;
+        }
+    }
+}
+
+// 最小素因子
+bool vis[MAXN];
+int spf[MAXN], prime[MAXN];
+
+void get_spf() {
+    int tot = 0;
+    for (int i = 2; i < MAXN - 5; i++) {
+        if (!vis[i]) {
+            prime[tot++] = i;
+            spf[i] = i;
+        }
+        for (int j = 0; j < tot; j++) {
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
+            spf[d] = prime[j];
+            if (i % prime[j] == 0) break;
+        }
+    }
+}
+
+// 欧拉函数
+bool vis[MAXN];
+int phi[MAXN], prime[MAXN];
+
+void get_phi() {
+    int tot = 0;
+    phi[1] = 1;
+    for (int i = 2; i < MAXN - 5; i++) {
+        if (!vis[i]) {
+            prime[tot++] = i;
+            phi[i] = i - 1;
+        }
+        for (int j = 0; j < tot; j++) {
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
+            if (i % prime[j] == 0) {
+                phi[d] = phi[i] * prime[j];
+                break;
+            }
+            else phi[d] = phi[i] * (prime[j] - 1);
+        }
+    }
+}
+
+// 莫比乌斯函数
+bool vis[MAXN];
+int mu[MAXN], prime[MAXN];
+
+void get_mu() {
+    int tot = 0;
+    mu[1] = 1;
+    for (int i = 2; i < MAXN - 5; i++) {
+        if (!vis[i]) {
+            prime[tot++] = i;
+            mu[i] = -1;
+        }
+        for (int j = 0; j < tot; j++) {
+            int d = i * prime[j];
+            if (d >= MAXN - 5) break;
+            vis[d] = true;
+            if (i % prime[j] == 0) {
+                mu[d] = 0;
+                break;
+            }
+            else mu[d] = -mu[i];
+        }
+    }
+}
+```
+
 ### 找因数
 
 ```cpp
@@ -147,19 +239,7 @@ void getf(int x, vector<int> &v) {
     if (x != 1) v.push_back(x);
 }
 
-// 预处理 O(nloglogn)
-int spf[MAXN];
-
-void init_spf() {
-    for (int i = 2; i < MAXN - 5; i++) {
-        if (!spf[i]) {
-            for (int j = i; j < MAXN - 5; j += i) {
-                if (!spf[j]) spf[j] = i;
-            }
-        }
-    }
-}
-
+// 前置：线性筛
 // O(logn)，无重复
 void getf(int x, vector<int> &v) {
     while (x > 1) {
@@ -204,78 +284,6 @@ void get_phi() {
                 if (!phi[j]) phi[j] = j;
                 phi[j] = phi[j] / i * (i - 1);
             }
-        }
-    }
-}
-```
-
-### 线性筛
-
-```cpp
-// 线性筛
-// 注意 0 和 1 不是素数
-bool vis[MAXN];
-int prime[MAXN];
-
-void get_prime() {
-    int tot = 0;
-    for (int i = 2; i < MAXN - 5; i++) {
-        if (!vis[i]) prime[tot++] = i;
-        for (int j = 0; j < tot; j++) {
-            int d = i * prime[j];
-            if (d >= MAXN - 5) break;
-            vis[d] = true;
-            if (i % prime[j] == 0) break;
-        }
-    }
-}
-
-// 欧拉线性筛
-bool vis[MAXN];
-int phi[MAXN], prime[MAXN];
-
-void get_phi() {
-    int tot = 0;
-    phi[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++) {
-        if (!vis[i]) {
-            prime[tot++] = i;
-            phi[i] = i - 1;
-        }
-        for (int j = 0; j < tot; j++) {
-            int d = i * prime[j];
-            if (d >= MAXN - 5) break;
-            vis[d] = true;
-            if (i % prime[j] == 0) {
-                phi[d] = phi[i] * prime[j];
-                break;
-            }
-            else phi[d] = phi[i] * (prime[j] - 1);
-        }
-    }
-}
-
-// 莫比乌斯线性筛
-bool vis[MAXN];
-int mu[MAXN], prime[MAXN];
-
-void get_mu() {
-    int tot = 0;
-    mu[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++) {
-        if (!vis[i]) {
-            prime[tot++] = i;
-            mu[i] = -1;
-        }
-        for (int j = 0; j < tot; j++) {
-            int d = i * prime[j];
-            if (d >= MAXN - 5) break;
-            vis[d] = true;
-            if (i % prime[j] == 0) {
-                mu[d] = 0;
-                break;
-            }
-            else mu[d] = -mu[i];
         }
     }
 }
