@@ -3,16 +3,16 @@
 ### GCD & LCM
 
 ```cpp
-long long gcd(long long a, long long b) { return b ? gcd(b, a % b) : a; }
-long long lcm(long long a, long long b) { return a / gcd(a, b) * b; }
+ll gcd(ll a, ll b) { return b ? gcd(b, a % b) : a; }
+ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
 ```
 
 ### 快速幂 & 快速乘
 
 ```cpp
 // 注意 b = 0, MOD = 1 的情况
-long long powMod(long long a, long long b) {
-    long long ans = 1;
+ll powMod(ll a, ll b) {
+    ll ans = 1;
     for (a %= MOD; b; b >>= 1) {
         if (b & 1) ans = ans * a % MOD;
         a = a * a % MOD;
@@ -21,8 +21,8 @@ long long powMod(long long a, long long b) {
 }
 
 // 模数爆int时使用
-long long mul(long long a, long long b) {
-    long long ans = 0;
+ll mul(ll a, ll b) {
+    ll ans = 0;
     for (a %= MOD; b; b >>= 1) {
         if (b & 1) ans = (ans + a) % MOD;
         a = (a << 1) % MOD;
@@ -31,8 +31,8 @@ long long mul(long long a, long long b) {
 }
 
 // O(1)
-long long mul(long long a, long long b) {
-    return (long long)(__int128(a) * b % MOD);
+ll mul(ll a, ll b) {
+    return (ll)(__int128(a) * b % MOD);
 }
 ```
 
@@ -42,8 +42,8 @@ long long mul(long long a, long long b) {
 const int MAT_SZ = 3;
 
 struct Mat {
-    long long m[MAT_SZ][MAT_SZ] = {0};
-    long long * operator [] (int i) { return m[i]; }
+    ll m[MAT_SZ][MAT_SZ] = {0};
+    ll * operator [] (int i) { return m[i]; }
     void one() { for (int i = 0; i < MAT_SZ; i++) m[i][i] = 1; }
 };
 
@@ -57,7 +57,7 @@ Mat mul(Mat &a, Mat &b) {
     return ans;
 }
 
-Mat pow(Mat &a, long long b) {
+Mat pow(Mat &a, ll b) {
     Mat ans;
     ans.one();
     while (b) {
@@ -81,12 +81,12 @@ bool isPrime(int x) {
 // O(logn)
 // 前置：快速幂、快速乘
 // int范围只需检查2, 7, 61
-bool Rabin_Miller(long long p, long long a) {
+bool Rabin_Miller(ll p, ll a) {
     if (p == 2) return 1;
     if (p & 1 == 0 || p == 1) return 0;
-    long long d = p - 1;
+    ll d = p - 1;
     while (!(d & 1)) d >>= 1;
-    long long m = powMod(a, d, p);
+    ll m = powMod(a, d, p);
     if (m == 1) return 1;
     while (d < p) {
         if (m == p - 1) return 1;
@@ -96,9 +96,9 @@ bool Rabin_Miller(long long p, long long a) {
     return 0;
 }
 
-bool isPrime(long long x) {
+bool isPrime(ll x) {
     if (x == 3 || x == 5) return 1;
-    static long long prime[7] = {2, 307, 7681, 36061, 555097, 4811057, 1007281591};
+    static ll prime[7] = {2, 307, 7681, 36061, 555097, 4811057, 1007281591};
     for (int i = 0; i < 7; i++) {
         if (x == prime[i]) return 1;
         if (!Rabin_Miller(x, prime[i])) return 0;
@@ -293,13 +293,13 @@ void get_phi() {
 
 ```cpp
 // ax + by = gcd(a, b)
-long long exgcd(long long a, long long b, long long &x, long long &y) {
+ll exgcd(ll a, ll b, ll &x, ll &y) {
     if (b == 0) {
         x = 1;
         y = 0;
         return a;
     }
-    long long d = exgcd(b, a % b, y, x);
+    ll d = exgcd(b, a % b, y, x);
     y -= a / b * x;
     return d;
 }
@@ -308,19 +308,19 @@ long long exgcd(long long a, long long b, long long &x, long long &y) {
 ### 逆元
 
 ```cpp
-long long inv(long long x) { return powMod(x, MOD - 2); }
+ll inv(ll x) { return powMod(x, MOD - 2); }
 
 // EXGCD
 // gcd(a, p) = 1时有逆元
-long long inv(long long a, long long p) {
-    long long x, y;
-    long long d = exgcd(a, p, x, y);
+ll inv(ll a, ll p) {
+    ll x, y;
+    ll d = exgcd(a, p, x, y);
     if (d == 1) return (x % p + p) % p;
     return -1;
 }
 
 // 逆元打表
-long long inv[MAXN];
+ll inv[MAXN];
 
 void initInv() {
     inv[1] = 1;
@@ -334,7 +334,7 @@ void initInv() {
 
 ```cpp
 // 组合数打表
-long long C[MAXN][MAXN];
+ll C[MAXN][MAXN];
 
 void initC() {
     C[0][0] = 1;
@@ -348,7 +348,7 @@ void initC() {
 
 // 快速组合数取模
 // MAXN开2倍上限
-long long fac[MAXN], ifac[MAXN];
+ll fac[MAXN], ifac[MAXN];
 
 void initInv() {
     fac[0] = 1;
@@ -362,13 +362,13 @@ void initInv() {
     }
 }
 
-long long C(int n, int m) {
+ll C(int n, int m) {
     if (n < m || m < 0) return 0;
     return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
 }
 
 // Lucas
-long long C(long long n, long long m) {
+ll C(ll n, ll m) {
     if (n < m || m < 0) return 0;
     if (n < MOD && m < MOD) return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
     return C(n / MOD, m / MOD) * C(n % MOD, m % MOD) % MOD;

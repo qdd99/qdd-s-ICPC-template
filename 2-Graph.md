@@ -31,10 +31,10 @@ struct Edge {
     Edge(int to = 0, int val = 0) : to(to), val(val) {}
 };
 vector<Edge> G[MAXN];
-long long dist[MAXN];
+ll dist[MAXN];
 
 void dijkstra(int s) {
-    using pii = pair<long long, int>;
+    using pii = pair<ll, int>;
     memset(dist, 0x3f, sizeof(dist));
     priority_queue<pii, vector<pii>, greater<pii> > q;
     dist[s] = 0;
@@ -94,10 +94,10 @@ struct Edge {
 
 vector<Edge> es;
 
-long long kruskal() {
+ll kruskal() {
     sort(es.begin(), es.end(), [](Edge& x, Edge& y) { return x.val < y.val; });
     iota(pa, pa + n + 1, 0);
-    long long ans = 0;
+    ll ans = 0;
     for (Edge& e : es) {
         if (find(e.from) != find(e.to)) {
             merge(e.from, e.to);
@@ -204,8 +204,8 @@ struct Dinic {
         return tmp - cap;
     }
 
-    long long solve() {
-        long long flow = 0;
+    ll solve() {
+        ll flow = 0;
         while (bfs()) {
             cur.assign(n + 1, 0);
             flow += dfs(s, INF);
@@ -321,9 +321,9 @@ void init() {
     dfs2(1, 1);
 }
 
-long long go(int u, int v) {
+ll go(int u, int v) {
     int uu = top[u], vv = top[v];
-    long long res = 0;
+    ll res = 0;
     while (uu != vv) {
         if (dep[uu] < dep[vv]) {
             swap(u, v);

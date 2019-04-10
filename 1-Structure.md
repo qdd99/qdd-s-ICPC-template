@@ -82,19 +82,19 @@ struct RMQ {
 // 区间加，区间和
 struct Node {
     int l, r;
-    long long val, lazy;
+    ll val, lazy;
 };
 
 struct Block {
     int size, b_size; // b_size块 每块大小b_size
-    long long *a;
+    ll *a;
     Node *b;
     int *pos;
 
     Block(int sz) {
         b_size = ceil(sqrt(sz + 0.5));
         size = b_size * b_size;
-        a = new long long[size + 1];
+        a = new ll[size + 1];
         b = new Node[b_size + 1];
         pos = new int[size + 1];
         for (int i = 1; i <= b_size; i++) {
@@ -137,8 +137,8 @@ struct Block {
         }
     }
 
-    long long query(int l, int r) {
-        long long ret = 0;
+    ll query(int l, int r) {
+        ll ret = 0;
         for (int i = pos[l]; i <= pos[r]; i++) {
             if (b[i].l < l || b[i].r > r) {
                 pushdown(i);
@@ -163,16 +163,16 @@ struct Block {
 // 查询：区间和
 struct Tbit {
     int size;
-    long long t[MAXN];
+    ll t[MAXN];
 
     int lowbit(int x) { return x & (-x); }
 
     void init(int sz) {
         size = sz + 1;
-        memset(t, 0, (sz + 2) * sizeof(long long));
+        memset(t, 0, (sz + 2) * sizeof(ll));
     }
 
-    void add(int pos, long long val) {
+    void add(int pos, ll val) {
         if (pos <= 0) return;
         while (pos <= size) {
             t[pos] += val;
@@ -180,8 +180,8 @@ struct Tbit {
         }
     }
 
-    long long get(int pos) {
-        long long sum = 0;
+    ll get(int pos) {
+        ll sum = 0;
         while (pos > 0) {
             sum += t[pos];
             pos -= lowbit(pos);
@@ -189,10 +189,10 @@ struct Tbit {
         return sum;
     }
 
-    void update(int pos, long long val) { add(pos, val - query(pos, pos)); }
-    long long query(int l, int r) { return get(r) - get(l - 1); }
+    void update(int pos, ll val) { add(pos, val - query(pos, pos)); }
+    ll query(int l, int r) { return get(r) - get(l - 1); }
 
-    int kth(long long k) {
+    int kth(ll k) {
         int p = 0;
         for (int i = 20; i >= 0; i--) {
             int p_ = p + (1 << i);
@@ -209,16 +209,16 @@ struct Tbit {
 // 查询：单点
 struct Tbit {
     int size;
-    long long t[MAXN];
+    ll t[MAXN];
 
     int lowbit(int x) { return x & (-x); }
 
     void init(int sz) {
         size = sz + 1;
-        memset(t, 0, (sz + 2) * sizeof(long long));
+        memset(t, 0, (sz + 2) * sizeof(ll));
     }
 
-    void add(int pos, long long val) {
+    void add(int pos, ll val) {
         if (pos <= 0) return;
         while (pos <= size) {
             t[pos] += val;
@@ -226,8 +226,8 @@ struct Tbit {
         }
     }
 
-    long long get(int pos) {
-        long long sum = 0;
+    ll get(int pos) {
+        ll sum = 0;
         while (pos > 0) {
             sum += t[pos];
             pos -= lowbit(pos);
@@ -235,7 +235,7 @@ struct Tbit {
         return sum;
     }
 
-    void update(int l, int r, long long val) {
+    void update(int l, int r, ll val) {
         add(l, val);
         add(r + 1, -val);
     }
@@ -245,14 +245,14 @@ struct Tbit {
 // 查询：区间和
 Tbit t1, t2;
 
-void range_add(int l, int r, long long val) {
+void range_add(int l, int r, ll val) {
     t1.add(l, val);
     t2.add(l, l * val);
     t1.add(r + 1, -val);
     t2.add(r + 1, (r + 1) * -val);
 }
 
-long long range_sum(int l, int r) {
+ll range_sum(int l, int r) {
     return (r + 1) * t1.get(r) - t2.get(r) - l * t1.get(l - 1) + t2.get(l - 1);
 }
 ```
@@ -311,7 +311,7 @@ struct SegT {
 // 权值线段树
 // 修改：单点加
 // 查询：第k大
-void add(int x, long long val) {
+void add(int x, ll val) {
     int p = size + x - 1;
     t[p].val += val;
     for (p >>= 1; p > 0; p >>= 1) {
@@ -319,18 +319,18 @@ void add(int x, long long val) {
     }
 }
 
-int ask(int p, long long k, int pl, int pr) {
+int ask(int p, ll k, int pl, int pr) {
     if (pl == pr) return pl;
     if (k <= t[lc].val) return ask(lc, k, pl, mid);
     return ask(rc, k - t[lc].val, mid + 1, pr);
 }
 
-int query(long long k) { return ask(1, k, 1, size); }
+int query(ll k) { return ask(1, k, 1, size); }
 
 // 修改：区间加
 // 查询：区间和
 struct Node {
-    long long val, lazy;
+    ll val, lazy;
 };
 
 void pushdown(int p, int pl, int pr) {
@@ -342,12 +342,12 @@ void pushdown(int p, int pl, int pr) {
     t[p].lazy = 0;
 }
 
-long long ask(int p, int l, int r, int pl, int pr) {
+ll ask(int p, int l, int r, int pl, int pr) {
     if (l > pr || r < pl) return 0;
     if (l <= pl && r >= pr) return t[p].val;
     pushdown(p, pl, pr);
-    long long vl = ask(lc, l, r, pl, mid);
-    long long vr = ask(rc, l, r, mid + 1, pr);
+    ll vl = ask(lc, l, r, pl, mid);
+    ll vr = ask(rc, l, r, mid + 1, pr);
     return vl + vr;
 }
 
@@ -365,12 +365,12 @@ void modify(int p, int l, int r, int val, int pl, int pr) {
 }
 
 void update(int l, int r, int val) { modify(1, l, r, val, 1, size); }
-long long query(int l, int r) { return ask(1, l, r, 1, size); }
+ll query(int l, int r) { return ask(1, l, r, 1, size); }
  
 // 修改：区间乘混加
 // 查询：区间和取模
 struct Node {
-    long long val, mul, add;
+    ll val, mul, add;
     Node() : val(0), add(0), mul(1) {}
 };
 
@@ -386,12 +386,12 @@ void pushdown(int p, int pl, int pr) {
     t[p].add = 0;
 }
 
-long long ask(int p, int l, int r, int pl, int pr) {
+ll ask(int p, int l, int r, int pl, int pr) {
     if (l > pr || r < pl) return 0;
     if (l <= pl && r >= pr) return t[p].val;
     pushdown(p, pl, pr);
-    long long vl = ask(lc, l, r, pl, mid);
-    long long vr = ask(rc, l, r, mid + 1, pr);
+    ll vl = ask(lc, l, r, pl, mid);
+    ll vr = ask(rc, l, r, mid + 1, pr);
     return (vl + vr) % MOD;
 }
 
@@ -411,7 +411,7 @@ void modify(int p, int l, int r, int a, int b, int pl, int pr) {
 }
 
 void update(int l, int r, int a, int b) { modify(1, l, r, a, b, 1, size); }
-long long query(int l, int r) { return ask(1, l, r, 1, size); }
+ll query(int l, int r) { return ask(1, l, r, 1, size); }
 ```
 
 ### 主席树
@@ -449,7 +449,7 @@ struct FST {
 
     int ask(int p1, int p2, int k, int pl, int pr) {
         if (pl == pr) return pl;
-        long long vl = t[t[p2].lc].val - t[t[p1].lc].val;
+        ll vl = t[t[p2].lc].val - t[t[p1].lc].val;
         if (k <= vl) return ask(t[p1].lc, t[p2].lc, k, pl, mid);
         return ask(t[p1].rc, t[p2].rc, k - vl, mid + 1, pr);
     }
