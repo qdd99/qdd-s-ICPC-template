@@ -160,11 +160,7 @@ struct Dinic {
     vector<vector<int> > G;
     vector<int> dist, cur;
 
-    Dinic(int n, int s, int t) : n(n), s(s), t(t) {
-        G.resize(n + 1);
-        dist.resize(n + 1);
-        cur.resize(n + 1);
-    }
+    Dinic(int n, int s, int t) : n(n), s(s), t(t), G(n + 1), dist(n + 1), cur(n + 1) {}
 
     void addEdge(int u, int v, int cap) {
         G[u].push_back(es.size());
@@ -233,12 +229,7 @@ struct MCMF {
     vector<int> d, p, a;  // dist, prev, add
     deque<bool> in;
 
-    MCMF(int n, int s, int t) : n(n), s(s), t(t) {
-        G.resize(n + 1);
-        p.resize(n + 1);
-        a.resize(n + 1);
-        flow = cost = 0;
-    }
+    MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), G(n + 1), p(n + 1), a(n + 1) {}
 
     void addEdge(int u, int v, int cap, int cost) {
         G[u].push_back(es.size());
