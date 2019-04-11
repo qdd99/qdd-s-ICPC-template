@@ -20,7 +20,7 @@ void mp_link(int u, int v) {
     mp[u] = ecnt++;
 }
 
-for (int i = mp[now]; i != -1; i = es[i].nxt)
+for (int i = mp[u]; i != -1; i = es[i].nxt)
 ```
 
 ### Dijkstra
@@ -31,24 +31,24 @@ struct Edge {
     Edge(int to = 0, int val = 0) : to(to), val(val) {}
 };
 vector<Edge> G[MAXN];
-ll dist[MAXN];
+ll dis[MAXN];
 
 void dijkstra(int s) {
     using pii = pair<ll, int>;
-    memset(dist, 0x3f, sizeof(dist));
+    memset(dis, 0x3f, sizeof(dis));
     priority_queue<pii, vector<pii>, greater<pii> > q;
-    dist[s] = 0;
+    dis[s] = 0;
     q.push({0, s});
     while (!q.empty()) {
         pii p = q.top();
         q.pop();
-        int now = p.second;
-        if (dist[now] < p.first) continue;
-        for (int i = 0; i < G[now].size(); i++) {
-            int to = G[now][i].to;
-            if (dist[to] > dist[now] + G[now][i].val) {
-                dist[to] = dist[now] + G[now][i].val;
-                q.push({dist[to], to});
+        int u = p.second;
+        if (dis[u] < p.first) continue;
+        for (int i = 0; i < G[u].size(); i++) {
+            int to = G[u][i].to;
+            if (dis[to] > dis[u] + G[u][i].val) {
+                dis[to] = dis[u] + G[u][i].val;
+                q.push({dis[to], to});
             }
         }
     }
@@ -70,13 +70,13 @@ bool topo(vector<int>& ans) {
         }
     }
     while (!q.empty()) {
-        int now = q.front();
+        int u = q.front();
         q.pop();
-        ans.push_back(now);
-        for (int nxt : G[now]) {
-            deg[nxt]--;
-            dis[nxt] = max(dis[nxt], dis[now] + 1);
-            if (deg[nxt] == 0) q.push(nxt);
+        ans.push_back(u);
+        for (int v : G[u]) {
+            deg[v]--;
+            dis[v] = max(dis[v], dis[u] + 1);
+            if (deg[v] == 0) q.push(v);
         }
     }
     return ans.size() == n;
@@ -113,15 +113,15 @@ ll kruskal() {
 ```cpp
 int dep[MAXN], up[MAXN][22]; // 22 = ((int)log2(MAXN) + 1)
 
-void dfs(int now, int pa) {
-    dep[now] = dep[pa] + 1;
-    up[now][0] = pa;
+void dfs(int u, int pa) {
+    dep[u] = dep[pa] + 1;
+    up[u][0] = pa;
     for (int i = 1; i < 22; i++) {
-        up[now][i] = up[up[now][i - 1]][i - 1];
+        up[u][i] = up[up[u][i - 1]][i - 1];
     }
-    for (int i = 0; i < G[now].size(); i++) {
-        if (G[now][i] != pa) {
-            dfs(G[now][i], now);
+    for (int i = 0; i < G[u].size(); i++) {
+        if (G[u][i] != pa) {
+            dfs(G[u][i], u);
         }
     }
 }
@@ -158,9 +158,9 @@ struct Dinic {
     int n, s, t;
     vector<Edge> es;
     vector<vector<int> > G;
-    vector<int> dist, cur;
+    vector<int> dis, cur;
 
-    Dinic(int n, int s, int t) : n(n), s(s), t(t), G(n + 1), dist(n + 1), cur(n + 1) {}
+    Dinic(int n, int s, int t) : n(n), s(s), t(t), G(n + 1), dis(n + 1), cur(n + 1) {}
 
     void addEdge(int u, int v, int cap) {
         G[u].push_back(es.size());
@@ -170,33 +170,33 @@ struct Dinic {
     }
 
     bool bfs() {
-        dist.assign(n + 1, 0);
+        dis.assign(n + 1, 0);
         queue<int> q;
         q.push(s);
-        dist[s] = 1;
+        dis[s] = 1;
         while (!q.empty()) {
-            int now = q.front();
+            int u = q.front();
             q.pop();
-            for (int i : G[now]) {
+            for (int i : G[u]) {
                 Edge& e = es[i];
-                if (!dist[e.to] && e.cap > 0) {
-                    dist[e.to] = dist[now] + 1;
+                if (!dis[e.to] && e.cap > 0) {
+                    dis[e.to] = dis[u] + 1;
                     q.push(e.to);
                 }
             }
         }
-        return dist[t];
+        return dis[t];
     }
 
-    int dfs(int now, int cap) {
-        if (now == t || cap == 0) return cap;
+    int dfs(int u, int cap) {
+        if (u == t || cap == 0) return cap;
         int tmp = cap, f;
-        for (int& i = cur[now]; i < G[now].size(); i++) {
-            Edge& e = es[G[now][i]];
-            if (dist[e.to] == dist[now] + 1) {
+        for (int& i = cur[u]; i < G[u].size(); i++) {
+            Edge& e = es[G[u][i]];
+            if (dis[e.to] == dis[u] + 1) {
                 f = dfs(e.to, min(cap, e.cap));
                 e.cap -= f;
-                es[G[now][i] ^ 1].cap += f;
+                es[G[u][i] ^ 1].cap += f;
                 cap -= f;
                 if (cap == 0) break;
             }
@@ -226,7 +226,7 @@ struct MCMF {
     int n, s, t, flow, cost;
     vector<Edge> es;
     vector<vector<int> > G;
-    vector<int> d, p, a;  // dist, prev, add
+    vector<int> d, p, a;  // dis, prev, add
     deque<bool> in;
 
     MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), G(n + 1), p(n + 1), a(n + 1) {}
@@ -247,15 +247,15 @@ struct MCMF {
         queue<int> q;
         q.push(s);
         while (!q.empty()) {
-            int now = q.front();
+            int u = q.front();
             q.pop();
-            in[now] = false;
-            for (int& i : G[now]) {
+            in[u] = false;
+            for (int& i : G[u]) {
                 Edge& e = es[i];
-                if (e.cap && d[e.to] > d[now] + e.cost) {
-                    d[e.to] = d[now] + e.cost;
+                if (e.cap && d[e.to] > d[u] + e.cost) {
+                    d[e.to] = d[u] + e.cost;
                     p[e.to] = i;
-                    a[e.to] = min(a[now], e.cap);
+                    a[e.to] = min(a[u], e.cap);
                     if (!in[e.to]) {
                         q.push(e.to);
                         in[e.to] = true;
@@ -288,29 +288,29 @@ struct MCMF {
 vector<int> G[MAXN];
 int pa[MAXN], sz[MAXN], dep[MAXN], dfn[MAXN], maxc[MAXN], top[MAXN];
 
-void dfs1(int now) {
-    sz[now] = 1;
-    maxc[now] = -1;
+void dfs1(int u) {
+    sz[u] = 1;
+    maxc[u] = -1;
     int maxs = 0;
-    for (int& nxt : G[now]) {
-        if (nxt != pa[now]) {
-            pa[nxt] = now;
-            dep[nxt] = dep[now] + 1;
-            dfs1(nxt);
-            sz[now] += sz[nxt];
-            if (updmax(maxs, sz[nxt])) maxc[now] = nxt;
+    for (int& v : G[u]) {
+        if (v != pa[u]) {
+            pa[v] = u;
+            dep[v] = dep[u] + 1;
+            dfs1(v);
+            sz[u] += sz[v];
+            if (updmax(maxs, sz[v])) maxc[u] = v;
         }
     }
 }
 
-void dfs2(int now, int tp) {
+void dfs2(int u, int tp) {
     static int cnt = 0;
-    top[now] = tp;
-    dfn[now] = ++cnt;
-    if (maxc[now] != -1) dfs2(maxc[now], tp);
-    for (int& nxt : G[now]) {
-        if (nxt != pa[now] && nxt != maxc[now]) {
-            dfs2(nxt, nxt);
+    top[u] = tp;
+    dfn[u] = ++cnt;
+    if (maxc[u] != -1) dfs2(maxc[u], tp);
+    for (int& v : G[u]) {
+        if (v != pa[u] && v != maxc[u]) {
+            dfs2(v, v);
         }
     }
 }
