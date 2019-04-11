@@ -45,10 +45,10 @@ void dijkstra(int s) {
         int u = p.second;
         if (dis[u] < p.first) continue;
         for (int i = 0; i < G[u].size(); i++) {
-            int to = G[u][i].to;
-            if (dis[to] > dis[u] + G[u][i].val) {
-                dis[to] = dis[u] + G[u][i].val;
-                q.push({dis[to], to});
+            int v = G[u][i].to;
+            if (dis[v] > dis[u] + G[u][i].val) {
+                dis[v] = dis[u] + G[u][i].val;
+                q.push({dis[v], v});
             }
         }
     }
