@@ -29,6 +29,9 @@ struct V {
     double len2() const { return x * x + y * y; }
 };
 
+ostream& operator << (ostream& os, const V& p) { return os << "(" << p.x << ", " << p.y << ")"; }
+istream& operator >> (istream& is, V& p) { return is >> p.x >> p.y; }
+
 double dist(const V& a, const V& b) { return (b - a).len(); }
 double dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
 double det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
