@@ -203,7 +203,8 @@ void get_mu() {
 
 ```cpp
 // O(sqrt(n))
-void getf(int x, vector<int> &v) {
+vector<int> getf(int x) {
+    vector<int> v;
     for (int i = 1; i * i <= x; i++) {
         if (x % i == 0) {
             v.push_back(i);
@@ -211,6 +212,7 @@ void getf(int x, vector<int> &v) {
         }
     }
     sort(v.begin(), v.end());
+    return v;
 }
 ```
 
@@ -218,7 +220,8 @@ void getf(int x, vector<int> &v) {
 
 ```cpp
 // O(sqrt(n))，无重复
-void getf(int x, vector<int> &v) {
+vector<int> getf(int x) {
+    vector<int> v;
     for (int i = 2; i * i <= x; i++) {
         if (x % i == 0) {
             v.push_back(i);
@@ -226,10 +229,12 @@ void getf(int x, vector<int> &v) {
         }
     }
     if (x != 1) v.push_back(x);
+    return v;
 }
 
 // O(sqrt(n))，有重复
-void getf(int x, vector<int> &v) {
+vector<int> getf(int x) {
+    vector<int> v;
     for (int i = 2; i * i <= x; i++) {
         while (x % i == 0) {
             v.push_back(i);
@@ -237,20 +242,24 @@ void getf(int x, vector<int> &v) {
         }
     }
     if (x != 1) v.push_back(x);
+    return v;
 }
 
 // 前置：线性筛
 // O(logn)，无重复
-void getf(int x, vector<int> &v) {
+vector<int> getf(int x) {
+    vector<int> v;
     while (x > 1) {
         int p = spf[x];
         v.push_back(p);
         while (x % p == 0) x /= p;
     }
+    return v;
 }
 
 // O(logn)，有重复
-void getf(int x, vector<int> &v) {
+vector<int> getf(int x) {
+    vector<int> v;
     while (x > 1) {
         int p = spf[x];
         while (x % p == 0) {
@@ -258,6 +267,7 @@ void getf(int x, vector<int> &v) {
             x /= p;
         }
     }
+    return v;
 }
 ```
 
