@@ -277,8 +277,7 @@ vector<int> getf(int x) {
 // 前置：找质因数（无重复）
 int phi(int x) {
     int ret = x;
-    vector<int> v;
-    getf(x, v);
+    vector<int> v = getf(x);
     for (int f : v) ret = ret / f * (f - 1);
     return ret;
 }
