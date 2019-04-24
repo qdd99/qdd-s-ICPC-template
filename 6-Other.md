@@ -1,6 +1,7 @@
 ## 杂项
 
 ### debug
+
 ```cpp
 #define dbg(x) cerr << #x << " = ", dprint(x), cerr << endl
 #define dbgr(x, y) cerr << #x << " = ", dprint(x, x + y), cerr << endl
