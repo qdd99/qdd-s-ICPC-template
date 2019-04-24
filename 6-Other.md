@@ -1,5 +1,38 @@
 ## 杂项
 
+### debug
+```cpp
+#define dbg(x) cerr << #x << " = ", dprint(x), cerr << endl
+#define dbgr(x, y) cerr << #x << " = ", dprint(x, x + y), cerr << endl
+
+#define E cerr
+#define L E << "{"
+#define R E << "}"
+#define W dprint
+#define S template<class T> void W
+#define D template<class T1, class T2> void W
+
+void W(string s)                                  { E << '"' << s << '"'; }
+S(T x)                                            { E << x; }
+D(pair<T1, T2> p)                                 { E << "("; W(p.first); E << ", "; W(p.second); E << ")"; }
+template<template<class...> class T, class t>
+void W(T<t> v)                                    { int f = 1; L; for (auto x : v) { if (!f) E << ", "; f = 0; W(x); } R; }
+D(map<T1, T2> v)                                  { int f = 1; L; for (auto x : v) { if (!f) E << ", "; f = 0; W(x); } R; }
+S(priority_queue<T> q)                            { L; while (!q.empty()) { W(q.top());   E << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
+S(priority_queue<T, vector<T>, greater<T> > q)    { L; while (!q.empty()) { W(q.top());   E << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
+S(queue<T> q)                                     { L; while (!q.empty()) { W(q.front()); E << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
+S(stack<T> q_)                                    { stack<T> q; while (!q_.empty()) { q.push(q_.top()); q_.pop(); } 
+                                                    L; while (!q.empty()) { W(q.top());   E << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
+S(T *s, T *t)                                     { W(vector<T>(s, t)); }
+
+#undef E
+#undef L
+#undef R
+#undef W
+#undef S
+#undef D
+```
+
 ### updmax/min
 
 ```cpp
