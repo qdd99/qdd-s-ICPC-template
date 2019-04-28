@@ -201,3 +201,40 @@ struct ACA {
     }
 };
 ```
+
+### 后缀数组
+
+```cpp
+// 下标从1开始
+// sa[i]: 排名为i的后缀位置
+// rk[i]: 第i个后缀的排名
+// ht[i]: LCP(sa[i], sa[i - 1])
+struct SA {
+    int n, m;
+    vector<int> a, d, sa, rk, ht;
+
+    void rsort() {
+        vector<int> c(m + 1);
+        for (int i = 1; i <= n; i++) c[rk[d[i]]]++;
+        for (int i = 1; i <= m; i++) c[i] += c[i - 1];
+        for (int i = n; i; i--) sa[c[rk[d[i]]]--] = d[i];
+    }
+
+    SA(const string& s) : n(s.size()), m(128), a(n + 1), d(n + 1), sa(n + 1), rk(n + 1), ht(n + 1) {
+        for (int i = 1; i <= n; i++) { rk[i] = a[i] = s[i - 1]; d[i] = i; }
+        rsort();
+        for (int j = 1, i, k; k < n; m = k, j <<= 1) {
+            for (i = n - j + 1, k = 0; i <= n; i++) d[++k] = i;
+            for (i = 1; i <= n; i++) if (sa[i] > j) d[++k] = sa[i] - j;
+            rsort(); swap(rk, d); rk[sa[1]] = k = 1;
+            for (i = 2; i <= n; i++) {
+                rk[sa[i]] = (d[sa[i]] == d[sa[i - 1]] && d[sa[i] + j] == d[sa[i - 1] + j]) ? k : ++k;
+            }
+        }
+        int j, k = 0;
+        for (int i = 1; i <= n; ht[rk[i++]] = k) {
+            for (k ? k-- : k, j = sa[rk[i] - 1]; a[i + k] == a[j + k]; ++k);
+        }
+    }
+};
+```
