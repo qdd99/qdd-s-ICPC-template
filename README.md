@@ -19,8 +19,15 @@ qdd的ACM板子
 + [x] RMQ
 + [x] 树状数组
 + [x] 线段树
++ [ ] 吉司机线段树
 + [x] 主席树
++ [ ] K-D Tree
 + [x] Splay
++ [ ] Treap
++ [ ] 舞蹈链
++ [ ] 莫队
++ [ ] CDQ 分治
++ [ ] Link-Cut Tree
 
 ## 图论
 
