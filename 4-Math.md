@@ -416,6 +416,21 @@ vector<int> inv_cantor(int x, int n) {
 }
 ```
 
+### 线性基
+
+```cpp
+ll a[65];
+
+void insert(ll x) {
+    for (int i = 60; i >= 0; i--) {
+        if ((x >> i) & 1) {
+            if (a[i]) x ^= a[i];
+            else { a[i] = x; break; }
+        }
+    }
+}
+```
+
 ### 自适应Simpson积分
 
 ```cpp
