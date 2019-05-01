@@ -7,31 +7,21 @@
 #define dbgr(x, y) cerr << #x << " = ", dprint(x, x + y), cerr << endl
 
 #define e cerr
-#define L e << "{"
-#define R e << "}"
 #define w dprint
-#define S template<class T> void w
-#define D template<class T1, class T2> void w
+#define tm template
+#define ca class
 
-void w(string s)                                  { e << '"' << s << '"'; }
-S(T x)                                            { e << x; }
-D(pair<T1, T2> p)                                 { e << "("; w(p.first); e << ", "; w(p.second); e << ")"; }
-template<template<class...> class T, class t>
-void w(T<t> v)                                    { int f = 1; L; for (auto x : v) { if (!f) e << ", "; f = 0; w(x); } R; }
-D(map<T1, T2> v)                                  { int f = 1; L; for (auto x : v) { if (!f) e << ", "; f = 0; w(x); } R; }
-S(priority_queue<T> q)                            { L; while (!q.empty()) { w(q.top());   e << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
-S(priority_queue<T, vector<T>, greater<T> > q)    { L; while (!q.empty()) { w(q.top());   e << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
-S(queue<T> q)                                     { L; while (!q.empty()) { w(q.front()); e << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
-S(stack<T> q_)                                    { stack<T> q; while (!q_.empty()) { q.push(q_.top()); q_.pop(); }
-                                                    L; while (!q.empty()) { w(q.top());   e << (q.size() > 1 ? ", " : ""); q.pop(); } R; }
-S(T *s, T *t)                                     { w(vector<T>(s, t)); }
+void w(string s) { e << '"' << s << '"'; }
+tm<ca T> void w(T x) { e << x; }
+tm<ca T1, ca T2> void w(pair<T1, T2> p) { e << "("; w(p.first); e << ", "; w(p.second); e << ")"; }
+tm<tm<ca...> ca T, ca t> void w(T<t> v) { int f = 1; e << "{"; for (auto x : v) { if (!f) e << ", "; f = 0; w(x); } e << "}"; }
+tm<ca T1, ca T2> void w(map<T1, T2> v) { int f = 1; e << "{"; for (auto x : v) { if (!f) e << ", "; f = 0; w(x); } e << "}"; }
+tm<ca T> void w(T *s, T *t) { w(vector<T>(s, t)); }
 
 #undef e
-#undef L
-#undef R
 #undef w
-#undef S
-#undef D
+#undef tm
+#undef ca
 ```
 
 ### 防爆vector
