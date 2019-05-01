@@ -34,6 +34,20 @@ S(T *s, T *t)                                     { w(vector<T>(s, t)); }
 #undef D
 ```
 
+### 防爆vector
+
+```cpp
+template<class T, class A = allocator<T> >
+class vector_s : public vector<T, A> {
+public:
+    vector_s(size_t n = 0, const T& x = T()) : vector<T, A>(n, x) {}
+    T& operator [] (size_t n) { return this->at(n); }
+    const T& operator [] (size_t n) const { return this->at(n); }
+};
+
+#define vector vector_s
+```
+
 ### updmax/min
 
 ```cpp
