@@ -51,8 +51,8 @@ public:
 ### updmax/min
 
 ```cpp
-template<typename T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
-template<typename T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
+template<class T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
+template<class T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
 ```
 
 ### 二分答案
