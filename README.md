@@ -93,7 +93,6 @@ qdd的ACM板子
 
 ## 杂项
 
-+ [x] debug
 + [x] 防爆vector
 + [x] updmax/min
 + [x] 二分答案
