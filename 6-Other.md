@@ -1,29 +1,5 @@
 ## 杂项
 
-### debug
-
-```cpp
-#define dbg(x) cerr << #x << " = ", dprint(x), cerr << endl
-#define dbgr(x, y) cerr << #x << " = ", dprint(x, x + y), cerr << endl
-
-#define e cerr
-#define w dprint
-#define tm template
-#define ca class
-
-void w(string s) { e << '"' << s << '"'; }
-tm<ca T> void w(T x) { e << x; }
-tm<ca T1, ca T2> void w(pair<T1, T2> p) { e << "("; w(p.first); e << ", "; w(p.second); e << ")"; }
-tm<tm<ca...> ca T, ca t> void w(T<t> v) { int f = 1; e << "{"; for (auto x : v) { if (!f) e << ", "; f = 0; w(x); } e << "}"; }
-tm<ca T1, ca T2> void w(map<T1, T2> v) { int f = 1; e << "{"; for (auto x : v) { if (!f) e << ", "; f = 0; w(x); } e << "}"; }
-tm<ca T> void w(T *s, T *t) { w(vector<T>(s, t)); }
-
-#undef e
-#undef w
-#undef tm
-#undef ca
-```
-
 ### 防爆vector
 
 ```cpp
