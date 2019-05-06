@@ -205,6 +205,21 @@ goto loop
 
 ### Java
 
++ Main
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        PrintStream out = System.out;
+
+    }
+}
+```
+
 + 大整数
 
 ```java
