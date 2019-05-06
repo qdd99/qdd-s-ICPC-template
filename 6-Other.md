@@ -203,6 +203,73 @@ g++ std.cpp -o std.exe -O2 -std=c++11
 goto loop
 ```
 
+### Java
+
++ 浮点数格式
+
+```java
+import java.text.DecimalFormat;
+
+DecimalFormat fmt;
+
+// String s = fmt.format(...)
+
+// round to at most 2 digits, leave of digits if not needed
+fmt = new DecimalFormat("#.##");
+// 12345.6789 -> "12345.68"
+// 12345.0 -> "12345"
+// 0.0 -> "0"
+// 0.01 -> ".1"
+
+// round to precisely 2 digits
+fmt = new DecimalFormat("#.00");
+// 12345.6789 -> "12345.68"
+// 12345.0 -> "12345.00"
+// 0.0 -> ".00"
+
+// round to precisely 2 digits, force leading zero
+fmt = new DecimalFormat("0.00");
+// 12345.6789 -> "12345.68"
+// 12345.0 -> "12345.00"
+// 0.0 -> "0.00"
+
+// round to precisely 2 digits, force leading zeros
+fmt = new DecimalFormat("000000000.00");
+// 12345.6789 -> "000012345.68"
+// 12345.0 -> "000012345.00"
+// 0.0 -> "000000000.00"
+
+// force leading '+'
+fmt = new DecimalFormat("+0;-0");
+// 12345.6789 -> "+12346"
+// -12345.6789 -> "-12346"
+// 0 -> "+0"
+
+// always show "."
+fmt = new DecimalFormat("#.#");
+fmt.setDecimalSeparatorAlwaysShown(true);
+// 12.34 -> "12.3"
+// 12 -> "12."
+// 0.34 -> "0.3"
+
+// different grouping distances:
+fmt = new DecimalFormat("#,####.###");
+// 123456789.123 -> "1,2345,6789.123"
+
+// scientific:
+fmt = new DecimalFormat("0.000E00");
+// 123456789.123 -> "1.235E08"
+// -0.000234 -> "-2.34E-04"
+
+// using variable number of digits:
+fmt = new DecimalFormat("0");
+// 123.123 -> "123"
+fmt.setMinimumFractionDigits(8);
+// 123.123 -> "123.12300000"
+fmt.setMaximumFractionDigits(0);
+// 123.123 -> "123"
+```
+
 ### pb_ds
 
 ```cpp
