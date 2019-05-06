@@ -145,8 +145,9 @@ int lca(int u, int v) {
 
 ### 网络流
 
++ 最大流
+
 ```cpp
-// 最大流
 const int INF = 0x7fffffff;
 
 struct Edge {
@@ -213,8 +214,11 @@ struct Dinic {
         return flow;
     }
 };
+```
 
-// 最小费用流
++ 最小费用流
+
+```cpp
 const int INF = 0x7fffffff;
 
 struct Edge {

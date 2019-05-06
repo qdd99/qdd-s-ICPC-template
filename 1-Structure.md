@@ -9,9 +9,10 @@ void merge(int a, int b) { pa[find(a)] = find(b); }
 
 ### RMQ
 
++ 一维
+
 ```cpp
 // 下标从0开始
-// 一维
 struct RMQ {
     int st[MAXN][22]; // 22 = ((int)log2(MAXN) + 1)
 
@@ -33,8 +34,11 @@ struct RMQ {
         return max(st[l][x], st[r - (1 << x) + 1][x]);
     }
 };
+```
 
-// 二维
++ 二维
+
+```cpp
 struct RMQ {
     int st[MAXN][MAXN][11][11]; // 11 = ((int)log2(MAXN) + 1)
 
@@ -76,11 +80,11 @@ struct RMQ {
 
 ### 树状数组
 
++ 单点修改，区间和
+
 ```cpp
 // 支持第k大的BIT
 // 下标从1开始
-// 修改：单点
-// 查询：区间和
 struct Tbit {
     int size;
     ll t[MAXN];
@@ -124,9 +128,11 @@ struct Tbit {
         return p + 1;
     }
 };
+```
 
-// 修改：区间加
-// 查询：单点
++ 区间加，单点查询
+
+```cpp
 struct Tbit {
     int size;
     ll t[MAXN];
@@ -160,9 +166,11 @@ struct Tbit {
         add(r + 1, -val);
     }
 };
+```
 
-// 修改：区间加
-// 查询：区间和
++ 区间加，区间和
+
+```cpp
 Tbit t1, t2;
 
 void range_add(int l, int r, ll val) {
@@ -179,10 +187,10 @@ ll range_sum(int l, int r) {
 
 ### 线段树
 
++ 单点修改，RMQ
+
 ```cpp
 // 下标从1开始
-// 修改：单点
-// 查询：RMQ
 struct Node {
     int val;
 };
@@ -227,10 +235,11 @@ struct SegT {
 #undef rc
 #undef mid
 };
+```
 
-// 权值线段树
-// 修改：单点加
-// 查询：第k大
++ 权值线段树：单点修改，第k大
+
+```cpp
 void add(int x, ll val) {
     int p = size + x - 1;
     t[p].val += val;
@@ -246,9 +255,11 @@ int ask(int p, ll k, int pl, int pr) {
 }
 
 int query(ll k) { return ask(1, k, 1, size); }
+```
 
-// 修改：区间加
-// 查询：区间和
++ 区间加，区间和
+
+```cpp
 struct Node {
     ll val, lazy;
 };
@@ -286,9 +297,11 @@ void modify(int p, int l, int r, int val, int pl, int pr) {
 
 void update(int l, int r, int val) { modify(1, l, r, val, 1, size); }
 ll query(int l, int r) { return ask(1, l, r, 1, size); }
- 
-// 修改：区间乘混加
-// 查询：区间和取模
+```
+
++ 区间乘混加，区间和取模
+
+```cpp
 struct Node {
     ll val, mul, add;
     Node() : val(0), add(0), mul(1) {}
