@@ -273,26 +273,34 @@ BigInteger.valueOf(2)
 
 BigInteger abs()
 BigInteger negate() // -this
+
 BigInteger add​(BigInteger x)
 BigInteger subtract​(BigInteger x)
 BigInteger multiply​(BigInteger x)
 BigInteger divide​(BigInteger x)
-BigInteger mod​(BigInteger m)
+
 BigInteger pow​(int exp)
 BigInteger sqrt() // since Java 9
+
+BigInteger mod​(BigInteger m)
 BigInteger modPow​(BigInteger exp, BigInteger m)
 BigInteger modInverse​(BigInteger m)
+
 boolean isProbablePrime​(int certainty) // probability: 1 - (1/2) ^ (certainty)
+
 BigInteger gcd​(BigInteger x)
+
 BigInteger not() // ~this
 BigInteger and​(BigInteger x)
 BigInteger or​(BigInteger x)
 BigInteger xor​(BigInteger x)
 BigInteger shiftLeft​(int n)
 BigInteger shiftRight​(int n)
+
 int compareTo​(BigInteger x) // -1, 0, 1
 BigInteger max​(BigInteger x)
 BigInteger min​(BigInteger x)
+
 int intValue()
 long longValue()
 String toString()
