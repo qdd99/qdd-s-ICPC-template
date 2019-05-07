@@ -467,6 +467,42 @@ void go(vector<cp>& a, vector<cp>& b) {
 }
 ```
 
++ NTT
+
+```cpp
+const int MOD = 998244353, G = 3, IG = 332748118;
+
+int n1, n2, n, k, rev[MAXN];
+
+void ntt(vector<ll>& a, int p) {
+    for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
+    for (int h = 1; h < n; h <<= 1) {
+        ll wn = powMod(p == 1 ? G : IG, (MOD - 1) / (h << 1));
+        for (int i = 0; i < n; i += (h << 1)) {
+            ll w = 1;
+            for (int j = 0; j < h; j++, (w *= wn) %= MOD) {
+                ll x = a[i + j], y = w * a[i + j + h] % MOD;
+                a[i + j] = (x + y) % MOD, a[i + j + h] = (x - y + MOD) % MOD;
+            }
+        }
+    }
+    if (p == -1) {
+        ll ninv = powMod(n, MOD - 2);
+        for (int i = 0; i < n; i++) (a[i] *= ninv) %= MOD;
+    }
+}
+
+void go(vector<ll>& a, vector<ll>& b) {
+    n = 1, k = 0;
+    while (n <= n1 + n2) n <<= 1, k++;
+    a.resize(n); b.resize(n);
+    for (int i = 0; i < n; i++) rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (k - 1));
+    ntt(a, 1); ntt(b, 1);
+    for (int i = 0; i < n; i++) (a[i] *= b[i]) %= MOD;
+    ntt(a, -1);
+}
+```
+
 ### 自适应Simpson积分
 
 ```cpp
