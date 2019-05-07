@@ -431,6 +431,42 @@ void insert(ll x) {
 }
 ```
 
+### FFT & NTT & FWT
+
++ FFT
+
+```cpp
+const double PI = acos(-1);
+using cp = complex<double>;
+
+int n1, n2, n, k, rev[MAXN];
+
+void fft(vector<cp>& a, int p) {
+    for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
+    for (int h = 1; h < n; h <<= 1) {
+        cp wn(cos(PI / h), p * sin(PI / h));
+        for (int i = 0; i < n; i += (h << 1)) {
+            cp w(1, 0);
+            for (int j = 0; j < h; j++, w *= wn) {
+                cp x = a[i + j], y = w * a[i + j + h];
+                a[i + j] = x + y, a[i + j + h] = x - y;
+            }
+        }
+    }
+    if (p == -1) for (int i = 0; i < n; i++) a[i] /= n;
+}
+
+void go(vector<cp>& a, vector<cp>& b) {
+    n = 1, k = 0;
+    while (n <= n1 + n2) n <<= 1, k++;
+    a.resize(n); b.resize(n);
+    for (int i = 0; i < n; i++) rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (k - 1));
+    fft(a, 1); fft(b, 1);
+    for (int i = 0; i < n; i++) a[i] *= b[i];
+    fft(a, -1);
+}
+```
+
 ### 自适应Simpson积分
 
 ```cpp
