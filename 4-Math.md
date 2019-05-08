@@ -431,6 +431,24 @@ void insert(ll x) {
 }
 ```
 
+### 中国剩余定理
+
+```cpp
+// 前置：exgcd
+ll excrt(vector<ll>& m, vector<ll>& r) {
+    ll M = m[0], R = r[0], x, y, d;
+    for (int i = 1; i < m.size(); i++) {
+        d = exgcd(M, m[i], x, y);
+        if ((r[i] - R) % d) return -1;
+        x = mul(x, (r[i] - R) / d, m[i] / d);
+        R += x * M;
+        M = M / d * m[i];
+        R %= M;
+    }
+    return R >= 0 ? R : R + M;
+}
+```
+
 ### 离散对数
 
 ```cpp
