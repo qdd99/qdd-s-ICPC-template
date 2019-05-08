@@ -431,6 +431,56 @@ void insert(ll x) {
 }
 ```
 
+### 离散对数
+
+```cpp
+// a ^ x = b (mod p)，要求模数为素数
+ll BSGS(ll a, ll b, ll p) {
+    a %= p;
+    if (!a && !b) return 1;
+    if (!a) return -1;
+    map<ll, ll> mp;
+    ll m = ceil(sqrt(p)), v = 1;
+    for (int i = 1; i <= m; i++) {
+        (v *= a) %= p;
+        mp[v * b % p] = i;
+    }
+    ll vv = v;
+    for (int i = 1; i <= m; i++) {
+        auto it = mp.find(vv);
+        if (it != mp.end()) return i * m - it->second;
+        (vv *= v) %= p;
+    }
+    return -1;
+}
+
+// 模数可以非素数
+ll exBSGS(ll a, ll b, ll p) {
+    a %= p; b %= p;
+    if (a == 0) return b > 1 ? -1 : (b == 0 && p != 1);
+    ll c = 0, q = 1;
+    for (;;) {
+        ll g = gcd(a, p);
+        if (g == 1) break;
+        if (b == 1) return c;
+        if (b % g) return -1;
+        ++c; b /= g; p /= g; q = a / g * q % p;
+    }
+    map<ll, ll> mp;
+    ll m = ceil(sqrt(p)), v = 1;
+    for (int i = 1; i <= m; i++) {
+        (v *= a) %= p;
+        mp[v * b % p] = i;
+    }
+    for (int i = 1; i <= m; i++) {
+        (q *= v) %= p;
+        auto it = mp.find(q);
+        if (it != mp.end()) return i * m - it->second + c;
+    }
+    return -1;
+}
+```
+
 ### FFT & NTT & FWT
 
 + FFT
