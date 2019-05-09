@@ -133,7 +133,7 @@ struct Tbit {
 + 区间加，单点查询
 
 ```cpp
-void update(int l, int r, ll x) {
+void range_add(int l, int r, ll x) {
     add(l, x);
     add(r + 1, -x);
 }
