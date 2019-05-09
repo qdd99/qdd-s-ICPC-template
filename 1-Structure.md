@@ -133,39 +133,10 @@ struct Tbit {
 + 区间加，单点查询
 
 ```cpp
-struct Tbit {
-    int size;
-    ll t[MAXN];
-
-    int lowbit(int x) { return x & (-x); }
-
-    void init(int sz) {
-        size = sz + 1;
-        memset(t, 0, (sz + 2) * sizeof(ll));
-    }
-
-    void add(int p, ll x) {
-        if (p <= 0) return;
-        while (p <= size) {
-            t[p] += x;
-            p += lowbit(p);
-        }
-    }
-
-    ll get(int p) {
-        ll sum = 0;
-        while (p > 0) {
-            sum += t[p];
-            p -= lowbit(p);
-        }
-        return sum;
-    }
-
-    void update(int l, int r, ll x) {
-        add(l, x);
-        add(r + 1, -x);
-    }
-};
+void update(int l, int r, ll x) {
+    add(l, x);
+    add(r + 1, -x);
+}
 ```
 
 + 区间加，区间和
