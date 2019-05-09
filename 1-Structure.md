@@ -96,24 +96,24 @@ struct Tbit {
         memset(t, 0, (sz + 2) * sizeof(ll));
     }
 
-    void add(int pos, ll val) {
-        if (pos <= 0) return;
-        while (pos <= size) {
-            t[pos] += val;
-            pos += lowbit(pos);
+    void add(int p, ll x) {
+        if (p <= 0) return;
+        while (p <= size) {
+            t[p] += x;
+            p += lowbit(p);
         }
     }
 
-    ll get(int pos) {
+    ll get(int p) {
         ll sum = 0;
-        while (pos > 0) {
-            sum += t[pos];
-            pos -= lowbit(pos);
+        while (p > 0) {
+            sum += t[p];
+            p -= lowbit(p);
         }
         return sum;
     }
 
-    void update(int pos, ll val) { add(pos, val - query(pos, pos)); }
+    void update(int p, ll x) { add(p, x - query(p, p)); }
     ll query(int l, int r) { return get(r) - get(l - 1); }
 
     int kth(ll k) {
@@ -144,26 +144,26 @@ struct Tbit {
         memset(t, 0, (sz + 2) * sizeof(ll));
     }
 
-    void add(int pos, ll val) {
-        if (pos <= 0) return;
-        while (pos <= size) {
-            t[pos] += val;
-            pos += lowbit(pos);
+    void add(int p, ll x) {
+        if (p <= 0) return;
+        while (p <= size) {
+            t[p] += x;
+            p += lowbit(p);
         }
     }
 
-    ll get(int pos) {
+    ll get(int p) {
         ll sum = 0;
-        while (pos > 0) {
-            sum += t[pos];
-            pos -= lowbit(pos);
+        while (p > 0) {
+            sum += t[p];
+            p -= lowbit(p);
         }
         return sum;
     }
 
-    void update(int l, int r, ll val) {
-        add(l, val);
-        add(r + 1, -val);
+    void update(int l, int r, ll x) {
+        add(l, x);
+        add(r + 1, -x);
     }
 };
 ```
@@ -173,11 +173,11 @@ struct Tbit {
 ```cpp
 Tbit t1, t2;
 
-void range_add(int l, int r, ll val) {
-    t1.add(l, val);
-    t2.add(l, l * val);
-    t1.add(r + 1, -val);
-    t2.add(r + 1, (r + 1) * -val);
+void range_add(int l, int r, ll x) {
+    t1.add(l, x);
+    t2.add(l, l * x);
+    t1.add(r + 1, -x);
+    t2.add(r + 1, (r + 1) * -x);
 }
 
 ll range_sum(int l, int r) {
