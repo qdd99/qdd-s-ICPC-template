@@ -42,7 +42,7 @@ ll mul(ll a, ll b) {
 const int MAT_SZ = 3;
 
 struct Mat {
-    ll m[MAT_SZ][MAT_SZ] = {0};
+    ll m[MAT_SZ][MAT_SZ] = {{0}};
     ll * operator [] (int i) { return m[i]; }
     void one() { for (int i = 0; i < MAT_SZ; i++) m[i][i] = 1; }
 };
