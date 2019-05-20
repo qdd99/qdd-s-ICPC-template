@@ -449,6 +449,26 @@ ll excrt(vector<ll>& m, vector<ll>& r) {
 }
 ```
 
+### 原根
+
+```cpp
+// 前置：找质因数（无重复）
+ll primitive_root(ll p) {
+    vector<ll> facs = getf(p - 1);
+    for (ll i = 2; i < p; i++) {
+        bool flag = true;
+        for (ll x : facs) {
+            if (powMod(i, (p - 1) / x, p) == 1) {
+                flag = false;
+                break;
+            }
+        }
+        if (flag) return i;
+    }
+    return -1;
+}
+```
+
 ### 离散对数
 
 ```cpp
@@ -496,6 +516,12 @@ ll exBSGS(ll a, ll b, ll p) {
         if (it != mp.end()) return i * m - it->second + c;
     }
     return -1;
+}
+
+// 已知 x, b, p，求 a
+ll SGSB(ll x, ll b, ll p) {
+    ll g = primitive_root(p);
+    return powMod(g, BSGS(powMod(g, x, p), b, p), p);
 }
 ```
 
