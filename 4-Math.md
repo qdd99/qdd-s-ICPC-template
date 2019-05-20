@@ -597,6 +597,39 @@ void go(vector<ll>& a, vector<ll>& b) {
 }
 ```
 
++ FWT
+
+```cpp
+void AND(ll& a, ll& b) { a += b; }
+void rAND(ll& a, ll& b) { a -= b; }
+
+void OR(ll& a, ll& b) { b += a; }
+void rOR(ll& a, ll& b) { b -= a; }
+
+void XOR (ll& a, ll& b) {
+    ll x = a, y = b;
+    a = (x + y) % MOD;
+    b = (x - y + MOD) % MOD;
+}
+void rXOR(ll& a, ll& b) {
+    static ll inv2 = (MOD + 1) / 2;
+    ll x = a, y = b;
+    a = (x + y) * inv2 % MOD;
+    b = (x - y + MOD) * inv2 % MOD;
+}
+
+template<class T>
+void fwt(vector<ll>& a, int n, T f) {
+    for (int d = 1; d < n; d <<= 1) {
+        for (int i = 0; i < n; i += (d << 1)) {
+            for (int j = 0; j < d; j++) {
+                f(a[i + j], a[i + j + d]);
+            }
+        }
+    }
+}
+```
+
 ### 自适应Simpson积分
 
 ```cpp
