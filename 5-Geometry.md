@@ -5,40 +5,42 @@
 ```cpp
 #define y1 qwq
 
-const double PI = acos(-1);
-const double EPS = 1e-8;
+using ld = double;
 
-int sgn(double x) { return x < -EPS ? -1 : x > EPS; }
+const ld PI = acos(-1);
+const ld EPS = 1e-8;
+
+int sgn(ld x) { return x < -EPS ? -1 : x > EPS; }
 
 // 不要直接使用sgn
-bool eq(double x, double y) { return sgn(x - y) == 0; }
-bool lt(double x, double y) { return sgn(x - y) < 0; }
-bool gt(double x, double y) { return sgn(x - y) > 0; }
-bool leq(double x, double y) { return sgn(x - y) <= 0; }
-bool geq(double x, double y) { return sgn(x - y) >= 0; }
+bool eq(ld x, ld y) { return sgn(x - y) == 0; }
+bool lt(ld x, ld y) { return sgn(x - y) < 0; }
+bool gt(ld x, ld y) { return sgn(x - y) > 0; }
+bool leq(ld x, ld y) { return sgn(x - y) <= 0; }
+bool geq(ld x, ld y) { return sgn(x - y) >= 0; }
 
 struct V {
-    double x, y;
-    V(double x = 0, double y = 0) : x(x), y(y) {}
+    ld x, y;
+    V(ld x = 0, ld y = 0) : x(x), y(y) {}
     V(const V& a, const V& b) : x(b.x - a.x), y(b.y - a.y) {}
-    V operator + (const V &b) const { return V(x + b.x, y + b.y); }
-    V operator - (const V &b) const { return V(x - b.x, y - b.y); }
-    V operator * (double k) const { return V(x * k, y * k); }
-    V operator / (double k) const { return V(x / k, y / k); }
-    double len() const { return hypot(x, y); }
-    double len2() const { return x * x + y * y; }
+    V operator + (const V& b) const { return V(x + b.x, y + b.y); }
+    V operator - (const V& b) const { return V(x - b.x, y - b.y); }
+    V operator * (ld k) const { return V(x * k, y * k); }
+    V operator / (ld k) const { return V(x / k, y / k); }
+    ld len() const { return hypot(x, y); }
+    ld len2() const { return x * x + y * y; }
 };
 
 ostream& operator << (ostream& os, const V& p) { return os << "(" << p.x << ", " << p.y << ")"; }
 istream& operator >> (istream& is, V& p) { return is >> p.x >> p.y; }
 
-double dist(const V& a, const V& b) { return (b - a).len(); }
-double dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
-double det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
-double cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
+ld dist(const V& a, const V& b) { return (b - a).len(); }
+ld dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
+ld det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
+ld cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
 
 // 逆时针旋转 r 弧度
-V rot(const V& p, double r) {
+V rot(const V& p, ld r) {
     return V(p.x * cos(r) - p.y * sin(r), p.x * sin(r) + p.y * cos(r));
 }
 V rot_ccw90(const V& p) { return V(-p.y, p.x); }
@@ -55,12 +57,12 @@ bool p_on_ray(const V& p, const V& a, const V& b) {
 }
 
 // 点到直线距离
-double dist_to_line(const V& p, const V& a, const V& b) {
+ld dist_to_line(const V& p, const V& a, const V& b) {
     return abs(cross(a, b, p) / dist(a, b));
 }
 
 // 点到线段距离
-double dist_to_seg(const V& p, const V& a, const V& b) {
+ld dist_to_seg(const V& p, const V& a, const V& b) {
     if (lt(dot(b - a, p - a), 0)) return dist(p, a);
     if (lt(dot(a - b, p - b), 0)) return dist(p, b);
     return dist_to_line(p, a, b);
@@ -68,7 +70,7 @@ double dist_to_seg(const V& p, const V& a, const V& b) {
 
 // 求直线交点
 V intersect(const V& a, const V& b, const V& c, const V& d) {
-    double s1 = cross(c, d, a), s2 = cross(c, d, b);
+    ld s1 = cross(c, d, a), s2 = cross(c, d, b);
     return (a * s2 - b * s1) / (s2 - s1);
 }
 ```
@@ -77,8 +79,8 @@ V intersect(const V& a, const V& b, const V& c, const V& d) {
 
 ```cpp
 // 多边形面积
-double area(const vector<V>& s) {
-    double ret = 0;
+ld area(const vector<V>& s) {
+    ld ret = 0;
     for (int i = 0; i < s.size(); i++) {
         ret += det(s[i], s[(i + 1) % s.size()]);
     }
@@ -154,9 +156,8 @@ int inside(const vector<V>& s, const V& p) {
 ```cpp
 struct C {
     V o;
-    double r;
-    C(double x = 0, double y = 0, double r = 0) : o(x, y), r(r) {}
-    C(const V& o, double r) : o(o), r(r) {}
+    ld r;
+    C(const V& o, ld r) : o(o), r(r) {}
 };
 ```
 
