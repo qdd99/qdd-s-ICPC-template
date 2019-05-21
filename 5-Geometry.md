@@ -159,6 +159,15 @@ struct C {
     ld r;
     C(const V& o, ld r) : o(o), r(r) {}
 };
+
+// 过一点求圆的切线，返回切点
+vector<V> tangent_point(const C& c, const V& p) {
+    ld k = c.r / dist(c.o, p);
+    if (gt(k, 1)) return vector<V>();
+    if (eq(k, 1)) return {p};
+    V a = V(c.o, p) * k;
+    return {c.o + rot(a, acos(k)), c.o + rot(a, -acos(k))};
+}
 ```
 
 ### 三维几何
