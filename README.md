@@ -1,6 +1,6 @@
 # qdd-s-ICPC-template
 
-qdd的ACM板子
+qdd的ACM模板库
 
 > “地球还是要继续转动，生活还是要继续努力，梦想绝不能因此停下它的脚步。”
 
