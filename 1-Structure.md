@@ -182,6 +182,34 @@ struct Tbit {
 };
 ```
 
++ 二维区间加，区间和
+
+```cpp
+Tbit t0, t1, t2, t3;
+
+void add4(int x, int y, ll d) {
+    t0.add(x, y, d);
+    t1.add(x, y, d * x);
+    t2.add(x, y, d * y);
+    t3.add(x, y, d * x * y);
+}
+
+void range_add(int x, int y, int xx, int yy, ll d) {
+    add4(x, y, d);
+    add4(x, yy + 1, -d);
+    add4(xx + 1, y, -d);
+    add4(xx + 1, yy + 1, d);
+}
+
+ll get4(int x, int y) {
+    return (x + 1) * (y + 1) * t0.get(x, y) - (y + 1) * t1.get(x, y) - (x + 1) * t2.get(x, y) + t3.get(x, y);
+}
+
+ll range_sum(int x, int y, int xx, int yy) {
+    return get4(xx, yy) - get4(x - 1, yy) - get4(xx, y - 1) + get4(x - 1, y - 1);
+}
+```
+
 ### 线段树
 
 + 单点修改，RMQ
