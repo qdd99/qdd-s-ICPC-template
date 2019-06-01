@@ -156,6 +156,32 @@ ll range_sum(int l, int r) {
 }
 ```
 
++ 二维
+
+```cpp
+struct Tbit {
+    ll t[MAXN][MAXN];
+
+    int lowbit(int x) { return x & (-x); }
+
+    void add(int x, int y, int d) {
+        for (int i = x; i <= n; i += lowbit(i))
+            for (int j = y; j <= m; j += lowbit(j)) t[i][j] += d;
+    }
+
+    ll get(int x, int y) {
+        ll sum = 0;
+        for (int i = x; i > 0; i -= lowbit(i))
+            for (int j = y; j > 0; j -= lowbit(j)) sum += t[i][j];
+        return sum;
+    }
+
+    ll query(int x, int y, int xx, int yy) {
+        return get(xx, yy) - get(x - 1, yy) - get(xx, y - 1) + get(x - 1, y - 1);
+    }
+};
+```
+
 ### 线段树
 
 + 单点修改，RMQ
