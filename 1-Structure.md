@@ -202,7 +202,10 @@ void range_add(int x, int y, int xx, int yy, ll d) {
 }
 
 ll get4(int x, int y) {
-    return (x + 1) * (y + 1) * t0.get(x, y) - (y + 1) * t1.get(x, y) - (x + 1) * t2.get(x, y) + t3.get(x, y);
+    return (x + 1) * (y + 1) * t0.get(x, y)
+    - (y + 1) * t1.get(x, y)
+    - (x + 1) * t2.get(x, y)
+    + t3.get(x, y);
 }
 
 ll range_sum(int x, int y, int xx, int yy) {
