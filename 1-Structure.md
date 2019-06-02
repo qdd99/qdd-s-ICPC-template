@@ -98,18 +98,12 @@ struct Tbit {
 
     void add(int p, ll x) {
         if (p <= 0) return;
-        while (p <= size) {
-            t[p] += x;
-            p += lowbit(p);
-        }
+        for (; p <= size; p += lowbit(p)) t[p] += x;
     }
 
     ll get(int p) {
         ll sum = 0;
-        while (p > 0) {
-            sum += t[p];
-            p -= lowbit(p);
-        }
+        for (; p > 0; p -= lowbit(p)) sum += t[p];
         return sum;
     }
 
