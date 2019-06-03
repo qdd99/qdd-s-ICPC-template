@@ -651,6 +651,25 @@ double asr(double l, double r) { return asr(l, r, EPS, simpson(l, r)); }
 ### 拉格朗日插值
 
 ```cpp
+// 求f(k)的值，O(n^2)
+ll La(const vector<pair<ll, ll> >& v, ll k) {
+    ll ret = 0;
+    for (int i = 0; i < v.size(); i++) {
+        ll up = v[i].second % MOD, down = 1;
+        for (int j = 0; j < v.size(); j++) {
+            if (i != j) {
+                (up *= (k - v[j].first) % MOD) %= MOD;
+                (down *= (v[i].first - v[j].first) % MOD) %= MOD;
+            }
+        }
+        if (up < 0) up += MOD;
+        if (down < 0) down += MOD;
+        (ret += up * inv(down) % MOD) %= MOD;
+    }
+    return ret;
+}
+
+// 求f(x)的系数表达式，O(n * 2^n)
 vector<double> La(vector<pair<double, double> > v) {
     int n = v.size(), t;
     vector<double> ret(n);
