@@ -651,7 +651,7 @@ double asr(double l, double r) { return asr(l, r, EPS, simpson(l, r)); }
 ### 拉格朗日插值
 
 ```cpp
-// 求f(k)的值，O(n^2)
+// 求 f(k) 的值，O(n^2)
 ll La(const vector<pair<ll, ll> >& v, ll k) {
     ll ret = 0;
     for (int i = 0; i < v.size(); i++) {
@@ -669,7 +669,7 @@ ll La(const vector<pair<ll, ll> >& v, ll k) {
     return ret;
 }
 
-// 求f(x)的系数表达式，O(n * 2^n)
+// 求 f(x) 的系数表达式，O(n * 2^n)（适合打表）
 vector<double> La(vector<pair<double, double> > v) {
     int n = v.size(), t;
     vector<double> ret(n);
