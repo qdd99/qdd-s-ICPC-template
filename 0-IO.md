@@ -45,8 +45,8 @@ while (~scanf) {}
 // 需测试是否可用
 inline __int128 get128() {
     __int128 x = 0, sgn = 1;
-    char c;
-    for (c = getchar(); c < '0' || c > '9'; c = getchar()) if (c == '-') sgn = -1;
+    char c = getchar();
+    for (; c < '0' || c > '9'; c = getchar()) if (c == '-') sgn = -1;
     for (; c >= '0' && c <= '9'; c = getchar()) x = x * 10 + c - '0';
     return sgn * x;
 }
