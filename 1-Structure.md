@@ -469,3 +469,15 @@ struct Splay {
     }
 };
 ```
+
+### 伪随机数
+
+```cpp
+// 此处本应有 Treap
+using uint = unsigned int;
+
+uint rnd() {
+    static uint A = 1 << 16 | 3, B = 33333331, C = 1091;
+    return C = A * C + B;
+}
+```
