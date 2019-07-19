@@ -21,6 +21,30 @@ template<class T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
 template<class T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
 ```
 
+### 分数
+
+```cpp
+struct Frac {
+    ll x, y;
+
+    Frac(ll p = 0, ll q = 1) {
+        ll d = __gcd(p, q);
+        x = p / d, y = q / d;
+        if (y < 0) x = -x, y = -y;
+    }
+
+    Frac operator + (const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
+    Frac operator - (const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
+    Frac operator * (const Frac& b) { return Frac(x * b.x, y * b.y); }
+    Frac operator / (const Frac& b) { return Frac(x * b.y, y * b.x); }
+};
+
+ostream& operator << (ostream& os, const Frac& f) {
+    if (f.y == 1) return os << f.x;
+    else return os << f.x << '/' << f.y;
+}
+```
+
 ### 二分答案
 
 ```cpp
