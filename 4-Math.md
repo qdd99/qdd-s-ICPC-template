@@ -72,9 +72,11 @@ Mat pow(Mat &a, ll b) {
 ### 素数判断
 
 ```cpp
-bool isPrime(int x) {
+bool isprime(int x) {
     if (x < 2) return false;
-    for (int i = 2; i * i <= x; i++) if (x % i == 0) return false;
+    for (int i = 2; i * i <= x; i++) {
+        if (x % i == 0) return false;
+    }
     return true;
 }
 
@@ -96,7 +98,7 @@ bool Rabin_Miller(ll p, ll a) {
     return 0;
 }
 
-bool isPrime(ll x) {
+bool isprime(ll x) {
     if (x == 3 || x == 5) return 1;
     static ll prime[7] = {2, 307, 7681, 36061, 555097, 4811057, 1007281591};
     for (int i = 0; i < 7; i++) {
