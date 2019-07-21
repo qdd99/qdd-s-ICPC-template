@@ -273,6 +273,39 @@ vector<int> getf(int x) {
 }
 ```
 
+### Pollard-Rho
+
+```cpp
+mt19937_64 mt_rand(time(0));
+
+ll pollard_rho(ll n, ll c) {
+    ll x = mt_rand() % (n - 1) + 1, y = x;
+    auto f = [&](ll v) {
+        ll t = mul(v, v, n) + c;
+        return t < n ? t : t - n;
+    };
+    for (;;) {
+        x = f(x); y = f(f(y));
+        if (x == y) return n;
+        ll d = gcd(abs(x - y), n);
+        if (d != 1) return d;
+    }
+}
+
+vector<ll> getf(ll x) {
+    vector<ll> v;
+    function<void(ll)> f = [&](ll n) {
+        if (n == 4) { v.push_back(2); v.push_back(2); return; }
+        if (isprime(n)) { v.push_back(n); return; }
+        ll p = n, c = 19260817;
+        while (p == n) p = pollard_rho(n, --c);
+        f(p); f(n / p);
+    };
+    f(x);
+    return v;
+}
+```
+
 ### 欧拉函数
 
 ```cpp
