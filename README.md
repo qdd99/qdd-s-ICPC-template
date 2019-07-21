@@ -66,7 +66,7 @@ qdd的ACM模板库 感谢郑老师和董老师的大力滋兹！TQL%%%
 + [ ] 杜教筛
 + [x] 找因数
 + [x] 找质因数
-+ [ ] Pollard-Rho
++ [x] Pollard-Rho
 + [x] 欧拉函数
 + [x] EXGCD
 + [x] 逆元
@@ -94,6 +94,7 @@ qdd的ACM模板库 感谢郑老师和董老师的大力滋兹！TQL%%%
 
 + [x] 防爆vector
 + [x] updmax/min
++ [x] 分数
 + [x] 二分答案
 + [x] 三分
 + [x] 日期
