@@ -150,20 +150,20 @@ int lca(int u, int v) {
 ```cpp
 const int INF = 0x7fffffff;
 
-struct Edge {
+struct DEdge {
     int to, cap;
-    Edge(int to, int cap) : to(to), cap(cap) {}
+    DEdge(int to, int cap) : to(to), cap(cap) {}
 };
 
 struct Dinic {
     int n, s, t;
-    vector<Edge> es;
+    vector<DEdge> es;
     vector<vector<int> > G;
     vector<int> dis, cur;
 
     Dinic(int n, int s, int t) : n(n), s(s), t(t), G(n + 1), dis(n + 1), cur(n + 1) {}
 
-    void addEdge(int u, int v, int cap) {
+    void add_edge(int u, int v, int cap) {
         G[u].push_back(es.size());
         es.emplace_back(v, cap);
         G[v].push_back(es.size());
@@ -179,7 +179,7 @@ struct Dinic {
             int u = q.front();
             q.pop();
             for (int i : G[u]) {
-                Edge& e = es[i];
+                DEdge& e = es[i];
                 if (!dis[e.to] && e.cap > 0) {
                     dis[e.to] = dis[u] + 1;
                     q.push(e.to);
@@ -193,7 +193,7 @@ struct Dinic {
         if (u == t || cap == 0) return cap;
         int tmp = cap, f;
         for (int& i = cur[u]; i < G[u].size(); i++) {
-            Edge& e = es[G[u][i]];
+            DEdge& e = es[G[u][i]];
             if (dis[e.to] == dis[u] + 1) {
                 f = dfs(e.to, min(cap, e.cap));
                 e.cap -= f;
@@ -221,21 +221,21 @@ struct Dinic {
 ```cpp
 const int INF = 0x7fffffff;
 
-struct Edge {
+struct MEdge {
     int from, to, cap, cost;
-    Edge(int from, int to, int cap, int cost) : from(from), to(to), cap(cap), cost(cost) {}
+    MEdge(int from, int to, int cap, int cost) : from(from), to(to), cap(cap), cost(cost) {}
 };
 
 struct MCMF {
     int n, s, t, flow, cost;
-    vector<Edge> es;
+    vector<MEdge> es;
     vector<vector<int> > G;
     vector<int> d, p, a;  // dis, prev, add
     deque<bool> in;
 
     MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), G(n + 1), p(n + 1), a(n + 1) {}
 
-    void addEdge(int u, int v, int cap, int cost) {
+    void add_edge(int u, int v, int cap, int cost) {
         G[u].push_back(es.size());
         es.emplace_back(u, v, cap, cost);
         G[v].push_back(es.size());
@@ -255,7 +255,7 @@ struct MCMF {
             q.pop();
             in[u] = false;
             for (int& i : G[u]) {
-                Edge& e = es[i];
+                MEdge& e = es[i];
                 if (e.cap && d[e.to] > d[u] + e.cost) {
                     d[e.to] = d[u] + e.cost;
                     p[e.to] = i;
