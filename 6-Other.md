@@ -355,6 +355,46 @@ fmt = new DecimalFormat("000000000.00");
 // 0.0 -> "000000000.00"
 ```
 
+### bits/stdc++.h
+
+```cpp
+// C
+#include <cassert>
+#include <cctype>
+#include <climits>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
+// C++
+#include <algorithm>
+#include <bitset>
+#include <complex>
+#include <deque>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <list>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <utility>
+#include <vector>
+
+// C++11
+#include <chrono>
+#include <initializer_list>
+#include <random>
+#include <unordered_map>
+#include <unordered_set>
+```
+
 ### pb_ds
 
 ```cpp
