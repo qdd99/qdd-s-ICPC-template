@@ -376,7 +376,6 @@ fmt = new DecimalFormat("000000000.00");
 #include <functional>
 #include <iomanip>
 #include <iostream>
-#include <iterator>
 #include <list>
 #include <map>
 #include <numeric>
@@ -389,7 +388,6 @@ fmt = new DecimalFormat("000000000.00");
 
 // C++11
 #include <chrono>
-#include <initializer_list>
 #include <random>
 #include <unordered_map>
 #include <unordered_set>
