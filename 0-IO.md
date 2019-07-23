@@ -65,38 +65,26 @@ inline void print128(__int128 x) {
 
 ```cpp
 // 本机测试需要EOF才能看到输出结果
-#define BUF_SIZE 1048576
+class Scanner {
+    static constexpr int BUF_SIZE = 1048576; // 1MB
 
-inline char nc() {
-    static char buf[BUF_SIZE], *p1 = buf, *p2 = buf;
-    if (p1 == p2) {
-        p1 = buf;
-        p2 = buf + fread(buf, 1, BUF_SIZE, stdin);
-        // assert(p1 != p2);
+    char buf[BUF_SIZE], *p1 = buf, *p2 = buf;
+
+    char nc() {
+        if (p1 == p2) {
+            p1 = buf; p2 = buf + fread(buf, 1, BUF_SIZE, stdin);
+            // assert(p1 != p2);
+        }
+        return *p1++;
     }
-    return *p1++;
-}
 
-inline bool blank(char c) { return c == ' ' || c == '\n' || c == '\r' || c == '\t'; }
-
-// non-negative integer
-inline int getint() {
-    int x = 0;
-    char c = nc();
-    while (blank(c)) c = nc();
-    for (; c >= '0' && c <= '9'; c = nc()) x = x * 10 + c - '0';
-    return x;
-}
-
-// integer
-inline int getint() {
-    int x = 0, sgn = 1;
-    char c = nc();
-    while (blank(c)) c = nc();
-    if (c == '-') sgn = -1, c = nc();
-    for (; c >= '0' && c <= '9'; c = nc()) x = x * 10 + c - '0';
-    return sgn * x;
-}
-
-#undef BUF_SIZE
+public:
+    int nextInt() {
+        int x = 0, sgn = 1;
+        char c = nc();
+        for (; c < '0' || c > '9'; c = nc()) if (c == '-') sgn = -1;
+        for (; c >= '0' && c <= '9'; c = nc()) x = x * 10 + c - '0';
+        return sgn * x;
+    }
+} in;
 ```
