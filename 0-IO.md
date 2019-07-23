@@ -86,5 +86,16 @@ public:
         for (; c >= '0' && c <= '9'; c = nc()) x = x * 10 + c - '0';
         return sgn * x;
     }
+
+    double nextDouble() {
+        double x = 0, base = 0.1;
+        int sgn = 1;
+        char c = nc();
+        for (; c < '0' || c > '9'; c = nc()) if (c == '-') sgn = -1;
+        for (; c >= '0' && c <= '9'; c = nc()) x = x * 10 + c - '0';
+        for (; c < '0' || c > '9'; c = nc()) if (c != '.') return sgn * x;
+        for (; c >= '0' && c <= '9'; c = nc()) x += base * (c - '0'), base *= 0.1;
+        return sgn * x;
+    }
 } in;
 ```
