@@ -40,14 +40,14 @@ struct RMQ {
 
 ```cpp
 struct RMQ {
-    int st[MAXN][MAXN][11][11]; // 11 = ((int)log2(MAXN) + 1)
+    int st[11][11][MAXN][MAXN]; // 11 = ((int)log2(MAXN) + 1)
 
     int xlog(int x) { return 31 - __builtin_clz(x); }
 
     void init(int n, int m) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                st[i][j][0][0] = a[i][j];
+                st[0][0][i][j] = a[i][j];
             }
         }
         for (int i = 0; (1 << i) <= n; i++) {
@@ -56,9 +56,9 @@ struct RMQ {
                 for (int r = 0; r + (1 << i) - 1 < n; r++) {
                     for (int c = 0; c + (1 << j) - 1 < m; c++) {
                         if (i == 0) {
-                            st[r][c][i][j] = max(st[r][c][i][j - 1], st[r][c + (1 << (j - 1))][i][j - 1]);
+                            st[i][j][r][c] = max(st[i][j - 1][r][c], st[i][j - 1][r][c + (1 << (j - 1))]);
                         } else {
-                            st[r][c][i][j] = max(st[r][c][i - 1][j], st[r + (1 << (i - 1))][c][i - 1][j]);
+                            st[i][j][r][c] = max(st[i - 1][j][r][c], st[i - 1][j][r + (1 << (i - 1))][c]);
                         }
                     }
                 }
@@ -69,10 +69,10 @@ struct RMQ {
     int query(int r1, int c1, int r2, int c2) {
         int x = xlog(r2 - r1 + 1);
         int y = xlog(c2 - c1 + 1);
-        int m1 = st[r1][c1][x][y];
-        int m2 = st[r1][c2 - (1 << y) + 1][x][y];
-        int m3 = st[r2 - (1 << x) + 1][c1][x][y];
-        int m4 = st[r2 - (1 << x) + 1][c2 - (1 << y) + 1][x][y];
+        int m1 = st[x][y][r1][c1];
+        int m2 = st[x][y][r1][c2 - (1 << y) + 1];
+        int m3 = st[x][y][r2 - (1 << x) + 1][c1];
+        int m4 = st[x][y][r2 - (1 << x) + 1][c2 - (1 << y) + 1];
         return max({m1, m2, m3, m4});
     }
 };
