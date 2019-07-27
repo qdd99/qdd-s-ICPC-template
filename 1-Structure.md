@@ -215,12 +215,17 @@ ll range_sum(int x, int y, int xx, int yy) {
 // 下标从1开始
 struct Node {
     int val;
+    Node(int val = -INF) : val(val) {}
 };
+
+Node merge(const Node& a, const Node& b) {
+    return Node(max(a.val, b.val));
+}
 
 struct SegT {
 #define lc (p << 1)
 #define rc (p << 1 | 1)
-#define mid (pl + pr >> 1)
+#define mid ((pl + pr) >> 1)
 
     int size;
     Node *t;
@@ -235,23 +240,21 @@ struct SegT {
         delete [] t;
     }
 
-    int ask(int p, int l, int r, int pl, int pr) {
-        if (l > pr || r < pl) return -INF;
-        if (l <= pl && r >= pr) return t[p].val;
-        int vl = ask(lc, l, r, pl, mid);
-        int vr = ask(rc, l, r, mid + 1, pr);
-        return max(vl, vr);
+    Node ask(int p, int l, int r, int pl, int pr) {
+        if (l > pr || r < pl) return Node();
+        if (l <= pl && r >= pr) return t[p];
+        return merge(ask(lc, l, r, pl, mid), ask(rc, l, r, mid + 1, pr));
     }
 
     void update(int k, int val) {
         int p = size + k - 1;
-        t[p].val = val;
+        t[p] = Node(val);
         for (p >>= 1; p > 0; p >>= 1) {
-            t[p].val = max(t[lc].val, t[rc].val);
+            t[p] = merge(t[lc], t[rc]);
         }
     }
 
-    int query(int l, int r) { return ask(1, l, r, 1, size); }
+    Node query(int l, int r) { return ask(1, l, r, 1, size); }
 
 #undef lc
 #undef rc
@@ -380,7 +383,7 @@ struct Node {
 int cnt;
 
 struct FST {
-#define mid (pl + pr >> 1)
+#define mid ((pl + pr) >> 1)
 
     int size;
     vector<int> root;
