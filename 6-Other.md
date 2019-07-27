@@ -42,7 +42,7 @@ vector<int> dc(const vector<T>& a, int start_id) {
 
 // 重复元素id相同
 template<class T>
-vector<int> dc(const vector<T>& a, int start_id) {
+vector<int> unique_dc(const vector<T>& a, int start_id) {
     int n = a.size();
     vector<T> t(a);
     sort(t.begin(), t.end());
