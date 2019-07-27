@@ -21,6 +21,40 @@ template<class T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
 template<class T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
 ```
 
+### 离散化
+
+```cpp
+// 重复元素id不同
+template<class T>
+vector<int> dc(const vector<T>& a, int start_id) {
+    int n = a.size();
+    vector<pair<T, int> > t(n);
+    for (int i = 0; i < n; i++) {
+        t[i] = make_pair(a[i], i);
+    }
+    sort(t.begin(), t.end());
+    vector<int> id(n);
+    for (int i = 0; i < n; i++) {
+        id[t[i].second] = start_id + i;
+    }
+    return id;
+}
+
+// 重复元素id相同
+template<class T>
+vector<int> dc(const vector<T>& a, int start_id) {
+    int n = a.size();
+    vector<T> t(a);
+    sort(t.begin(), t.end());
+    t.resize(unique(t.begin(), t.end()) - t.begin());
+    vector<int> id(n);
+    for (int i = 0; i < n; i++) {
+        id[i] = start_id + lower_bound(t.begin(), t.end(), a[i]) - t.begin();
+    }
+    return id;
+}
+```
+
 ### 分数
 
 ```cpp
