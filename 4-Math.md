@@ -81,31 +81,26 @@ bool isprime(int x) {
 }
 
 // O(logn)
-// 前置：快速幂、快速乘
+// 前置：快速乘、快速幂
 // int范围只需检查2, 7, 61
-bool Rabin_Miller(ll p, ll a) {
-    if (p == 2) return 1;
-    if (p & 1 == 0 || p == 1) return 0;
-    ll d = p - 1;
+bool Rabin_Miller(ll a, ll n) {
+    if (n == 2 || a >= n) return 1;
+    if (n == 1 || !(n & 1)) return 0;
+    ll d = n - 1;
     while (!(d & 1)) d >>= 1;
-    ll m = powMod(a, d, p);
-    if (m == 1) return 1;
-    while (d < p) {
-        if (m == p - 1) return 1;
+    ll t = powMod(a, d, n);
+    while (d != n - 1 && t != 1 && t != n - 1) {
+        t = mul(t, t, n);
         d <<= 1;
-        m = mul(m, m, p);
     }
-    return 0;
+    return t == n - 1 || d & 1;
 }
 
-bool isprime(ll x) {
-    if (x == 3 || x == 5) return 1;
-    static ll prime[7] = {2, 307, 7681, 36061, 555097, 4811057, 1007281591};
-    for (int i = 0; i < 7; i++) {
-        if (x == prime[i]) return 1;
-        if (!Rabin_Miller(x, prime[i])) return 0;
-    }
-    return 1;
+bool isprime(ll n) {
+    static vector<ll> t = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
+    if (n <= 1) return false;
+    for (ll k : t) if (!Rabin_Miller(k, n)) return false;
+    return true;
 }
 ```
 
