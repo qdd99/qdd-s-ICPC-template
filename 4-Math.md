@@ -636,7 +636,7 @@ void rAND(ll& a, ll& b) { a -= b; }
 void OR(ll& a, ll& b) { b += a; }
 void rOR(ll& a, ll& b) { b -= a; }
 
-void XOR (ll& a, ll& b) {
+void XOR(ll& a, ll& b) {
     ll x = a, y = b;
     a = (x + y) % MOD;
     b = (x - y + MOD) % MOD;
