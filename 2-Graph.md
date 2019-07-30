@@ -345,8 +345,9 @@ ll go(int u, int v) {
 
 ### 支配树
 
++ 有向无环图
+
 ```cpp
-// 有向无环图
 // rt是G中入度为0的点（可能需要建超级源点）
 int n, deg[MAXN], dep[MAXN], up[MAXN][22];
 vector<int> G[MAXN], rG[MAXN], dt[MAXN];
@@ -396,6 +397,71 @@ void go(int rt) {
         up[u][0] = pa;
         for (int i = 1; i < 22; i++) {
             up[u][i] = up[up[u][i - 1]][i - 1];
+        }
+    }
+}
+```
+
++ 一般有向图
+
+```cpp
+vector<int> G[MAXN], rG[MAXN];
+vector<int> dt[MAXN];
+
+namespace tl {
+    int pa[MAXN], dfn[MAXN], clk, rdfn[MAXN];
+    int c[MAXN], best[MAXN], sdom[MAXN], idom[MAXN];
+
+    void init(int n) {
+        clk = 0;
+        fill(c, c + n + 1, -1);
+        fill(dfn, dfn + n + 1, 0);
+        for (int i = 1; i <= n; i++) {
+            dt[i].clear();
+            sdom[i] = best[i] = i;
+        }
+    }
+
+    void dfs(int u) {
+        dfn[u] = ++clk;
+        rdfn[clk] = u;
+        for (int& v: G[u]) {
+            if (!dfn[v]) {
+                pa[v] = u;
+                dfs(v);
+            }
+        }
+    }
+
+    int fix(int x) {
+        if (c[x] == -1) return x;
+        int& f = c[x], rt = fix(f);
+        if (dfn[sdom[best[x]]] > dfn[sdom[best[f]]]) best[x] = best[f];
+        return f = rt;
+    }
+
+    void go(int rt) {
+        dfs(rt);
+        for (int i = clk; i > 1; i--) {
+            int x = rdfn[i], mn = clk + 1;
+            for (int& u: rG[x]) {
+                if (!dfn[u]) continue; // 可能不能到达所有点
+                fix(u);
+                mn = min(mn, dfn[sdom[best[u]]]);
+            }
+            c[x] = pa[x];
+            dt[sdom[x] = rdfn[mn]].push_back(x);
+            x = rdfn[i - 1];
+            for (int& u: dt[x]) {
+                fix(u);
+                idom[u] = (sdom[best[u]] == x) ? x : best[u];
+            }
+            dt[x].clear();
+        }
+        for (int i = 2; i <= clk; i++) {
+            int u = rdfn[i];
+            if (idom[u] != sdom[u]) idom[u] = idom[idom[u]];
+            dt[idom[u]].push_back(u);
         }
     }
 }
