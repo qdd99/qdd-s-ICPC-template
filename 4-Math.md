@@ -10,63 +10,81 @@ ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
 ### 快速幂 & 快速乘
 
 ```cpp
-// 注意 b = 0, MOD = 1 的情况
-ll powMod(ll a, ll b) {
+ll qk(ll a, ll b, ll p) {
+    ll ans = 1 % p;
+    for (a %= p; b; b >>= 1) {
+        if (b & 1) ans = ans * a % p;
+        a = a * a % p;
+    }
+    return ans;
+}
+
+// 十进制快速幂
+ll qk(ll a, const string& b, ll p) {
     ll ans = 1;
-    for (a %= MOD; b; b >>= 1) {
-        if (b & 1) ans = ans * a % MOD;
-        a = a * a % MOD;
+    for (int i = b.size() - 1; i >= 0; i--) {
+        ans = ans * qk(a, b[i] - '0', p) % p;
+        a = qk(a, 10, p);
     }
     return ans;
 }
 
 // 模数爆int时使用
-ll mul(ll a, ll b) {
+ll mul(ll a, ll b, ll p) {
     ll ans = 0;
-    for (a %= MOD; b; b >>= 1) {
-        if (b & 1) ans = (ans + a) % MOD;
-        a = (a << 1) % MOD;
+    for (a %= p; b; b >>= 1) {
+        if (b & 1) ans = (ans + a) % p;
+        a = (a << 1) % p;
     }
     return ans;
 }
 
 // O(1)
-ll mul(ll a, ll b) {
-    return (ll)(__int128(a) * b % MOD);
+ll mul(ll a, ll b, ll p) {
+    return (ll)(__int128(a) * b % p);
 }
 ```
 
 ### 矩阵快速幂
 
 ```cpp
-const int MAT_SZ = 3;
+const int M_SZ = 3;
 
-struct Mat {
-    ll m[MAT_SZ][MAT_SZ] = {{0}};
-    ll * operator [] (int i) { return m[i]; }
-    void one() { for (int i = 0; i < MAT_SZ; i++) m[i][i] = 1; }
-};
+using Mat = array<array<ll, M_SZ>, M_SZ>;
 
-Mat mul(Mat &a, Mat &b) {
-    Mat ans;
-    for (int i = 0; i < MAT_SZ; i++)
-        for (int j = 0; j < MAT_SZ; j++)
-            if (a[i][j])
-                for (int k = 0; k < MAT_SZ; k++)
-                    ans[i][k] = (ans[i][k] + a[i][j] * b[j][k]) % MOD;
-    return ans;
-}
+#define rep2 for (int i = 0; i < M_SZ; i++) for (int j = 0; j < M_SZ; j++)
 
-Mat pow(Mat &a, ll b) {
-    Mat ans;
-    ans.one();
-    while (b) {
-        if (b & 1) ans = mul(a, ans);
-        b >>= 1;
-        a = mul(a, a);
+void zero(Mat& a) { rep2 a[i][j] = 0; }
+void one(Mat& a) { rep2 a[i][j] = (i == j); }
+
+Mat mul(const Mat& a, const Mat& b, ll p) {
+    Mat ans; zero(ans);
+    rep2 if (a[i][j]) for (int k = 0; k < M_SZ; k++) {
+        (ans[i][k] += a[i][j] * b[j][k]) %= p;
     }
     return ans;
 }
+
+Mat qk(Mat a, ll b, ll p) {
+    Mat ans; one(ans);
+    for (; b; b >>= 1) {
+        if (b & 1) ans = mul(a, ans, p);
+        a = mul(a, a, p);
+    }
+    return ans;
+}
+
+// 十进制快速幂
+Mat qk(Mat a, const string& b, ll p) {
+    Mat ans; one(ans);
+    for (int i = b.size() - 1; i >= 0; i--) {
+        ans = mul(qk(a, b[i] - '0', p), ans, p);
+        a = qk(a, 10, p);
+    }
+    return ans;
+}
+
+#undef rep2
 ```
 
 ### 素数判断
@@ -88,7 +106,7 @@ bool Rabin_Miller(ll a, ll n) {
     if (n == 1 || !(n & 1)) return 0;
     ll d = n - 1;
     while (!(d & 1)) d >>= 1;
-    ll t = powMod(a, d, n);
+    ll t = qk(a, d, n);
     while (d != n - 1 && t != 1 && t != n - 1) {
         t = mul(t, t, n);
         d <<= 1;
@@ -347,7 +365,7 @@ ll exgcd(ll a, ll b, ll &x, ll &y) {
 ### 逆元
 
 ```cpp
-ll inv(ll x) { return powMod(x, MOD - 2); }
+ll inv(ll x) { return qk(x, MOD - 2, MOD); }
 
 // EXGCD
 // gcd(a, p) = 1时有逆元
@@ -394,7 +412,7 @@ void initInv() {
     for (int i = 1; i < MAXN; i++) {
         fac[i] = fac[i - 1] * i % MOD;
     }
-    ifac[MAXN - 1] = powMod(fac[MAXN - 1], MOD - 2);
+    ifac[MAXN - 1] = qk(fac[MAXN - 1], MOD - 2, MOD);
     for (int i = MAXN - 2; i >= 0; i--) {
         ifac[i] = ifac[i + 1] * (i + 1);
         ifac[i] %= MOD;
@@ -488,7 +506,7 @@ ll primitive_root(ll p) {
     for (ll i = 2; i < p; i++) {
         bool flag = true;
         for (ll x : facs) {
-            if (powMod(i, (p - 1) / x, p) == 1) {
+            if (qk(i, (p - 1) / x, p) == 1) {
                 flag = false;
                 break;
             }
@@ -551,7 +569,7 @@ ll exBSGS(ll a, ll b, ll p) {
 // 已知 x, b, p，求 a
 ll SGSB(ll x, ll b, ll p) {
     ll g = primitive_root(p);
-    return powMod(g, BSGS(powMod(g, x, p), b, p), p);
+    return qk(g, BSGS(qk(g, x, p), b, p), p);
 }
 ```
 
@@ -601,7 +619,7 @@ int n1, n2, n, k, rev[MAXN];
 void ntt(vector<ll>& a, int p) {
     for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
     for (int h = 1; h < n; h <<= 1) {
-        ll wn = powMod(p == 1 ? G : IG, (MOD - 1) / (h << 1));
+        ll wn = qk(p == 1 ? G : IG, (MOD - 1) / (h << 1), MOD);
         for (int i = 0; i < n; i += (h << 1)) {
             ll w = 1;
             for (int j = 0; j < h; j++, (w *= wn) %= MOD) {
@@ -611,7 +629,7 @@ void ntt(vector<ll>& a, int p) {
         }
     }
     if (p == -1) {
-        ll ninv = powMod(n, MOD - 2);
+        ll ninv = qk(n, MOD - 2, MOD);
         for (int i = 0; i < n; i++) (a[i] *= ninv) %= MOD;
     }
 }
