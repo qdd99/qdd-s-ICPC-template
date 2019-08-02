@@ -131,11 +131,11 @@ int prime[MAXN];
 
 void get_prime() {
     int tot = 0;
-    for (int i = 2; i < MAXN - 5; i++) {
+    for (int i = 2; i < MAXN; i++) {
         if (!vis[i]) prime[tot++] = i;
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN - 5) break;
+            if (d >= MAXN) break;
             vis[d] = true;
             if (i % prime[j] == 0) break;
         }
@@ -148,14 +148,14 @@ int spf[MAXN], prime[MAXN];
 
 void get_spf() {
     int tot = 0;
-    for (int i = 2; i < MAXN - 5; i++) {
+    for (int i = 2; i < MAXN; i++) {
         if (!vis[i]) {
             prime[tot++] = i;
             spf[i] = i;
         }
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN - 5) break;
+            if (d >= MAXN) break;
             vis[d] = true;
             spf[d] = prime[j];
             if (i % prime[j] == 0) break;
@@ -170,14 +170,14 @@ int phi[MAXN], prime[MAXN];
 void get_phi() {
     int tot = 0;
     phi[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++) {
+    for (int i = 2; i < MAXN; i++) {
         if (!vis[i]) {
             prime[tot++] = i;
             phi[i] = i - 1;
         }
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN - 5) break;
+            if (d >= MAXN) break;
             vis[d] = true;
             if (i % prime[j] == 0) {
                 phi[d] = phi[i] * prime[j];
@@ -195,14 +195,14 @@ int mu[MAXN], prime[MAXN];
 void get_mu() {
     int tot = 0;
     mu[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++) {
+    for (int i = 2; i < MAXN; i++) {
         if (!vis[i]) {
             prime[tot++] = i;
             mu[i] = -1;
         }
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN - 5) break;
+            if (d >= MAXN) break;
             vis[d] = true;
             if (i % prime[j] == 0) {
                 mu[d] = 0;
@@ -335,9 +335,9 @@ int phi[MAXN];
 
 void get_phi() {
     phi[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++) {
+    for (int i = 2; i < MAXN; i++) {
         if (!phi[i]) {
-            for (int j = i; j < MAXN - 5; j += i) {
+            for (int j = i; j < MAXN; j += i) {
                 if (!phi[j]) phi[j] = j;
                 phi[j] = phi[j] / i * (i - 1);
             }
@@ -381,7 +381,7 @@ ll inv[MAXN];
 
 void initInv() {
     inv[1] = 1;
-    for (int i = 2; i < MAXN - 5; i++) {
+    for (int i = 2; i < MAXN; i++) {
         inv[i] = 1LL * (MOD - MOD / i) * inv[MOD % i] % MOD;
     }
 }
@@ -395,7 +395,7 @@ ll C[MAXN][MAXN];
 
 void initC() {
     C[0][0] = 1;
-    for (int i = 1; i < MAXN - 5; i++) {
+    for (int i = 1; i < MAXN; i++) {
         C[i][0] = 1;
         for (int j = 1; j <= i; j++) {
             C[i][j] = (C[i - 1][j] + C[i - 1][j - 1]) % MOD;
