@@ -127,6 +127,12 @@ for (int i = l + 1; i <= r; i++) {
 ### 日期
 
 ```cpp
+// 0 ~ 6 对应 周一 ~ 周日
+int zeller(int y, int m, int d) {
+    if (m <= 2) m += 12, y--;
+    return (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
+}
+
 int date_to_int(int y, int m, int d) {
     return
     1461 * (y + 4800 + (m - 14) / 12) / 4 +
