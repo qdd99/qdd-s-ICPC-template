@@ -343,6 +343,51 @@ ll go(int u, int v) {
 }
 ```
 
+### Tarjan
+
++ 割点
+
+```cpp
+int dfn[MAXN], low[MAXN], clk;
+
+void init() { clk = 0; memset(dfn, 0, sizeof(dfn)); }
+
+void tarjan(int u, int pa) {
+    low[u] = dfn[u] = ++clk;
+    int cc = (pa != 0);
+    for (int v : G[u]) {
+        if (v == pa) continue;
+        if (!dfn[v]) {
+            tarjan(v, u);
+            low[u] = min(low[u], low[v]);
+            cc += low[v] >= dfn[u];
+        } else low[u] = min(low[u], dfn[v]);
+    }
+    if (cc > 1) // ...
+}
+```
+
++ 桥
+
+```cpp
+int dfn[MAXN], low[MAXN], clk;
+
+void init() { clk = 0; memset(dfn, 0, sizeof(dfn)); }
+
+void tarjan(int u, int pa) {
+    low[u] = dfn[u] = ++clk;
+    int f = 0;
+    for (int v : G[u]) {
+        if (v == pa && ++f == 1) continue;
+        if (!dfn[v]) {
+            tarjan(v, u);
+            if (low[v] > dfn[u]) // ...
+            low[u] = min(low[u], low[v]);
+        } else low[u] = min(low[u], dfn[v]);
+    }
+}
+```
+
 ### 支配树
 
 + 有向无环图
