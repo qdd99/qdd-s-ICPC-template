@@ -14,7 +14,7 @@ void merge(int a, int b) { pa[find(a)] = find(b); }
 ```cpp
 // 下标从0开始
 struct RMQ {
-    int st[MAXN][22]; // 22 = ((int)log2(MAXN) + 1)
+    int st[N][22]; // 22 = ((int)log2(N) + 1)
 
     int xlog(int x) { return 31 - __builtin_clz(x); }
 
@@ -40,7 +40,7 @@ struct RMQ {
 
 ```cpp
 struct RMQ {
-    int st[11][11][MAXN][MAXN]; // 11 = ((int)log2(MAXN) + 1)
+    int st[11][11][N][N]; // 11 = ((int)log2(N) + 1)
 
     int xlog(int x) { return 31 - __builtin_clz(x); }
 
@@ -87,7 +87,7 @@ struct RMQ {
 // 下标从1开始
 struct Tbit {
     int size;
-    ll t[MAXN];
+    ll t[N];
 
     int lowbit(int x) { return x & (-x); }
 
@@ -154,7 +154,7 @@ ll range_sum(int l, int r) {
 
 ```cpp
 struct Tbit {
-    ll t[MAXN][MAXN];
+    ll t[N][N];
 
     int lowbit(int x) { return x & (-x); }
 
@@ -378,7 +378,7 @@ ll query(int l, int r) { return ask(1, l, r, 1, size); }
 struct Node {
     int lc, rc, val;
     Node(int lc = 0, int rc = 0, int val = 0) : lc(lc), rc(rc), val(val) {}
-} t[40 * MAXN];
+} t[40 * N];
 
 int cnt;
 
@@ -391,18 +391,18 @@ struct FST {
     FST(int sz) {
         size = 1;
         while (size < sz) size <<= 1;
-        root.push_back(N(0, 0, 0));
+        root.push_back(A(0, 0, 0));
     }
 
-    int N(int lc, int rc, int val) {
+    int A(int lc, int rc, int val) {
         t[cnt] = Node(lc, rc, val);
         return cnt++;
     }
 
     int ins(int p, int x, int pl, int pr) {
         if (pl > x || pr < x) return p;
-        if (pl == pr) return N(0, 0, t[p].val + 1);
-        return N(ins(t[p].lc, x, pl, mid), ins(t[p].rc, x, mid + 1, pr), t[p].val + 1);
+        if (pl == pr) return A(0, 0, t[p].val + 1);
+        return A(ins(t[p].lc, x, pl, mid), ins(t[p].rc, x, mid + 1, pr), t[p].val + 1);
     }
 
     int ask(int p1, int p2, int k, int pl, int pr) {
@@ -434,14 +434,14 @@ struct Node {
     Node(int val = 0, Node *pa = nullptr) : val(val), size(1), pa(pa), lc(nullptr), rc(nullptr) {}
     Node*& c(bool x) { return x ? lc : rc; }
     bool d() { return pa ? this == pa->lc : 0; }
-} pool[MAXN], *tail = pool;
+} pool[N], *tail = pool;
 
 struct Splay {
     Node *root;
 
     Splay() : root(nullptr) {}
 
-    Node* N(int val, Node *pa) {
+    Node* A(int val, Node *pa) {
         return new (tail++) Node(val, pa);
     }
 

@@ -126,16 +126,16 @@ bool isprime(ll n) {
 
 ```cpp
 // 注意 0 和 1 不是素数
-bool vis[MAXN];
-int prime[MAXN];
+bool vis[N];
+int prime[N];
 
 void get_prime() {
     int tot = 0;
-    for (int i = 2; i < MAXN; i++) {
+    for (int i = 2; i < N; i++) {
         if (!vis[i]) prime[tot++] = i;
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN) break;
+            if (d >= N) break;
             vis[d] = true;
             if (i % prime[j] == 0) break;
         }
@@ -143,19 +143,19 @@ void get_prime() {
 }
 
 // 最小素因子
-bool vis[MAXN];
-int spf[MAXN], prime[MAXN];
+bool vis[N];
+int spf[N], prime[N];
 
 void get_spf() {
     int tot = 0;
-    for (int i = 2; i < MAXN; i++) {
+    for (int i = 2; i < N; i++) {
         if (!vis[i]) {
             prime[tot++] = i;
             spf[i] = i;
         }
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN) break;
+            if (d >= N) break;
             vis[d] = true;
             spf[d] = prime[j];
             if (i % prime[j] == 0) break;
@@ -164,20 +164,20 @@ void get_spf() {
 }
 
 // 欧拉函数
-bool vis[MAXN];
-int phi[MAXN], prime[MAXN];
+bool vis[N];
+int phi[N], prime[N];
 
 void get_phi() {
     int tot = 0;
     phi[1] = 1;
-    for (int i = 2; i < MAXN; i++) {
+    for (int i = 2; i < N; i++) {
         if (!vis[i]) {
             prime[tot++] = i;
             phi[i] = i - 1;
         }
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN) break;
+            if (d >= N) break;
             vis[d] = true;
             if (i % prime[j] == 0) {
                 phi[d] = phi[i] * prime[j];
@@ -189,20 +189,20 @@ void get_phi() {
 }
 
 // 莫比乌斯函数
-bool vis[MAXN];
-int mu[MAXN], prime[MAXN];
+bool vis[N];
+int mu[N], prime[N];
 
 void get_mu() {
     int tot = 0;
     mu[1] = 1;
-    for (int i = 2; i < MAXN; i++) {
+    for (int i = 2; i < N; i++) {
         if (!vis[i]) {
             prime[tot++] = i;
             mu[i] = -1;
         }
         for (int j = 0; j < tot; j++) {
             int d = i * prime[j];
-            if (d >= MAXN) break;
+            if (d >= N) break;
             vis[d] = true;
             if (i % prime[j] == 0) {
                 mu[d] = 0;
@@ -331,13 +331,13 @@ int phi(int x) {
 }
 
 // O(nloglogn)
-int phi[MAXN];
+int phi[N];
 
 void get_phi() {
     phi[1] = 1;
-    for (int i = 2; i < MAXN; i++) {
+    for (int i = 2; i < N; i++) {
         if (!phi[i]) {
-            for (int j = i; j < MAXN; j += i) {
+            for (int j = i; j < N; j += i) {
                 if (!phi[j]) phi[j] = j;
                 phi[j] = phi[j] / i * (i - 1);
             }
@@ -377,11 +377,11 @@ ll inv(ll a, ll p) {
 }
 
 // 逆元打表
-ll inv[MAXN];
+ll inv[N];
 
 void initInv() {
     inv[1] = 1;
-    for (int i = 2; i < MAXN; i++) {
+    for (int i = 2; i < N; i++) {
         inv[i] = 1LL * (MOD - MOD / i) * inv[MOD % i] % MOD;
     }
 }
@@ -391,11 +391,11 @@ void initInv() {
 
 ```cpp
 // 组合数打表
-ll C[MAXN][MAXN];
+ll C[N][N];
 
 void initC() {
     C[0][0] = 1;
-    for (int i = 1; i < MAXN; i++) {
+    for (int i = 1; i < N; i++) {
         C[i][0] = 1;
         for (int j = 1; j <= i; j++) {
             C[i][j] = (C[i - 1][j] + C[i - 1][j - 1]) % MOD;
@@ -405,15 +405,15 @@ void initC() {
 
 // 快速组合数取模
 // MAXN开2倍上限
-ll fac[MAXN], ifac[MAXN];
+ll fac[N], ifac[N];
 
 void initInv() {
     fac[0] = 1;
-    for (int i = 1; i < MAXN; i++) {
+    for (int i = 1; i < N; i++) {
         fac[i] = fac[i - 1] * i % MOD;
     }
-    ifac[MAXN - 1] = qk(fac[MAXN - 1], MOD - 2, MOD);
-    for (int i = MAXN - 2; i >= 0; i--) {
+    ifac[N - 1] = qk(fac[N - 1], MOD - 2, MOD);
+    for (int i = N - 2; i >= 0; i--) {
         ifac[i] = ifac[i + 1] * (i + 1);
         ifac[i] %= MOD;
     }
@@ -581,7 +581,7 @@ ll SGSB(ll x, ll b, ll p) {
 const double PI = acos(-1);
 using cp = complex<double>;
 
-int n1, n2, n, k, rev[MAXN];
+int n1, n2, n, k, rev[N];
 
 void fft(vector<cp>& a, int p) {
     for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
@@ -614,7 +614,7 @@ void go(vector<cp>& a, vector<cp>& b) {
 ```cpp
 const int MOD = 998244353, G = 3, IG = 332748118;
 
-int n1, n2, n, k, rev[MAXN];
+int n1, n2, n, k, rev[N];
 
 void ntt(vector<ll>& a, int p) {
     for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
