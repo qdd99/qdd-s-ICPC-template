@@ -9,12 +9,12 @@ using ull = unsigned long long;
 const int x = 135, p1 = 1e9 + 7, p2 = 1e9 + 9;
 
 int n;
-char s[N];
-ull xp1[N], xp2[N], h[N];
+char s[MAXN];
+ull xp1[MAXN], xp2[MAXN], h[MAXN];
 
 void init_xp() {
     xp1[0] = xp2[0] = 1;
-    for (int i = 1; i < N; i++) {
+    for (int i = 1; i < MAXN; i++) {
         xp1[i] = xp1[i - 1] * x % p1;
         xp2[i] = xp2[i - 1] * x % p2;
     }
@@ -116,7 +116,7 @@ void get_z(const string& s, vector<int>& z) {
 ```cpp
 // 01 Trie
 struct Trie {
-    int t[31 * N][2], sz;
+    int t[31 * MAXN][2], sz;
 
     void init() {
         memset(t, 0, 2 * (sz + 2) * sizeof(int));
@@ -135,7 +135,7 @@ struct Trie {
 
 // 正常Trie
 struct Trie {
-    int t[N][26], sz, cnt[N];
+    int t[MAXN][26], sz, cnt[MAXN];
 
     void init() {
         memset(t, 0, 26 * (sz + 2) * sizeof(int));
@@ -159,7 +159,7 @@ struct Trie {
 
 ```cpp
 struct ACA {
-    int t[N][26], sz, fail[N], nxt[N], cnt[N];
+    int t[MAXN][26], sz, fail[MAXN], nxt[MAXN], cnt[MAXN];
 
     void init() {
         memset(t, 0, 26 * (sz + 2) * sizeof(int));
