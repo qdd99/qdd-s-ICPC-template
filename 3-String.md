@@ -7,10 +7,9 @@
 using ull = unsigned long long;
 
 const int x = 135, p1 = 1e9 + 7, p2 = 1e9 + 9;
+const ull mask32 = ~(0u);
 
-int n;
-char s[MAXN];
-ull xp1[MAXN], xp2[MAXN], h[MAXN];
+ull xp1[MAXN], xp2[MAXN];
 
 void init_xp() {
     xp1[0] = xp2[0] = 1;
@@ -20,26 +19,31 @@ void init_xp() {
     }
 }
 
-void init_hash() {
-    ull res1 = 0, res2 = 0;
-    h[n + 1] = 0;
-    for (int i = n; i >= 0; i--) {
-        res1 = (res1 * x + s[i]) % p1;
-        res2 = (res2 * x + s[i]) % p2;
-        h[i] = (res1 << 32) | res2;
-    }
-}
+struct Hash {
+    vector<ull> h;
 
-ull get_hash(int l, int r) {
-    r++;
-    int len = r - l;
-    unsigned int mask32 = ~(0u);
-    ull l1 = h[l] >> 32, r1 = h[r] >> 32;
-    ull l2 = h[l] & mask32, r2 = h[r] & mask32;
-    ull res1 = (l1 - r1 * xp1[len] % p1 + p1) % p1;
-    ull res2 = (l2 - r2 * xp2[len] % p2 + p2) % p2;
-    return (res1 << 32) | res2;
-}
+    Hash() : h(1) {}
+
+    void add(const string& s) {
+        ull res1 = h.back() >> 32;
+        ull res2 = h.back() & mask32;
+        for (char c : s) {
+            res1 = (res1 * x + c) % p1;
+            res2 = (res2 * x + c) % p2;
+            h.push_back((res1 << 32) | res2);
+        }
+    }
+
+    ull get(int l, int r) {
+        r++;
+        int len = r - l;
+        ull l1 = h[l] >> 32, r1 = h[r] >> 32;
+        ull l2 = h[l] & mask32, r2 = h[r] & mask32;
+        ull res1 = (r1 - l1 * xp1[len] % p1 + p1) % p1;
+        ull res2 = (r2 - l2 * xp2[len] % p2 + p2) % p2;
+        return (res1 << 32) | res2;
+    }
+};
 ```
 
 ### Manacher
