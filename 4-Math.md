@@ -720,6 +720,79 @@ double asr(double l, double r, double eps, double S) {
 double asr(double l, double r) { return asr(l, r, EPS, simpson(l, r)); }
 ```
 
+### BM 线性递推
+
+```cpp
+namespace linear_seq {
+    using V = vector<ll>;
+
+    inline void up(ll& a, ll b) { (a += b) %= MOD; }
+
+    V mul(const V&a, const V& b, const V& m, int k) {
+        V r(2 * k - 1);
+        for (int i = 0; i < k; i++) {
+            for (int j = 0; j < k; j++) {
+                up(r[i + j], a[i] * b[j]);
+            }
+        }
+        for (int i = k - 2; i >= 0; i--) {
+            for (int j = 0; j < k; j++) {
+                up(r[i + j], r[i + k] * m[j]);
+            }
+            r.pop_back();
+        }
+        return r;
+    }
+    
+    V pow(ll n, const V& m) {
+        int k = m.size() - 1;
+        assert(m[k] == -1 || m[k] == MOD - 1);
+        V r(k), x(k);
+        r[0] = x[1] = 1;
+        for (; n; n >>= 1) {
+            if (n & 1) r = mul(x, r, m, k);
+            x = mul(x, x, m, k);
+        }
+        return r;
+    }
+    
+    V BM(const V& x) {
+        V a = {-1}, b = {233};
+        for (int i = 1; i < x.size(); i++) {
+            b.push_back(0);
+            ll d = 0, n = a.size(), m = b.size();
+            for (int j = 0; j < n; j++) up(d, a[j] * x[i - n + 1 + j]);
+            if (d == 0) continue;
+            V t(max(n, m));
+            for (int j = 0; j < m; j++) t[j] = d * b[j] % MOD;
+            m = max(n, m);
+            for (int j = 0; j < n; j++) up(t[m - 1 - j], a[n - 1 - j]);
+            if (m > n) {
+                swap(a, b);
+                ll inv_d = -inv(d + MOD);
+                for (ll& v : b) v = v * inv_d % MOD;
+            }
+            a = move(t);
+        }
+        for (ll& v : a) up(v, MOD);
+        return a;
+    }
+
+    ll go(const V& a, const V& x, ll n) {
+        // a: (-1, a1, a2, ..., ak).reverse
+        // x: x1, x2, ..., xk
+        // x[n] = sum[a[i]*x[n-i],{i,1,k}]
+        int k = a.size() - 1;
+        if (n <= k) return x[n - 1];
+        if (a.size() == 2) return x[0] * qk(a[0], n - 1, MOD) % MOD;
+        V r = pow(n - 1, a);
+        ll ans = 0;
+        for (int i = 0; i < k; i++) up(ans, r[i] * x[i]);
+        return (ans + MOD) % MOD;
+    }
+}
+```
+
 ### 拉格朗日插值
 
 ```cpp
