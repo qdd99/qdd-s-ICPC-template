@@ -573,6 +573,30 @@ ll SGSB(ll x, ll b, ll p) {
 }
 ```
 
+### 二次剩余
+
+```cpp
+ll Quadratic_residue(ll a) {
+    if (a == 0) return 0;
+    ll b;
+    do b = mt_rand() % MOD;
+    while (qk(b, (MOD - 1) >> 1, MOD) != MOD - 1);
+    ll s = MOD - 1, t = 0, f = 1;
+    while (!(s & 1)) s >>= 1, t++, f <<= 1;
+    t--, f >>= 1;
+    ll x = qk(a, (s + 1) >> 1, MOD), inv_a = qk(a, MOD - 2, MOD);
+    while (t) {
+        f >>= 1;
+        if (qk(inv_a * x % MOD * x % MOD, f, MOD) != 1) {
+            (x *= qk(b, s, MOD)) %= MOD;
+        }
+        t--, s <<= 1;
+    }
+    if (x * x % MOD != a) return -1;
+    return min(x, MOD - x);
+}
+```
+
 ### FFT & NTT & FWT
 
 + FFT
