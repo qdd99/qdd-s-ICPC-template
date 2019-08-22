@@ -203,6 +203,26 @@ vector<V> tangent_point(const C& c, const V& p) {
     V a = V(c.o, p) * k;
     return {c.o + rot(a, acos(k)), c.o + rot(a, -acos(k))};
 }
+
+// 最小圆覆盖
+C min_circle_cover(vector<V> a) {
+    shuffle(a.begin(), a.end(), mt_rand);
+    V o = a[0];
+    ld r = 0;
+    int n = a.size();
+    for (int i = 1; i < n; i++) if (gt(dist(a[i], o), r)) {
+        o = a[i]; r = 0;
+        for (int j = 0; j < i; j++) if (gt(dist(a[j], o), r)) {
+            o = (a[i] + a[j]) / 2;
+            r = dist(a[j], o);
+            for (int k = 0; k < j; k++) if (gt(dist(a[k], o), r)) {
+                o = circumcenter(a[i], a[j], a[k]);
+                r = dist(a[k], o);
+            }
+        }
+    }
+    return C(o, r);
+}
 ```
 
 ### 三维几何
