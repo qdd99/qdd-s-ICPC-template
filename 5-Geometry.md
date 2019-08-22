@@ -39,6 +39,8 @@ ld dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
 ld det(const V& a, const V& b) { return a.x * b.y - a.y * b.x; }
 ld cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
 
+ld to_rad(ld deg) { return deg / 180 * PI; }
+
 // 逆时针旋转 r 弧度
 V rot(const V& p, ld r) {
     return V(p.x * cos(r) - p.y * sin(r), p.x * sin(r) + p.y * cos(r));
@@ -72,6 +74,39 @@ ld dist_to_seg(const V& p, const V& a, const V& b) {
 V intersect(const V& a, const V& b, const V& c, const V& d) {
     ld s1 = cross(c, d, a), s2 = cross(c, d, b);
     return (a * s2 - b * s1) / (s2 - s1);
+}
+
+// 三角形重心
+V centroid(const V& a, const V& b, const V& c) {
+    return (a + b + c) / 3;
+}
+
+// 内心
+V incenter(const V& a, const V& b, const V& c) {
+    ld AB = dist(a, b), AC = dist(a, c), BC = dist(b, c);
+    // ld r = abs(cross(b, c, a)) / (AB + AC + BC);
+    return (a * BC + b * AC + c * AB) / (AB + BC + AC);
+}
+
+// 外心
+V circumcenter(const V& a, const V& b, const V& c) {
+    V mid1 = (a + b) / 2, mid2 = (a + c) / 2;
+    // ld r = dist(a, b) * dist(b, c) * dist(c, a) / 2 / abs(cross(b, c, a));
+    return intersect(mid1, mid1 + rot_ccw90(b - a), mid2, mid2 + rot_ccw90(c - a));
+}
+
+// 垂心
+V orthocenter(const V& a, const V& b, const V& c) {
+    return centroid(a, b, c) * 3 - circumcenter(a, b, c) * 2;
+}
+
+// 旁心（三个）
+vector<V> escenter(const V& a, const V& b, const V& c) {
+    ld AB = dist(a, b), AC = dist(a, c), BC = dist(b, c);
+    V p1 = (a * (-BC) + b * AC + c * AB) / (AB + AC - BC);
+    V p2 = (a * BC + b * (-AC) + c * AB) / (AB - AC + BC);
+    V p3 = (a * BC + b * AC + c * (-AB)) / (-AB + AC + BC);
+    return {p1, p2, p3};
 }
 ```
 

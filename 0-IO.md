@@ -22,7 +22,7 @@ cin.tie(0);
 ### 程序计时
 
 ```cpp
-fprintf(stderr, "%f\n", (double)clock() / CLOCKS_PER_SEC);
+(double)clock() / CLOCKS_PER_SEC
 ```
 
 ### 整行读入
