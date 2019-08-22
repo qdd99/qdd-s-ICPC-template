@@ -64,9 +64,12 @@ inline void print128(__int128 x) {
 ### 读入挂
 
 ```cpp
-// 本机测试需要EOF才能看到输出结果
 class Scanner {
+#ifdef qdd
+    static constexpr int BUF_SIZE = 1;
+#else
     static constexpr int BUF_SIZE = 1048576; // 1MB
+#endif
 
     char buf[BUF_SIZE], *p1 = buf, *p2 = buf;
 
