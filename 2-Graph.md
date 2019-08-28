@@ -30,6 +30,7 @@ struct Edge {
     int to, val;
     Edge(int to = 0, int val = 0) : to(to), val(val) {}
 };
+
 vector<Edge> G[MAXN];
 ll dis[MAXN];
 
@@ -38,17 +39,16 @@ void dijkstra(int s) {
     memset(dis, 0x3f, sizeof(dis));
     priority_queue<pii, vector<pii>, greater<pii> > q;
     dis[s] = 0;
-    q.push({0, s});
+    q.emplace(0, s);
     while (!q.empty()) {
         pii p = q.top();
         q.pop();
         int u = p.second;
         if (dis[u] < p.first) continue;
-        for (int i = 0; i < G[u].size(); i++) {
-            int v = G[u][i].to;
-            if (dis[v] > dis[u] + G[u][i].val) {
-                dis[v] = dis[u] + G[u][i].val;
-                q.push({dis[v], v});
+        for (Edge& e : G[u]) {
+            int v = e.to;
+            if (updmin(dis[v], dis[u] + e.val)) {
+                q.emplace(dis[v], v);
             }
         }
     }
