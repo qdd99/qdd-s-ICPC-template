@@ -108,6 +108,23 @@ ll kruskal() {
 }
 ```
 
+### Floyd 最小环
+```cpp
+// 注意 INF 不能超过 1/3 LLONG_MAX
+for (int k = 0; k < n; k++) {
+    for (int i = 0; i < k; i++) {
+        for (int j = 0; j < i; j++) {
+            ans = min(ans, G[i][k] + G[k][j] + dis[i][j]);
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
+        }
+    }
+}
+```
+
 ### LCA
 
 ```cpp
