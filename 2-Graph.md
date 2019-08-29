@@ -302,6 +302,66 @@ struct MCMF {
 };
 ```
 
+### 无向图最小割
+
+```cpp
+namespace stoer_wagner {
+    bool vis[MAXN], in[MAXN];
+    int G[MAXN][MAXN], w[MAXN];
+
+    void init() {
+        memset(G, 0, sizeof(G));
+        memset(in, 0, sizeof(in));
+    }
+
+    void add_edge(int u, int v, int w) {
+        G[u][v] += w;
+        G[v][u] += w;
+    }
+
+    int search(int& s, int& t) {
+        memset(vis, 0, sizeof(vis));
+        memset(w, 0, sizeof(w));
+        int maxw, tt = n + 1;
+        for (int i = 0; i < n; i++) {
+            maxw = -INF;
+            for (int j = 0; j < n; j++) {
+                if (!in[j] && !vis[j] && w[j] > maxw) {
+                    maxw = w[j];
+                    tt = j;
+                }
+            }
+            if (t == tt) return w[t];
+            s = t; t = tt;
+            vis[tt] = true;
+            for (int j = 0; j < n; j++) {
+                if (!in[j] && !vis[j]) {
+                    w[j] += G[tt][j];
+                }
+            }
+        }
+        return w[t];
+    }
+
+    int go() {
+        int s, t, ans = INF;
+        for (int i = 0; i < n - 1; i++) {
+            s = t = -1;
+            ans = min(ans, search(s, t));
+            if (ans == 0) return 0;
+            in[t] = true;
+            for (int j = 0; j < n; j++) {
+                if (!in[j]) {
+                    G[s][j] += G[t][j];
+                    G[j][s] += G[j][t];
+                }
+            }
+        }
+        return ans;
+    }
+}
+```
+
 ### 树链剖分
 
 ```cpp
