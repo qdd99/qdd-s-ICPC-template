@@ -465,6 +465,41 @@ void tarjan(int u, int pa) {
 }
 ```
 
++ 强连通分量缩点
+
+```cpp
+int dfn[MAXN], low[MAXN], clk, tot, color[MAXN];
+vector<int> scc[MAXN];
+
+void init() { tot = clk = 0; memset(dfn, 0, sizeof dfn); }
+
+void tarjan(int u) {
+    static int st[MAXN], p;
+    static bool in[MAXN];
+    dfn[u] = low[u] = ++clk;
+    st[p++] = u;
+    in[u] = true;
+    for (int v : G[u]) {
+        if (!dfn[v]) {
+            tarjan(v);
+            low[u] = min(low[u], low[v]);
+        } else if (in[v]) {
+            low[u] = min(low[u], dfn[v]);
+        }
+    }
+    if (dfn[u] == low[u]) {
+        ++tot;
+        for (;;) {
+            int x = st[--p];
+            in[x] = false;
+            color[x] = tot;
+            scc[tot].push_back(x);
+            if (x == u) break;
+        }
+    }
+}
+```
+
 ### 支配树
 
 + 有向无环图
