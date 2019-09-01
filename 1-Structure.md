@@ -378,7 +378,7 @@ ll query(int l, int r) { return ask(1, l, r, 1, size); }
 struct Node {
     int lc, rc, val;
     Node(int lc = 0, int rc = 0, int val = 0) : lc(lc), rc(rc), val(val) {}
-} t[40 * MAXN];
+} t[40 * MAXN]; // (4 + log(size)) * MAXN 小心 MLE
 
 int cnt;
 
