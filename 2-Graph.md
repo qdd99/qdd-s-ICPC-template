@@ -23,7 +23,9 @@ void mp_link(int u, int v) {
 for (int i = mp[u]; i != -1; i = es[i].nxt)
 ```
 
-### Dijkstra
+### 最短路
+
++ Dijkstra
 
 ```cpp
 struct Edge {
@@ -50,6 +52,52 @@ void dijkstra(int s) {
             if (updmin(dis[v], dis[u] + e.val)) {
                 q.emplace(dis[v], v);
             }
+        }
+    }
+}
+```
+
++ SPFA
+
+```cpp
+void spfa(int s) {
+    queue<int> q;
+    q.push(s);
+    memset(dis, 0x3f, sizeof(dis));
+    memset(in, 0, sizeof(in));
+    in[s] = 1;
+    dis[s] = 0;
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        for (Edge& e : G[u]) {
+            int v = e.to;
+            if (dis[v] > dis[u] + e.val) {
+                dis[v] = dis[u] + e.val;
+                if (!in[v]) {
+                    in[v] = 1;
+                    q.push(v);
+                }
+            }
+        }
+        in[u] = 0;
+    }
+}
+```
+
++ Floyd 最小环
+
+```cpp
+// 注意 INF 不能超过 1/3 LLONG_MAX
+for (int k = 0; k < n; k++) {
+    for (int i = 0; i < k; i++) {
+        for (int j = 0; j < i; j++) {
+            ans = min(ans, G[i][k] + G[k][j] + dis[i][j]);
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
         }
     }
 }
@@ -105,23 +153,6 @@ ll kruskal() {
         }
     }
     return ans;
-}
-```
-
-### Floyd 最小环
-```cpp
-// 注意 INF 不能超过 1/3 LLONG_MAX
-for (int k = 0; k < n; k++) {
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < i; j++) {
-            ans = min(ans, G[i][k] + G[k][j] + dis[i][j]);
-        }
-    }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
-        }
-    }
 }
 ```
 
