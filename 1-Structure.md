@@ -228,16 +228,12 @@ struct SegT {
 #define mid ((pl + pr) >> 1)
 
     int size;
-    Node *t;
+    vector<Node> t;
 
     SegT(int sz) {
         size = 1;
         while (size < sz) size <<= 1;
-        t = new Node[2 * size]();
-    }
-
-    ~SegT() {
-        delete [] t;
+        t.resize(2 * size);
     }
 
     Node ask(int p, int l, int r, int pl, int pr) {
