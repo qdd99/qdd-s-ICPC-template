@@ -7,6 +7,24 @@ int find(int x) { return (x == pa[x]) ? x : pa[x] = find(pa[x]); }
 void merge(int a, int b) { pa[find(a)] = find(b); }
 ```
 
++ 动态开点并查集
+
+```cpp
+// pa 为负数表示集合大小
+unordered_map<int, int> pa;
+
+void _set(int x) { if (!pa.count(x)) pa[x] = -1; }
+int find(int x) { return (pa[x] < 0) ? x : pa[x] = find(pa[x]); }
+
+void merge(int a, int b) {
+    int x = find(a), y = find(b);
+    if (x == y) return;
+    if (pa[x] > pa[y]) swap(x, y);
+    pa[x] += pa[y];
+    pa[y] = x;
+}
+```
+
 ### RMQ
 
 + 一维
