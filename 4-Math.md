@@ -307,6 +307,7 @@ ll pollard_rho(ll n, ll c) {
 
 vector<ll> getf(ll x) {
     vector<ll> v;
+    if (x <= 1) return v;
     function<void(ll)> f = [&](ll n) {
         if (n == 4) { v.push_back(2); v.push_back(2); return; }
         if (isprime(n)) { v.push_back(n); return; }
