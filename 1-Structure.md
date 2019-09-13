@@ -386,6 +386,53 @@ void update(int l, int r, int a, int b) { modify(1, l, r, a, b, 1, size); }
 ll query(int l, int r) { return ask(1, l, r, 1, size); }
 ```
 
+### 动态开点线段树
+
+```cpp
+struct Node {
+    int lc, rc, val;
+    Node(int lc = 0, int rc = 0, int val = 0) : lc(lc), rc(rc), val(val) {}
+} t[20 * MAXN];
+
+int cnt;
+
+struct SegT {
+#define mid ((pl + pr) >> 1)
+
+    int rt, size;
+
+    SegT(int sz) : rt(0) {
+        size = 1;
+        while (size < sz) size <<= 1;
+    }
+
+    int modify(int p, int k, int val, int pl, int pr) {
+        if (pl > k || pr < k) return p;
+        if (!p) p = ++cnt;
+        if (pl == pr) t[p].val = val;
+        else {
+            t[p].lc = modify(t[p].lc, k, val, pl, mid);
+            t[p].rc = modify(t[p].rc, k, val, mid + 1, pr);
+            t[p].val = max(t[t[p].lc].val, t[t[p].rc].val);
+        }
+        return p;
+    }
+
+    int ask(int p, int l, int r, int pl, int pr) {
+        if (l > pr || r < pl) return -INF;
+        if (l <= pl && r >= pr) return t[p].val;
+        int vl = ask(t[p].lc, l, r, pl, mid);
+        int vr = ask(t[p].rc, l, r, mid + 1, pr);
+        return max(vl, vr);
+    }
+
+    void update(int k, int val) { rt = modify(rt, k, val, 1, size); }
+    int query(int l, int r) { return ask(rt, l, r, 1, size); }
+
+#undef mid
+};
+```
+
 ### 主席树
 
 ```cpp
