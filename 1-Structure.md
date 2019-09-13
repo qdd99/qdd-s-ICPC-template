@@ -495,7 +495,7 @@ struct Node {
     Node(int val = 0, Node *pa = nullptr) : val(val), size(1), pa(pa), lc(nullptr), rc(nullptr) {}
     Node*& c(bool x) { return x ? lc : rc; }
     bool d() { return pa ? this == pa->lc : 0; }
-} pool[MAXN], *tail = pool;
+} pool[MAXN << 2], *tail = pool;
 
 struct Splay {
     Node *root;
@@ -506,7 +506,7 @@ struct Splay {
         return new (tail++) Node(val, pa);
     }
 
-    void pushup(Node *o) {
+    void upd(Node *o) {
         o->size = (o->lc ? o->lc->size : 0) + (o->rc ? o->rc->size : 0) + 1;
     }
 
@@ -521,8 +521,8 @@ struct Splay {
         link(o, xx, x->d());
         link(y, x, dd);
         link(x, o, !dd);
-        pushup(x);
-        pushup(o);
+        upd(x);
+        upd(o);
     }
 
     void splay(Node *o) {
@@ -534,14 +534,73 @@ struct Splay {
 };
 ```
 
-### 伪随机数
+### Treap
 
 ```cpp
-// 此处本应有 Treap
-using uint = unsigned int;
+// split_x 左侧元素 < x
+// split_k 左侧分割出 k 个元素
+namespace tr {
+    using uint = unsigned int;
 
-uint rnd() {
-    static uint A = 1 << 16 | 3, B = 33333331, C = 1091;
-    return C = A * C + B;
+    uint rnd() {
+        static uint A = 1 << 16 | 3, B = 33333331, C = 1091;
+        return C = A * C + B;
+    }
+
+    struct Node {
+        uint key;
+        int val, size;
+        Node *lc, *rc;
+        Node(int val = 0) : key(rnd()), val(val), size(1), lc(nullptr), rc(nullptr) {}
+    } pool[MAXN << 2], *tail = pool;
+
+    Node* N(int val) {
+        return new (tail++) Node(val);
+    }
+
+    void upd(Node *o) {
+        o->size = (o->lc ? o->lc->size : 0) + (o->rc ? o->rc->size : 0) + 1;
+    }
+
+    Node* merge(Node *l, Node *r) {
+        if (!l) return r;
+        if (!r) return l;
+        if (l->key > r->key) {
+            l->rc = merge(l->rc, r);
+            upd(l);
+            return l;
+        } else {
+            r->lc = merge(l, r->lc);
+            upd(r);
+            return r;
+        }
+    }
+
+    void split_x(Node *o, int x, Node*& l, Node*& r) {
+        if (!o) { l = r = nullptr; return; }
+        if (o->val < x) {
+            l = o;
+            split_x(o->rc, x, l->rc, r);
+            upd(l);
+        } else {
+            r = o;
+            split_x(o->lc, x, l, r->lc);
+            upd(r);
+        }
+    }
+
+    void split_k(Node *o, int k, Node*& l, Node*& r) {
+        if (!o) { l = r = nullptr; return; }
+        int lsize = o->lc ? o->lc->size : 0;
+        if (lsize < k) {
+            l = o;
+            split_k(o->rc, k - lsize - 1, o->rc, r);
+            upd(l);
+        } else {
+            r = o;
+            split_k(o->lc, k, l, o->lc);
+            upd(r);
+        }
+    }
 }
 ```
