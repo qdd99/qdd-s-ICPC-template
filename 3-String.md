@@ -46,6 +46,46 @@ struct Hash {
 };
 ```
 
++ 二维哈希
+
+```cpp
+const ll basex = 239, basey = 241, p = 998244353;
+
+ll pwx[MAXN], pwy[MAXN];
+
+void init_xp() {
+    pwx[0] = pwy[0] = 1;
+    for (int i = 1; i < MAXN; i++) {
+        pwx[i] = pwx[i - 1] * basex % p;
+        pwy[i] = pwy[i - 1] * basey % p;
+    }
+}
+
+struct Hash2D {
+    vector<vector<ll> > h;
+
+    Hash2D(const vector<vector<int> >& a, int n, int m) : h(n + 1, vector<ll>(m + 1)) {
+        for (int i = 0; i < n; i++) {
+            ll s = 0;
+            for (int j = 0; j < m; j++) {
+                s = (s * basey + a[i][j] + 1) % p;
+                h[i + 1][j + 1] = (h[i][j + 1] * basex + s) % p;
+            }
+        }
+    }
+
+    ll get(int x, int y, int xx, int yy) {
+        ++xx; ++yy;
+        int dx = xx - x, dy = yy - y;
+        ll res = h[xx][yy]
+            - h[x][yy] * pwx[dx]
+            - h[xx][y] * pwy[dy]
+            + h[x][y] * pwx[dx] % p * pwy[dy];
+        return (res % p + p) % p;
+    }
+};
+```
+
 ### Manacher
 
 ```cpp
