@@ -155,6 +155,24 @@ void get_z(const string& s, vector<int>& z) {
 }
 ```
 
+### 最小表示法
+
+```cpp
+int get(const string& s) {
+    int k = 0, i = 0, j = 1, n = s.size();
+    while (k < n && i < n && j < n) {
+        if (s[(i + k) % n] == s[(j + k) % n]) {
+            k++;
+        } else {
+            s[(i + k) % n] > s[(j + k) % n] ? i = i + k + 1 : j = j + k + 1;
+            if (i == j) i++;
+            k = 0;
+        }
+    }
+    return min(i, j);
+}
+```
+
 ### Trie
 
 ```cpp

@@ -53,6 +53,7 @@ qdd的ACM模板库 感谢郑老师和董老师的大力滋兹！TQL%%%
 + [x] 哈希
 + [x] Manacher
 + [x] KMP
++ [x] 最小表示法
 + [x] Trie
 + [x] AC自动机
 + [x] 回文自动机
