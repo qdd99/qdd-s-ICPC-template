@@ -96,6 +96,21 @@ struct RMQ {
 };
 ```
 
++ 滑动窗口 RMQ
+
+```cpp
+// k 为滑动窗口的大小
+deque<int> q;
+for (int i = 0, j = 0; i + k <= n; i++) {
+    while (j < i + k) {
+        while (!q.empty() && a[q.back()] < a[j]) q.pop_back(); // 最小值取'>'号
+        q.push_back(j++);
+    }
+    while (q.front() < i) q.pop_front();
+    rmq.push_back(a[q.front()]);
+}
+```
+
 ### 树状数组
 
 + 单点修改，区间和
