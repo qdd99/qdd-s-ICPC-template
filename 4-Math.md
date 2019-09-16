@@ -408,7 +408,7 @@ void initC() {
 // MAXN开2倍上限
 ll fac[MAXN], ifac[MAXN];
 
-void initInv() {
+void init_inv() {
     fac[0] = 1;
     for (int i = 1; i < MAXN; i++) {
         fac[i] = fac[i - 1] * i % MOD;
@@ -431,6 +431,9 @@ ll C(ll n, ll m) {
     if (n < MOD && m < MOD) return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
     return C(n / MOD, m / MOD) * C(n % MOD, m % MOD) % MOD;
 }
+
+// 可重复组合数
+ll H(int n, int m) { return C(n + m - 1, m); }
 ```
 
 ### 康托展开
