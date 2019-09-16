@@ -259,7 +259,7 @@ struct Palindromic_Tree {
     int cnt[MAXN]; // 表示节点i表示的本质不同的串的个数 aftre count()
     int num[MAXN]; // 表示以节点i表示的最长回文串的最右端点为回文串结尾的回文串个数。
     int len[MAXN]; // len[i]表示节点i表示的回文串的长度
-    int lcnt[MAXN]; // len[i]表示节点i表示的回文串的长度
+    int lcnt[MAXN];
     int S[MAXN]; // 存放添加的字符
     int last; // 指向上一个字符所在的节点，方便下一次add
     int n; // 字符数组指针
@@ -304,7 +304,7 @@ struct Palindromic_Tree {
 
     void count() {
         for (int i = p - 1; i >= 0; --i) cnt[fail[i]] += cnt[i];
-        // 父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串！
+        // 父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串
     }
 } pt;
 ```
