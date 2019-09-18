@@ -619,3 +619,53 @@ namespace tr {
     }
 }
 ```
+
+### CDQ 分治
+
++ 三维偏序（不严格）
+
+```cpp
+struct Node {
+    int x, y, z, sum, ans;
+} p[MAXN], q[MAXN];
+
+void CDQ(int l, int r) {
+    if (l == r) return;
+    int mid = (l + r) >> 1;
+    CDQ(l, mid);
+    CDQ(mid + 1, r);
+    int i = l, j = mid + 1;
+    for (int t = l; t <= r; t++) {
+        if (j > r || (i <= mid && p[i].y <= p[j].y)) {
+            q[t] = p[i++];
+            bit.add(q[t].z, q[t].sum);
+        } else {
+            q[t] = p[j++];
+            q[t].ans += bit.get(q[t].z);
+        }
+    }
+    for (i = l; i <= r; i++) {
+        p[i] = q[i];
+        bit.update(p[i].z, 0);
+    }
+}
+
+void go() {
+    sort(p + 1, p + n + 1, [](const Node &a, const Node &b) {
+        if (a.x != b.x) return a.x < b.x;
+        if (a.y != b.y) return a.y < b.y;
+        return a.z < b.z;
+    });
+    auto eq = [](const Node& a, const Node& b) {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    };
+    int k = n;
+    for (int i = 1, j = 1; i <= n; i++, j++) {
+        if (eq(p[i], p[j - 1])) j--, k--;
+        else if (i != j) p[j] = p[i];
+        p[j].sum++;
+    }
+    bit.init(m);
+    CDQ(1, k);
+}
+```
