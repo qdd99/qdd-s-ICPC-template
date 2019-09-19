@@ -363,6 +363,61 @@ ll exgcd(ll a, ll b, ll &x, ll &y) {
 }
 ```
 
+### 类欧几里得
+
+```cpp
+// f(a,b,c,n) = ∑(i=[0,n]) (ai+b)/c
+// g(a,b,c,n) = ∑(i=[0,n]) i*((ai+b)/c)
+// h(a,b,c,n) = ∑(i=[0,n]) ((ai+b)/c)^2
+ll f(ll a, ll b, ll c, ll n);
+ll g(ll a, ll b, ll c, ll n);
+ll h(ll a, ll b, ll c, ll n);
+
+ll f(ll a, ll b, ll c, ll n) {
+    if (n < 0) return 0;
+    ll m = (a * n + b) / c;
+    if (a >= c || b >= c) {
+        return (a / c) * n * (n + 1) / 2
+        + (b / c) * (n + 1)
+        + f(a % c, b % c, c, n);
+    } else {
+        return n * m - f(c, c - b - 1, a, m - 1);
+    }
+}
+
+ll g(ll a, ll b, ll c, ll n) {
+    if (n < 0) return 0;
+    ll m = (a * n + b) / c;
+    if (a >= c || b >= c) {
+        return (a / c) * n * (n + 1) * (2 * n + 1) / 6
+        + (b / c) * n * (n + 1) / 2
+        + g(a % c, b % c, c, n);
+    } else {
+        return (n * (n + 1) * m
+        - f(c, c - b - 1, a, m - 1) 
+        - h(c, c - b - 1, a, m - 1)) / 2;
+    }
+}
+
+ll h(ll a, ll b, ll c, ll n) {
+    if (n < 0) return 0;
+    ll m = (a * n + b) / c;
+    if (a >= c || b >= c) {
+        return (a / c) * (a / c) * n * (n + 1) * (2 * n + 1) / 6
+        + (b / c) * (b / c) * (n + 1)
+        + (a / c) * (b / c) * n * (n + 1)
+        + h(a % c, b % c, c, n)
+        + 2 * (a / c) * g(a % c, b % c, c, n)
+        + 2 * (b / c) * f(a % c, b % c, c, n);
+    } else {
+        return n * m * (m + 1)
+        - 2 * g(c, c - b - 1, a, m - 1)
+        - 2 * f(c, c - b - 1, a, m - 1)
+        - f(a, b, c, n);
+    }
+}
+```
+
 ### 逆元
 
 ```cpp
