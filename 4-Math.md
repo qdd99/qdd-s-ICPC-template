@@ -435,7 +435,7 @@ ll inv(ll a, ll p) {
 // 逆元打表
 ll inv[MAXN];
 
-void initInv() {
+void init_inv() {
     inv[1] = 1;
     for (int i = 2; i < MAXN; i++) {
         inv[i] = 1LL * (MOD - MOD / i) * inv[MOD % i] % MOD;

@@ -317,9 +317,149 @@ ld Dist(ld la1, ld lo1, ld la2, ld lo2, ld R) {
     ld x2 = cos(la2) * sin(lo2), y2 = cos(la2) * cos(lo2), z1 = sin(la2); 
     return R * acos(x1 * x2 + y1 * y2 + z1 * z2);
 }
+
+// jiry_2
+int cmp(ld k1, ld k2) {
+    return sgn(k1 - k2);
+}
+V proj(V k1, V k2, V q) { // q 到直线 k1,k2 的投影 
+    V k = k2 - k1;
+    return k1 + k * (dot(q - k1, k) / k.abs2());
+}
+V reflect(V k1, V k2, V q) {
+    return proj(k1, k2, q) * 2 - q;
+}
+int clockwise(V k1, V k2, V k3) { // k1 k2 k3 逆时针 1 顺时针 -1 否则 0  
+    return sgn(det(k2 - k1, k3 - k1));
+}
+int checkLL(V k1, V k2, V k3, V k4) { // 求直线 (L) 线段 (S) k1,k2 和 k3,k4 的交点 
+    return cmp(det(k3 - k1, k4 - k1), det(k3 - k2, k4 - k2)) != 0;
+}
+V getLL(V k1, V k2, V k3, V k4) {
+    ld w1 = det(k1 - k3, k4 - k3), w2 = det(k4 - k3, k2 - k3);
+    return (k1 * w2 + k2 * w1) / (w1 + w2);
+}
+vector<line> getHL(vector<line>& L) { // 求半平面交, 半平面是逆时针方向, 输出按照逆时针
+    sort(L.begin(), L.end());
+    deque<line> q;
+    for (int i = 0; i < (int) L.size(); i++) {
+        if (i && sameDir(L[i], L[i - 1])) continue;
+        while (q.size() > 1 && !checkpos(q[q.size() - 2], q[q.size() - 1], L[i])) q.pop_back();
+        while (q.size() > 1 && !checkpos(q[1], q[0], L[i])) q.pop_front();
+        q.push_back(L[i]);
+    }
+    while (q.size() > 2 && !checkpos(q[q.size() - 2], q[q.size() - 1], q[0])) q.pop_back();
+    while (q.size() > 2 && !checkpos(q[1], q[0], q[q.size() - 1])) q.pop_front();
+    vector<line> ans;
+    for (int i = 0; i < q.size(); i++) ans.push_back(q[i]);
+    return ans;
+}
+ld closepoint(vector<V>& A, int l, int r) { // 最近点对, 先要按照 x 坐标排序 
+    if (r - l <= 5) {
+        ld ans = 1e20;
+        for (int i = l; i <= r; i++)
+            for (int j = i + 1; j <= r; j++) ans = min(ans, A[i].dis(A[j]));
+        return ans;
+    }
+    int mid = l + r >> 1;
+    ld ans = min(closepoint(A, l, mid), closepoint(A, mid + 1, r));
+    vector<V> B;
+    for (int i = l; i <= r; i++)
+        if (abs(A[i].x - A[mid].x) <= ans) B.push_back(A[i]);
+    sort(B.begin(), B.end(), [](V k1, V k2) {
+        return k1.y < k2.y;
+    });
+    for (int i = 0; i < B.size(); i++)
+        for (int j = i + 1; j < B.size() && B[j].y - B[i].y < ans; j++) ans = min(ans, B[i].dis(B[j]));
+    return ans;
+}
+int checkposCC(circle k1, circle k2) { // 返回两个圆的公切线数量
+    if (cmp(k1.r, k2.r) == -1) swap(k1, k2);
+    ld dis = k1.o.dis(k2.o);
+    int w1 = cmp(dis, k1.r + k2.r), w2 = cmp(dis, k1.r - k2.r);
+    if (w1 > 0) return 4;
+    else if (w1 == 0) return 3;
+    else if (w2 > 0) return 2;
+    else if (w2 == 0) return 1;
+    else return 0;
+}
+vector<V> getCL(circle k1, V k2, V k3) { // 沿着 k2->k3 方向给出, 相切给出两个 
+    V k = proj(k2, k3, k1.o);
+    ld d = k1.r * k1.r - (k - k1.o).abs2();
+    if (sgn(d) == -1) return {};
+    V del = (k3 - k2).unit() * sqrt(max((ld) 0.0, d));
+    return {k - del, k + del};
+}
+vector<line> TangentoutCC(circle k1, circle k2) {
+    int pd = checkposCC(k1, k2);
+    if (pd == 0) return {};
+    if (pd == 1) {
+        V k = getCC(k1, k2)[0];
+        return { (line){k, k} };
+    }
+    if (cmp(k1.r, k2.r) == 0) {
+        V del = (k2.o - k1.o).unit().turn90().getdel();
+        return {
+            (line){k1.o - del * k1.r, k2.o - del * k2.r},
+            (line){k1.o + del * k1.r, k2.o + del * k2.r}
+        };
+    } else {
+        V p = (k2.o * k1.r - k1.o * k2.r) / (k1.r - k2.r);
+        vector<V> A = TangentCP(k1, p), B = TangentCP(k2, p);
+        vector<line> ans;
+        for (int i = 0; i < A.size(); i++) ans.push_back((line){A[i], B[i]});
+        return ans;
+    }
+}
+vector<line> TangentinCC(circle k1, circle k2) {
+    int pd = checkposCC(k1, k2);
+    if (pd <= 2) return {};
+    if (pd == 3) {
+        V k = getCC(k1, k2)[0];
+        return { (line){k, k} };
+    }
+    V p = (k2.o * k1.r + k1.o * k2.r) / (k1.r + k2.r);
+    vector<V> A = TangentCP(k1, p), B = TangentCP(k2, p);
+    vector<line> ans;
+    for (int i = 0; i < A.size(); i++) ans.push_back((line){A[i], B[i]});
+    return ans;
+}
+vector<line> TangentCC(circle k1, circle k2) {
+    int flag = 0;
+    if (k1.r < k2.r) swap(k1, k2), flag = 1;
+    vector<line> A = TangentoutCC(k1, k2), B = TangentinCC(k1, k2);
+    for (line k: B) A.push_back(k);
+    if (flag) for (line& k: A) swap(k[0], k[1]);
+    return A;
+}
+ld convexDiameter(vector<V> A) {
+    int now = 0, n = A.size();
+    ld ans = 0;
+    for (int i = 0; i < A.size(); i++) {
+        now = max(now, i);
+        while (1) {
+            ld k1 = A[i].dis(A[now % n]), k2 = A[i].dis(A[(now + 1) % n]);
+            ans = max(ans, max(k1, k2));
+            if (k2 > k1) now++;
+            else break;
+        }
+    }
+    return ans;
+}
+vector<V> convexcut(vector<V> A, V k1, V k2) { // 保留 k1,k2,p 逆时针的所有点
+    int n = A.size();
+    A.push_back(A[0]);
+    vector<V> ans;
+    for (int i = 0; i < n; i++) {
+        int w1 = clockwise(k1, k2, A[i]), w2 = clockwise(k1, k2, A[i + 1]);
+        if (w1 >= 0) ans.push_back(A[i]);
+        if (w1 * w2 < 0) ans.push_back(getLL(k1, k2, A[i], A[i + 1]));
+    }
+    return ans;
+}
 ```
 
-### 未涉及的专题
+### 本模板未涉及的专题
 
 + ECNU
 
@@ -353,7 +493,3 @@ zkw费用流 树上点分治 二分图匹配 虚树 欧拉路径 一般图匹配
 **图论**
 
 次小生成树 生成树计数 2-SAT 曼哈顿最小生成树
-
-**计算几何**
-
-平面最近点对
