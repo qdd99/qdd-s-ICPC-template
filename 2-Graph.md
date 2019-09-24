@@ -535,12 +535,7 @@ void tarjan(int u) {
 
 ```cpp
 // MAXN 开两倍
-void add_edge(int a, bool va, int b, bool vb) {
-    G[va ? a + n : a].push_back(vb ? b : b + n);
-    G[vb ? b + n : b].push_back(va ? a : a + n);
-}
-
-void go() {
+void two_sat() {
     for (int i = 1; i <= n * 2; i++) {
         if (!dfn[i]) tarjan(i);
     }
