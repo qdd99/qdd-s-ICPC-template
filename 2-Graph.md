@@ -531,6 +531,32 @@ void tarjan(int u) {
 }
 ```
 
++ 2-SAT
+
+```cpp
+// MAXN 开两倍
+void add_edge(int a, bool va, int b, bool vb) {
+    G[va ? a + n : a].push_back(vb ? b : b + n);
+    G[vb ? b + n : b].push_back(va ? a : a + n);
+}
+
+void go() {
+    for (int i = 1; i <= n * 2; i++) {
+        if (!dfn[i]) tarjan(i);
+    }
+    for (int i = 1; i <= n; i++) {
+        if (color[i] == color[i + n]) {
+            // impossible
+        }
+    }
+    for (int i = 1; i <= n; i++) {
+        if (color[i] < color[i + n]) {
+            // select
+        }
+    }
+}
+```
+
 ### 支配树
 
 + 有向无环图
