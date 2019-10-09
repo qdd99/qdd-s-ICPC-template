@@ -41,6 +41,32 @@ ld cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
 
 ld to_rad(ld deg) { return deg / 180 * PI; }
 
+// 象限
+int quad(const V& p) {
+    int x = sgn(p.x), y = sgn(p.y);
+    if (x > 0 && y >= 0) return 1;
+    if (x <= 0 && y > 0) return 2;
+    if (x < 0 && y <= 0) return 3;
+    if (x >= 0 && y < 0) return 4;
+    assert(0);
+}
+
+// 极角排序
+struct cmp_angle {
+    V p;
+    cmp_angle(const V& p = V()) : p(p) {}
+    bool operator () (const V& a, const V& b) const {
+        int qa = quad(a - p), qb = quad(b - p);
+        if (qa != qb) return qa < qb;
+        int d = sgn(cross(a, b, p));
+        if (d) return d > 0;
+        return dist(a, p) < dist(b, p);
+    }
+};
+
+// 单位向量
+V unit(const V& p) { return eq(p.len(), 0) ? V(1, 0) : p / p.len(); }
+
 // 逆时针旋转 r 弧度
 V rot(const V& p, ld r) {
     return V(p.x * cos(r) - p.y * sin(r), p.x * sin(r) + p.y * cos(r));
