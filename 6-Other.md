@@ -133,6 +133,8 @@ int zeller(int y, int m, int d) {
     return (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
 }
 
+// date_to_int(1, 1, 1) = 1721426
+// date_to_int(2019, 10, 27) = 2458784
 int date_to_int(int y, int m, int d) {
     return
     1461 * (y + 4800 + (m - 14) / 12) / 4 +
