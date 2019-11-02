@@ -14,6 +14,20 @@ public:
 #define vector vector_s
 ```
 
+### pair_hash
+
+```cpp
+template<class T1, class T2>
+struct pair_hash {
+    size_t operator () (const pair<T1, T2>& p) const {
+        return hash<T1>()(p.first) * 19260817 + hash<T2>()(p.second);
+    }
+};
+
+unordered_set<pair<int, int>, pair_hash<int, int> > st;
+unordered_map<pair<int, int>, int, pair_hash<int, int> > mp;
+```
+
 ### updmax/min
 
 ```cpp
