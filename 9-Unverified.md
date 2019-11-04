@@ -10,6 +10,85 @@ S[d[i] = lower_bound(S, S + i, a[i] - 1) - S] = min(S[d[i]], a[i]);
 ans = max(ans, d[i]);
 ```
 
+### 约瑟夫问题
+
+```cpp
+// n个人，1至m报数，问最后留下来的人的编号
+// 公式：f(n,m)=(f(n−1,m)+m)%n，f(0,m)=0;
+// O(n)
+ll calc(int n, ll m) {
+    ll p = 0;
+    for (int i = 2; i <= n; i++) {
+        p = (p + m) % i;
+    }
+    return p + 1;
+}
+
+// n个人，1至m报数，问第k个出局的人的编号
+// 公式：f(n,k)=(f(n−1,k−1)+m−1)%n+1
+// f(n−k+1,1)=m%(n−k+1)
+// if (f==0) f=n−k+1
+// O(k)
+ll cal1(ll n, ll m, ll k) {  // (k == n) equal(calc)
+    ll p = m % (n - k + 1);
+    if (p == 0) p = n - k + 1;
+    for (ll i = 2; i <= k; i++) {
+        p = (p + m - 1) % (n - k + i) + 1;
+    }
+    return p;
+}
+
+// n个人，1至m报数，问第k个出局的人的编号
+// O(m*log(m))
+ll cal2(ll n, ll m, ll k) {
+    if (m == 1)
+        return k;
+    else {
+        ll a = n - k + 1, b = 1;
+        ll c = m % a, x = 0;
+        if (c == 0) c = a;
+        while (b + x <= k) {
+            a += x, b += x, c += m * x;
+            c %= a;
+            if (c == 0) c = a;
+            x = (a - c) / (m - 1) + 1;
+        }
+        c += (k - b) * m;
+        c %= n;
+        if (c == 0) c = n;
+        return c;
+    }
+}
+
+// n个人，1至m报数，问编号为k的人是第几个出局的
+// O(n)
+ll n, k;  //可做n<=4e7,询问个数<=100,下标范围[0,n-1]
+ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第几个死亡
+    ll tmp = 0;
+    while (n) {
+        x = (x + n) % n;
+        if (k > n) x += (k - x - 1 + n - 1) / n * n;
+        if ((x + 1) % k == 0) {
+            tmp += (x + 1) / k;
+            break;
+        } else {
+            if (k > n) {
+                tmp += x / k;
+                ll ttmp = x;
+                x = x - (x / n + 1) * (x / k) + (x + n) / n * n - k;
+                n -= ttmp / k;
+            } else {
+                tmp += n / k;
+                x = x - x / k;
+                x += n - n / k * k;
+                n -= n / k;
+            }
+        }
+    }
+    return tmp;
+}
+```
+
 ### Link-Cut Tree
 
 ```cpp
