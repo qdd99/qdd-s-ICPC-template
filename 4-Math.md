@@ -97,7 +97,24 @@ bool isprime(int x) {
     }
     return true;
 }
+```
 
+```py
+from random import randint
+
+def is_prime(x, n):
+    if x < 2:
+        return False
+    if n >= x:
+        n = x - 1
+    for i in range(n):
+        val = randint(1, x - 1)
+        if pow(val, x - 1, x) != 1:
+            return False
+    return True
+```
+
+```cpp
 // O(logn)
 // 前置：快速乘、快速幂
 // int范围只需检查2, 7, 61
