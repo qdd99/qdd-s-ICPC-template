@@ -131,6 +131,176 @@ namespace R {
 }
 ```
 
+### 上下界网络流
+
+```cpp
+const int INF = 0x3f3f3f3f;
+
+struct edge {
+    int to, cap, rev;
+};
+
+const int MAXN = 60003;
+const int MAXM = 400003;
+
+struct graph {
+    int n, m;
+    edge w[MAXM];
+    int fr[MAXM];
+    int num[MAXN], cur[MAXN], first[MAXN];
+    edge e[MAXM];
+
+    void init(int n) {
+        this->n = n;
+        m = 0;
+    }
+
+    void add_edge(int from, int to, int cap) {
+        w[++m] = (edge){to, cap};
+        num[from]++, fr[m] = from;
+        w[++m] = (edge){from, 0};
+        num[to]++, fr[m] = to;
+    }
+
+    void prepare() {
+        first[1] = 1;
+        for (int i = 2; i <= n; i++) first[i] = first[i - 1] + num[i - 1];
+        for (int i = 1; i < n; i++) num[i] = first[i + 1] - 1;
+        num[n] = m;
+        for (int i = 1; i <= m; i++) {
+            e[first[fr[i]] + (cur[fr[i]]++)] = w[i];
+
+            if (!(i % 2)) {
+                e[first[fr[i]] + cur[fr[i]] - 1].rev =
+                    first[w[i].to] + cur[w[i].to] - 1;
+                e[first[w[i].to] + cur[w[i].to] - 1].rev =
+                    first[fr[i]] + cur[fr[i]] - 1;
+            }
+        }
+    }
+
+    int q[MAXN];
+    int dist[MAXN];
+    int t;
+
+    bool bfs(int s) {
+        int l = 1, r = 1;
+        q[1] = s;
+        memset(dist, -1, (n + 1) * 4);
+        dist[s] = 0;
+        while (l <= r) {
+            int u = q[l++];
+            for (int i = first[u]; i <= num[u]; i++) {
+                int v = e[i].to;
+                if ((dist[v] != -1) || (!e[i].cap)) continue;
+                dist[v] = dist[u] + 1;
+                if (v == t) return true;
+                q[++r] = v;
+            }
+        }
+        return dist[t] != -1;
+    }
+
+    int dfs(int u, int flow) {
+        if (u == t) return flow;
+        for (int& i = cur[u]; i <= num[u]; i++) {
+            int v = e[i].to;
+            if (!e[i].cap || dist[v] != dist[u] + 1) continue;
+            int t = dfs(v, min(flow, e[i].cap));
+            if (t) {
+                e[i].cap -= t;
+                e[e[i].rev].cap += t;
+                return t;
+            }
+        }
+        return 0;
+    }
+
+    ll dinic(int s, int t) {
+        ll ans = 0;
+        this->t = t;
+        while (bfs(s)) {
+            int flow;
+            for (int i = 1; i <= n; i++) cur[i] = first[i];
+            while (flow = dfs(s, INF)) ans += (ll)flow;
+        }
+        return ans;
+    }
+};
+
+struct graph_bounds {
+    int in[MAXN];
+    int S, T, sum, cur;
+    graph g;
+    int n;
+
+    void init(int n) {
+        this->n = n;
+        S = n + 1;
+        T = n + 2;
+        sum = 0;
+        g.init(n + 2);
+    }
+
+    void add_edge(int from, int to, int low, int up) {
+        g.add_edge(from, to, up - low);
+        in[to] += low;
+        in[from] -= low;
+    }
+
+    void build() {
+        for (int i = 1; i <= n; i++)
+            if (in[i] > 0)
+                g.add_edge(S, i, in[i]), sum += in[i];
+            else if (in[i])
+                g.add_edge(i, T, -in[i]);
+        g.prepare();
+    }
+
+    bool canflow() {
+        build();
+        int flow = g.dinic(S, T);
+        return flow >= sum;
+    }
+
+    bool canflow(int s, int t) {
+        g.add_edge(t, s, INF);
+        build();
+        for (int i = 1; i <= g.m; i++) {
+            edge& e = g.e[i];
+            if (e.to == s && e.cap == INF) {
+                cur = i;
+                break;
+            }
+        }
+        int flow = g.dinic(S, T);
+        return flow >= sum;
+    }
+
+    int maxflow(int s, int t) {
+        if (!canflow(s, t)) return -1;
+        return g.dinic(s, t);
+    }
+
+    int minflow(int s, int t) {
+        if (!canflow(s, t)) return -1;
+        edge& e = g.e[cur];
+        int flow = INF - e.cap;
+        e.cap = g.e[e.rev].cap = 0;
+        return flow - g.dinic(t, s);
+    }
+} g;
+
+void solve() {
+    int n = read(), m = read(), s = read(), t = read();
+    g.init(n);
+    while (m--) {
+        int u = read(), v = read(), low = read(), up = read();
+        g.add_edge(u, v, low, up);
+    }
+}
+```
+
 ### Link-Cut Tree
 
 ```cpp
