@@ -214,6 +214,32 @@ void get_mu() {
 }
 ```
 
+### 区间筛
+
+```cpp
+// a, b <= 1e13, b - a <= 1e6
+bool vis_small[MAXN], vis_big[MAXN];
+ll prime[MAXN];
+int tot = 0;
+
+void get_prime(ll a, ll b) {
+    ll c = ceil(sqrt(b));
+    for (ll i = 2; i <= c; i++) {
+        if (!vis_small[i]) {
+            for (ll j = i * i; j <= c; j += i) {
+                vis_small[j] = 1;
+            }
+            for (ll j = max(i, (a + i - 1) / i) * i; j <= b; j += i) {
+                vis_big[j - a] = 1;
+            }
+        }
+    }
+    for (int i = max(0LL, 2 - a); i <= b - a; i++) {
+        if (!vis_big[i]) prime[tot++] = i + a;
+    }
+}
+```
+
 ### 找因数
 
 ```cpp
