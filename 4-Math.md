@@ -7,9 +7,24 @@ ll gcd(ll a, ll b) { return b ? gcd(b, a % b) : a; }
 ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
 ```
 
-### 快速幂 & 快速乘
+### 快速乘 & 快速幂
 
 ```cpp
+// 模数爆int时使用
+ll mul(ll a, ll b, ll p) {
+    ll ans = 0;
+    for (a %= p; b; b >>= 1) {
+        if (b & 1) ans = (ans + a) % p;
+        a = (a << 1) % p;
+    }
+    return ans;
+}
+
+// O(1)
+ll mul(ll a, ll b, ll p) {
+    return (ll)(__int128(a) * b % p);
+}
+
 ll qk(ll a, ll b, ll p) {
     ll ans = 1 % p;
     for (a %= p; b; b >>= 1) {
@@ -27,21 +42,6 @@ ll qk(ll a, const string& b, ll p) {
         a = qk(a, 10, p);
     }
     return ans;
-}
-
-// 模数爆int时使用
-ll mul(ll a, ll b, ll p) {
-    ll ans = 0;
-    for (a %= p; b; b >>= 1) {
-        if (b & 1) ans = (ans + a) % p;
-        a = (a << 1) % p;
-    }
-    return ans;
-}
-
-// O(1)
-ll mul(ll a, ll b, ll p) {
-    return (ll)(__int128(a) * b % p);
 }
 ```
 
