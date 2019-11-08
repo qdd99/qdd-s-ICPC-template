@@ -278,8 +278,7 @@ struct MCMF {
     int n, s, t, flow, cost;
     vector<MEdge> es;
     vector<vector<int> > G;
-    vector<int> d, p, a;  // dis, prev, add
-    deque<bool> in;
+    vector<int> d, p, a, in;  // dis, prev, add
 
     MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), G(n + 1), p(n + 1), a(n + 1) {}
 
@@ -292,7 +291,7 @@ struct MCMF {
 
     bool spfa() {
         d.assign(n + 1, INF);
-        in.assign(n + 1, false);
+        in.assign(n + 1, 0);
         d[s] = 0;
         in[s] = 1;
         a[s] = INF;
@@ -301,7 +300,7 @@ struct MCMF {
         while (!q.empty()) {
             int u = q.front();
             q.pop();
-            in[u] = false;
+            in[u] = 0;
             for (int& i : G[u]) {
                 MEdge& e = es[i];
                 if (e.cap && d[e.to] > d[u] + e.cost) {
@@ -310,7 +309,7 @@ struct MCMF {
                     a[e.to] = min(a[u], e.cap);
                     if (!in[e.to]) {
                         q.push(e.to);
-                        in[e.to] = true;
+                        in[e.to] = 1;
                     }
                 }
             }
