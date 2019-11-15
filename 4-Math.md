@@ -549,6 +549,77 @@ vector<int> inv_cantor(int x, int n) {
 }
 ```
 
+### 高斯消元
+
+```cpp
+// n 方程个数，m 变量个数，a 是 n*(m+1) 的增广矩阵，free 是否为自由变量
+// 返回自由变量个数，-1 无解
+const double EPS = 1e-8;
+const int MAXN = 2000 + 7;
+
+double x[MAXN];
+bool free_x[MAXN];
+
+int sgn(double x) { return x < -EPS ? -1 : x > EPS; }
+
+int gauss(vector<vector<double> >& a, int n, int m) {
+    fill(x, x + m + 1, 0);
+    fill(free_x, free_x + m + 1, true);
+
+    // 求上三角矩阵
+    int r = 0, c = 0;
+    while (r < n && c < m) {
+        int mr = r;
+        for (int i = r + 1; i < n; i++) {
+            if (abs(a[i][c]) > abs(a[mr][c])) mr = i;
+        }
+        if (mr != r) swap(a[r], a[mr]);
+        if (!sgn(a[r][c])) {
+            a[r][c] = 0;
+            ++c;
+            continue;
+        }
+        for (int i = r + 1; i < n; i++) {
+            if (a[i][c]) {
+                double t = a[i][c] / a[r][c];
+                for (int j = c; j <= m; j++) a[i][j] -= a[r][j] * t;
+            }
+        }
+        ++r, ++c;
+    }
+    for (int i = r; i < n; i++) {
+        if (sgn(a[i][m])) return -1;
+    }
+
+    // 求解 x0, x1, ..., xm-1
+    if (r < m) {
+        for (int i = r - 1; i >= 0; i--) {
+            int fcnt = 0, k = -1;
+            for (int j = 0; j < m; j++) {
+                if (sgn(a[i][j]) && free_x[j]) {
+                    ++fcnt;
+                    k = j;
+                }
+            }
+            if (fcnt > 0) continue;
+            double s = a[i][m];
+            for (int j = 0; j < m; j++) {
+                if (j != k) s -= a[i][j] * x[j];
+            }
+            x[k] = s / a[i][k];
+            free_x[k] = 0;
+        }
+        return m - r;
+    }
+    for (int i = m - 1; i >= 0; i--) {
+        double s = a[i][m];
+        for (int j = i + 1; j < m; j++) s -= a[i][j] * x[j];
+        x[i] = s / a[i][i];
+    }
+    return 0;
+}
+```
+
 ### 线性基
 
 ```cpp
