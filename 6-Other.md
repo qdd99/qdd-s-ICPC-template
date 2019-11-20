@@ -210,6 +210,41 @@ void subset(int k, int n) {
 }
 ```
 
+### 数位 dp
+
+```cpp
+// 小于等于 x 的 base 进制下回文数个数
+ll dp[20][20][20][2], tmp[20], a[20];
+
+ll dfs(ll base, ll pos, ll len, ll s, bool limit) {
+    if (pos == -1) return s;
+    if (!limit && dp[base][pos][len][s] != -1) return dp[base][pos][len][s];
+    ll ret = 0;
+    ll ed = limit ? a[pos] : base - 1;
+    for (int i = 0; i <= ed; i++) {
+        tmp[pos] = i;
+        if (len == pos)
+            ret += dfs(base, pos - 1, len - (i == 0), s, limit && i == a[pos]);
+        else if (s && pos < (len + 1) / 2)
+            ret += dfs(base, pos - 1, len, tmp[len - pos] == i, limit && i == a[pos]);
+        else
+            ret += dfs(base, pos - 1, len, s, limit && i == a[pos]);
+    }
+    if (!limit) dp[base][pos][len][s] = ret;
+    return ret;
+}
+
+ll solve(ll x, ll base) {
+    memset(dp, -1, sizeof(dp));
+    ll sz = 0;
+    while (x) {
+        a[sz++] = x % base;
+        x /= base;
+    }
+    return dfs(base, sz - 1, sz - 1, 1, true);
+}
+```
+
 ### 表达式求值
 
 ```py
