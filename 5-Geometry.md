@@ -21,8 +21,8 @@ bool geq(ld x, ld y) { return sgn(x - y) >= 0; }
 
 struct V {
     ld x, y;
-    V(ld x = 0, ld y = 0) : x(x), y(y) {}
-    V(const V& a, const V& b) : x(b.x - a.x), y(b.y - a.y) {}
+    constexpr V(ld x = 0, ld y = 0) : x(x), y(y) {}
+    constexpr V(const V& a, const V& b) : x(b.x - a.x), y(b.y - a.y) {}
     V operator + (const V& b) const { return V(x + b.x, y + b.y); }
     V operator - (const V& b) const { return V(x - b.x, y - b.y); }
     V operator * (ld k) const { return V(x * k, y * k); }
