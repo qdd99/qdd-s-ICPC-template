@@ -269,10 +269,10 @@ struct SegT {
         t.resize(2 * size);
     }
 
-    Node ask(int p, int l, int r, int pl, int pr) {
+    Node ask(int p, int pl, int pr, int l, int r) {
         if (l > pr || r < pl) return Node();
         if (l <= pl && r >= pr) return t[p];
-        return merge(ask(lc, l, r, pl, mid), ask(rc, l, r, mid + 1, pr));
+        return merge(ask(lc, pl, mid, l, r), ask(rc, mid + 1, pr, l, r));
     }
 
     void update(int k, int val) {
@@ -283,7 +283,7 @@ struct SegT {
         }
     }
 
-    Node query(int l, int r) { return ask(1, l, r, 1, size); }
+    Node query(int l, int r) { return ask(1, 1, size, l, r); }
 
 #undef lc
 #undef rc
@@ -302,13 +302,13 @@ void add(int x, ll val) {
     }
 }
 
-int ask(int p, ll k, int pl, int pr) {
+int ask(int p, int pl, int pr, ll k) {
     if (pl == pr) return pl;
-    if (k <= t[lc].val) return ask(lc, k, pl, mid);
-    return ask(rc, k - t[lc].val, mid + 1, pr);
+    if (k <= t[lc].val) return ask(lc, pl, mid, k);
+    return ask(rc, mid + 1, pr, k - t[lc].val);
 }
 
-int query(ll k) { return ask(1, k, 1, size); }
+int query(ll k) { return ask(1, 1, size, k); }
 ```
 
 + 区间加，区间和
@@ -327,16 +327,16 @@ void pushdown(int p, int pl, int pr) {
     t[p].lazy = 0;
 }
 
-ll ask(int p, int l, int r, int pl, int pr) {
+ll ask(int p, int pl, int pr, int l, int r) {
     if (l > pr || r < pl) return 0;
     if (l <= pl && r >= pr) return t[p].val;
     pushdown(p, pl, pr);
-    ll vl = ask(lc, l, r, pl, mid);
-    ll vr = ask(rc, l, r, mid + 1, pr);
+    ll vl = ask(lc, pl, mid, l, r);
+    ll vr = ask(rc, mid + 1, pr, l, r);
     return vl + vr;
 }
 
-void modify(int p, int l, int r, int val, int pl, int pr) {
+void modify(int p, int pl, int pr, int l, int r, int val) {
     if (l > pr || r < pl) return;
     if (l <= pl && r >= pr) {
         t[p].val += 1LL * val * (pr - pl + 1);
@@ -344,13 +344,13 @@ void modify(int p, int l, int r, int val, int pl, int pr) {
         return;
     }
     pushdown(p, pl, pr);
-    modify(lc, l, r, val, pl, mid);
-    modify(rc, l, r, val, mid + 1, pr);
+    modify(lc, pl, mid, l, r, val);
+    modify(rc, mid + 1, pr, l, r, val);
     t[p].val = t[lc].val + t[rc].val;
 }
 
-void update(int l, int r, int val) { modify(1, l, r, val, 1, size); }
-ll query(int l, int r) { return ask(1, l, r, 1, size); }
+void update(int l, int r, int val) { modify(1, 1, size, l, r, val); }
+ll query(int l, int r) { return ask(1, 1, size, l, r); }
 ```
 
 + 区间乘混加，区间和取模
@@ -373,17 +373,17 @@ void pushdown(int p, int pl, int pr) {
     t[p].add = 0;
 }
 
-ll ask(int p, int l, int r, int pl, int pr) {
+ll ask(int p, int pl, int pr, int l, int r) {
     if (l > pr || r < pl) return 0;
     if (l <= pl && r >= pr) return t[p].val;
     pushdown(p, pl, pr);
-    ll vl = ask(lc, l, r, pl, mid);
-    ll vr = ask(rc, l, r, mid + 1, pr);
+    ll vl = ask(lc, pl, mid, l, r);
+    ll vr = ask(rc, mid + 1, pr, l, r);
     return (vl + vr) % MOD;
 }
 
 // x' = ax + b
-void modify(int p, int l, int r, int a, int b, int pl, int pr) {
+void modify(int p, int pl, int pr, int l, int r, int a, int b) {
     if (l > pr || r < pl) return;
     if (l <= pl && r >= pr) {
         t[p].val = (t[p].val * a % MOD + 1LL * (pr - pl + 1) * b % MOD) % MOD;
@@ -392,13 +392,13 @@ void modify(int p, int l, int r, int a, int b, int pl, int pr) {
         return;
     }
     pushdown(p, pl, pr);
-    modify(lc, l, r, a, b, pl, mid);
-    modify(rc, l, r, a, b, mid + 1, pr);
+    modify(lc, pl, mid, l, r, a, b);
+    modify(rc, mid + 1, pr, l, r, a, b);
     t[p].val = (t[lc].val + t[rc].val) % MOD;
 }
 
-void update(int l, int r, int a, int b) { modify(1, l, r, a, b, 1, size); }
-ll query(int l, int r) { return ask(1, l, r, 1, size); }
+void update(int l, int r, int a, int b) { modify(1, 1, size, l, r, a, b); }
+ll query(int l, int r) { return ask(1, 1, size, l, r); }
 ```
 
 ### 动态开点线段树
@@ -421,28 +421,28 @@ struct SegT {
         while (size < sz) size <<= 1;
     }
 
-    int modify(int p, int k, int val, int pl, int pr) {
+    int modify(int p, int pl, int pr, int k, int val) {
         if (pl > k || pr < k) return p;
         if (!p) p = ++cnt;
         if (pl == pr) t[p].val = val;
         else {
-            t[p].lc = modify(t[p].lc, k, val, pl, mid);
-            t[p].rc = modify(t[p].rc, k, val, mid + 1, pr);
+            t[p].lc = modify(t[p].lc, pl, mid, k, val);
+            t[p].rc = modify(t[p].rc, mid + 1, pr, k, val);
             t[p].val = max(t[t[p].lc].val, t[t[p].rc].val);
         }
         return p;
     }
 
-    int ask(int p, int l, int r, int pl, int pr) {
+    int ask(int p, int pl, int pr, int l, int r) {
         if (l > pr || r < pl) return -INF;
         if (l <= pl && r >= pr) return t[p].val;
-        int vl = ask(t[p].lc, l, r, pl, mid);
-        int vr = ask(t[p].rc, l, r, mid + 1, pr);
+        int vl = ask(t[p].lc, pl, mid, l, r);
+        int vr = ask(t[p].rc, mid + 1, pr, l, r);
         return max(vl, vr);
     }
 
-    void update(int k, int val) { rt = modify(rt, k, val, 1, size); }
-    int query(int l, int r) { return ask(rt, l, r, 1, size); }
+    void update(int k, int val) { rt = modify(rt, 1, size, k, val); }
+    int query(int l, int r) { return ask(rt, 1, size, l, r); }
 
 #undef mid
 };
@@ -475,25 +475,25 @@ struct FST {
         return cnt++;
     }
 
-    int ins(int p, int x, int pl, int pr) {
+    int ins(int p, int pl, int pr, int x) {
         if (pl > x || pr < x) return p;
         if (pl == pr) return N(0, 0, t[p].val + 1);
-        return N(ins(t[p].lc, x, pl, mid), ins(t[p].rc, x, mid + 1, pr), t[p].val + 1);
+        return N(ins(t[p].lc, pl, mid, x), ins(t[p].rc, mid + 1, pr, x), t[p].val + 1);
     }
 
-    int ask(int p1, int p2, int k, int pl, int pr) {
+    int ask(int p1, int p2, int pl, int pr, int k) {
         if (pl == pr) return pl;
         ll vl = t[t[p2].lc].val - t[t[p1].lc].val;
-        if (k <= vl) return ask(t[p1].lc, t[p2].lc, k, pl, mid);
-        return ask(t[p1].rc, t[p2].rc, k - vl, mid + 1, pr);
+        if (k <= vl) return ask(t[p1].lc, t[p2].lc, pl, mid, k);
+        return ask(t[p1].rc, t[p2].rc, mid + 1, pr, k - vl);
     }
 
     void add(int x) {
-        root.push_back(ins(root.back(), x, 1, size));
+        root.push_back(ins(root.back(), 1, size, x));
     }
 
     int query(int l, int r, int k) {
-        return ask(root[l - 1], root[r], k, 1, size);
+        return ask(root[l - 1], root[r], 1, size, k);
     }
 
 #undef mid
