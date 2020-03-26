@@ -167,10 +167,8 @@ void dfs(int u, int pa) {
     for (int i = 1; i < 22; i++) {
         up[u][i] = up[up[u][i - 1]][i - 1];
     }
-    for (int i = 0; i < G[u].size(); i++) {
-        if (G[u][i] != pa) {
-            dfs(G[u][i], u);
-        }
+    for (int v : G[u]) {
+        if (v != pa) dfs(v, u);
     }
 }
 
