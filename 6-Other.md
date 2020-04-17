@@ -69,6 +69,23 @@ vector<int> unique_dc(const vector<T>& a, int start_id) {
 }
 ```
 
+### 数据分组
+
+```cpp
+template <class T>
+vector<pair<T, int> > norm(vector<T>& v) {
+    // sort(v.begin(), v.end());
+    vector<pair<T, int> > p;
+    for (int i = 0; i < (int)v.size(); i++) {
+        if (i == 0 || v[i] != v[i - 1])
+            p.emplace_back(v[i], 1);
+        else
+            p.back().second++;
+    }
+    return p;
+}
+```
+
 ### 加强版优先队列
 
 ```cpp
