@@ -69,7 +69,7 @@ vector<int> unique_dc(const vector<T>& a, int start_id) {
 }
 ```
 
-### 数据分组
+### 合并同类项
 
 ```cpp
 template <class T>
