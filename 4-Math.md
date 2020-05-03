@@ -13,10 +13,8 @@ ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
 // 模数爆int时使用
 ll mul(ll a, ll b, ll p) {
     ll ans = 0;
-    for (a %= p; b; b >>= 1) {
+    for (a %= p; b; b >>= 1, a = (a << 1) % p)
         if (b & 1) ans = (ans + a) % p;
-        a = (a << 1) % p;
-    }
     return ans;
 }
 
@@ -27,10 +25,16 @@ ll mul(ll a, ll b, ll p) {
 
 ll qk(ll a, ll b, ll p) {
     ll ans = 1 % p;
-    for (a %= p; b; b >>= 1) {
+    for (a %= p; b; b >>= 1, a = a * a % p)
         if (b & 1) ans = ans * a % p;
-        a = a * a % p;
-    }
+    return ans;
+}
+
+// 爆int
+ll qk(ll a, ll b, ll p) {
+    ll ans = 1 % p;
+    for (a %= p; b; b >>= 1, a = mul(a, a, p))
+        if (b & 1) ans = mul(ans, a, p);
     return ans;
 }
 
