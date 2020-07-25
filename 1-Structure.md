@@ -3,8 +3,12 @@
 ### 并查集
 
 ```cpp
-int find(int x) { return (x == pa[x]) ? x : pa[x] = find(pa[x]); }
-void merge(int a, int b) { pa[find(a)] = find(b); }
+struct dsu {
+    vector<int> p;
+    dsu(int n) : p(n) { iota(p.begin(), p.end(), 0); }
+    int find(int x) { return (x == p[x]) ? x : p[x] = find(p[x]); }
+    void merge(int a, int b) { p[find(a)] = find(b); }
+};
 ```
 
 + 动态开点并查集
