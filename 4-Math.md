@@ -106,7 +106,7 @@ bool isprime(int x) {
 // 前置：快速乘、快速幂
 // int范围只需检查2, 7, 61
 bool Rabin_Miller(ll a, ll n) {
-    if (n == 2 || a >= n) return 1;
+    if (n == 2) return 1;
     if (n == 1 || !(n & 1)) return 0;
     ll d = n - 1;
     while (!(d & 1)) d >>= 1;
