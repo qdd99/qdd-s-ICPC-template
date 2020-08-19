@@ -102,6 +102,16 @@ V intersect(const V& a, const V& b, const V& c, const V& d) {
     return (a * s2 - b * s1) / (s2 - s1);
 }
 
+// 点在直线上的投影点
+V proj(const V& p, const V& a, const V& b) {
+    return a + (b - a) * dot(b - a, p - a) / (b - a).len2();
+}
+
+// 点关于直线的对称点
+V reflect(const V& p, const V& a, const V& b) {
+    return proj(p, a, b) * 2 - p;
+}
+
 // 三角形重心
 V centroid(const V& a, const V& b, const V& c) {
     return (a + b + c) / 3;
