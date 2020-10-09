@@ -262,3 +262,25 @@ C min_circle_cover(vector<V> a) {
 ```
 
 ### 三维几何
+
+```cpp
+struct V {
+    ld x, y, z;
+    constexpr V(ld x = 0, ld y = 0, ld z = 0) : x(x), y(y), z(z) {}
+    constexpr V(const V& a, const V& b) : x(b.x - a.x), y(b.y - a.y), z(b.z - a.z) {}
+    V operator+(const V& b) const { return V(x + b.x, y + b.y, z + b.z); }
+    V operator-(const V& b) const { return V(x - b.x, y - b.y, z - b.z); }
+    V operator*(ld k) const { return V(x * k, y * k, z * k); }
+    V operator/(ld k) const { return V(x / k, y / k, z / k); }
+    ld len() const { return sqrt(len2()); }
+    ld len2() const { return x * x + y * y + z * z; }
+};
+
+ostream& operator<<(ostream& os, const V& p) { return os << "(" << p.x << "," << p.y << "," << p.z << ")"; }
+istream& operator>>(istream& is, V& p) { return is >> p.x >> p.y >> p.z; }
+
+ld dist(const V& a, const V& b) { return (b - a).len(); }
+ld dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+V det(const V& a, const V& b) { return V(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x); }
+ld mix(const V& a, const V& b, const V& c) { return dot(a, det(b, c)); }
+```
