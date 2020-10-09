@@ -282,5 +282,6 @@ istream& operator>>(istream& is, V& p) { return is >> p.x >> p.y >> p.z; }
 ld dist(const V& a, const V& b) { return (b - a).len(); }
 ld dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 V det(const V& a, const V& b) { return V(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x); }
+V cross(const V& s, const V& t, const V& o) { return det(V(o, s), V(o, t)); }
 ld mix(const V& a, const V& b, const V& c) { return dot(a, det(b, c)); }
 ```
