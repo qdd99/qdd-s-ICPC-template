@@ -395,7 +395,7 @@ namespace stoer_wagner {
 ```cpp
 // 点权
 vector<int> G[MAXN];
-int pa[MAXN], sz[MAXN], dep[MAXN], dfn[MAXN], maxc[MAXN], top[MAXN];
+int pa[MAXN], sz[MAXN], dep[MAXN], dfn[MAXN], maxc[MAXN], top[MAXN], clk;
 
 void dfs1(int u) {
     sz[u] = 1;
@@ -413,9 +413,8 @@ void dfs1(int u) {
 }
 
 void dfs2(int u, int tp) {
-    static int cnt = 0;
     top[u] = tp;
-    dfn[u] = ++cnt;
+    dfn[u] = ++clk;
     if (maxc[u] != -1) dfs2(maxc[u], tp);
     for (int& v : G[u]) {
         if (v != pa[u] && v != maxc[u]) {
@@ -425,6 +424,7 @@ void dfs2(int u, int tp) {
 }
 
 void init() {
+    clk = 0;
     dep[1] = 1;
     dfs1(1);
     dfs2(1, 1);
