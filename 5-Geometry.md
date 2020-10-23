@@ -23,16 +23,16 @@ struct V {
     ld x, y;
     constexpr V(ld x = 0, ld y = 0) : x(x), y(y) {}
     constexpr V(const V& a, const V& b) : x(b.x - a.x), y(b.y - a.y) {}
-    V operator + (const V& b) const { return V(x + b.x, y + b.y); }
-    V operator - (const V& b) const { return V(x - b.x, y - b.y); }
-    V operator * (ld k) const { return V(x * k, y * k); }
-    V operator / (ld k) const { return V(x / k, y / k); }
+    V operator+(const V& b) const { return V(x + b.x, y + b.y); }
+    V operator-(const V& b) const { return V(x - b.x, y - b.y); }
+    V operator*(ld k) const { return V(x * k, y * k); }
+    V operator/(ld k) const { return V(x / k, y / k); }
     ld len() const { return hypot(x, y); }
     ld len2() const { return x * x + y * y; }
 };
 
-ostream& operator << (ostream& os, const V& p) { return os << "(" << p.x << ", " << p.y << ")"; }
-istream& operator >> (istream& is, V& p) { return is >> p.x >> p.y; }
+ostream& operator<<(ostream& os, const V& p) { return os << "(" << p.x << ", " << p.y << ")"; }
+istream& operator>>(istream& is, V& p) { return is >> p.x >> p.y; }
 
 ld dist(const V& a, const V& b) { return (b - a).len(); }
 ld dot(const V& a, const V& b) { return a.x * b.x + a.y * b.y; }
