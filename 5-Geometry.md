@@ -242,7 +242,7 @@ vector<V> tangent_point(const C& c, const V& p) {
 
 // 最小圆覆盖
 C min_circle_cover(vector<V> a) {
-    shuffle(a.begin(), a.end(), mt_rand);
+    shuffle(a.begin(), a.end(), rng);
     V o = a[0];
     ld r = 0;
     int n = a.size();

@@ -319,10 +319,10 @@ vector<int> getf(int x) {
 ### Pollard-Rho
 
 ```cpp
-mt19937_64 mt_rand(time(0));
+mt19937_64 rng(time(0));
 
 ll pollard_rho(ll n, ll c) {
-    ll x = mt_rand() % (n - 1) + 1, y = x;
+    ll x = rng() % (n - 1) + 1, y = x;
     auto f = [&](ll v) {
         ll t = mul(v, v, n) + c;
         return t < n ? t : t - n;
@@ -739,7 +739,7 @@ ll SGSB(ll x, ll b, ll p) {
 ll Quadratic_residue(ll a) {
     if (a == 0) return 0;
     ll b;
-    do b = mt_rand() % MOD;
+    do b = rng() % MOD;
     while (qk(b, (MOD - 1) >> 1, MOD) != MOD - 1);
     ll s = MOD - 1, t = 0, f = 1;
     while (!(s & 1)) s >>= 1, t++, f <<= 1;
