@@ -105,23 +105,22 @@ bool isprime(int x) {
 // O(logn)
 // 前置：快速乘、快速幂
 // int范围只需检查2, 7, 61
-bool Rabin_Miller(ll a, ll n) {
-    if (n == 2) return 1;
-    if (n == 1 || !(n & 1)) return 0;
-    ll d = n - 1;
-    while (!(d & 1)) d >>= 1;
-    ll t = qk(a, d, n);
-    while (d != n - 1 && t != 1 && t != n - 1) {
-        t = mul(t, t, n);
-        d <<= 1;
-    }
-    return t == n - 1 || d & 1;
-}
-
 bool isprime(ll n) {
-    static vector<ll> t = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
-    if (n <= 1) return false;
-    for (ll k : t) if (!Rabin_Miller(k, n)) return false;
+    if (n < 3) return n == 2;
+    if (!(n & 1)) return false;
+    ll d = n - 1, r = 0;
+    while (!(d & 1)) d >>= 1, r++;
+    static vector<ll> A = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
+    for (ll a : A) {
+        ll t = qk(a, d, n);
+        if (t <= 1 || t == n - 1) continue;
+        for (int i = 0; i < r; i++) {
+            t = mul(t, t, n);
+            if (t == 1) return false;
+            if (t == n - 1) break;
+        }
+        if (t != 1 && t != n - 1) return false;
+    }
     return true;
 }
 ```
