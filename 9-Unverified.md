@@ -2,12 +2,202 @@
 
 **版权归原作者所有 部分代码有风格调整 不保证内容的正确性**
 
-### 最长上升子序列
+### 吉利线段树
 
 ```cpp
-// Chestnut
-S[d[i] = lower_bound(S, S + i, a[i] - 1) - S] = min(S[d[i]], a[i]);
-ans = max(ans, d[i]);
+// Nyaan
+struct AngelBeats {
+  using i64 = long long;
+  static constexpr i64 INF = numeric_limits<i64>::max() / 2.1;
+
+  struct alignas(32) Node {
+    i64 sum = 0, g1 = 0, l1 = 0;
+    i64 g2 = -INF, gc = 1, l2 = INF, lc = 1, add = 0;
+  };
+
+  vector<Node> v;
+  i64 n, log;
+
+  AngelBeats() {}
+  AngelBeats(int _n) : AngelBeats(vector<i64>(_n)) {}
+  AngelBeats(const vector<i64>& vc) {
+    n = 1, log = 0;
+    while (n < (int)vc.size()) n <<= 1, log++;
+    v.resize(2 * n);
+    for (i64 i = 0; i < (int)vc.size(); ++i) {
+      v[i + n].sum = v[i + n].g1 = v[i + n].l1 = vc[i];
+    }
+    for (i64 i = n - 1; i; --i) update(i);
+  }
+
+  void range_chmin(int l, int r, i64 x) { inner_apply<1>(l, r, x); }
+  void range_chmax(int l, int r, i64 x) { inner_apply<2>(l, r, x); }
+  void range_add(int l, int r, i64 x) { inner_apply<3>(l, r, x); }
+  void range_update(int l, int r, i64 x) { inner_apply<4>(l, r, x); }
+  i64 range_min(int l, int r) { return inner_fold<1>(l, r); }
+  i64 range_max(int l, int r) { return inner_fold<2>(l, r); }
+  i64 range_sum(int l, int r) { return inner_fold<3>(l, r); }
+
+ private:
+  void update(int k) {
+    Node& p = v[k];
+    Node& l = v[k * 2 + 0];
+    Node& r = v[k * 2 + 1];
+
+    p.sum = l.sum + r.sum;
+
+    if (l.g1 == r.g1) {
+      p.g1 = l.g1;
+      p.g2 = max(l.g2, r.g2);
+      p.gc = l.gc + r.gc;
+    } else {
+      bool f = l.g1 > r.g1;
+      p.g1 = f ? l.g1 : r.g1;
+      p.gc = f ? l.gc : r.gc;
+      p.g2 = max(f ? r.g1 : l.g1, f ? l.g2 : r.g2);
+    }
+
+    if (l.l1 == r.l1) {
+      p.l1 = l.l1;
+      p.l2 = min(l.l2, r.l2);
+      p.lc = l.lc + r.lc;
+    } else {
+      bool f = l.l1 < r.l1;
+      p.l1 = f ? l.l1 : r.l1;
+      p.lc = f ? l.lc : r.lc;
+      p.l2 = min(f ? r.l1 : l.l1, f ? l.l2 : r.l2);
+    }
+  }
+
+  void push_add(int k, i64 x) {
+    Node& p = v[k];
+    p.sum += x << (log + __builtin_clz(k) - 31);
+    p.g1 += x;
+    p.l1 += x;
+    if (p.g2 != -INF) p.g2 += x;
+    if (p.l2 != INF) p.l2 += x;
+    p.add += x;
+  }
+  void push_min(int k, i64 x) {
+    Node& p = v[k];
+    p.sum += (x - p.g1) * p.gc;
+    if (p.l1 == p.g1) p.l1 = x;
+    if (p.l2 == p.g1) p.l2 = x;
+    p.g1 = x;
+  }
+  void push_max(int k, i64 x) {
+    Node& p = v[k];
+    p.sum += (x - p.l1) * p.lc;
+    if (p.g1 == p.l1) p.g1 = x;
+    if (p.g2 == p.l1) p.g2 = x;
+    p.l1 = x;
+  }
+  void push(int k) {
+    Node& p = v[k];
+    if (p.add != 0) {
+      push_add(k * 2 + 0, p.add);
+      push_add(k * 2 + 1, p.add);
+      p.add = 0;
+    }
+    if (p.g1 < v[k * 2 + 0].g1) push_min(k * 2 + 0, p.g1);
+    if (p.l1 > v[k * 2 + 0].l1) push_max(k * 2 + 0, p.l1);
+
+    if (p.g1 < v[k * 2 + 1].g1) push_min(k * 2 + 1, p.g1);
+    if (p.l1 > v[k * 2 + 1].l1) push_max(k * 2 + 1, p.l1);
+  }
+
+  void subtree_chmin(int k, i64 x) {
+    if (v[k].g1 <= x) return;
+    if (v[k].g2 < x) {
+      push_min(k, x);
+      return;
+    }
+    push(k);
+    subtree_chmin(k * 2 + 0, x);
+    subtree_chmin(k * 2 + 1, x);
+    update(k);
+  }
+
+  void subtree_chmax(int k, i64 x) {
+    if (x <= v[k].l1) return;
+    if (x < v[k].l2) {
+      push_max(k, x);
+      return;
+    }
+    push(k);
+    subtree_chmax(k * 2 + 0, x);
+    subtree_chmax(k * 2 + 1, x);
+    update(k);
+  }
+
+  template <int cmd>
+  inline void _apply(int k, i64 x) {
+    if constexpr (cmd == 1) subtree_chmin(k, x);
+    if constexpr (cmd == 2) subtree_chmax(k, x);
+    if constexpr (cmd == 3) push_add(k, x);
+    if constexpr (cmd == 4) subtree_chmin(k, x), subtree_chmax(k, x);
+  }
+
+  template <int cmd>
+  void inner_apply(int l, int r, i64 x) {
+    if (l == r) return;
+    l += n, r += n;
+    for (int i = log; i >= 1; i--) {
+      if (((l >> i) << i) != l) push(l >> i);
+      if (((r >> i) << i) != r) push((r - 1) >> i);
+    }
+    {
+      int l2 = l, r2 = r;
+      while (l < r) {
+        if (l & 1) _apply<cmd>(l++, x);
+        if (r & 1) _apply<cmd>(--r, x);
+        l >>= 1;
+        r >>= 1;
+      }
+      l = l2;
+      r = r2;
+    }
+    for (int i = 1; i <= log; i++) {
+      if (((l >> i) << i) != l) update(l >> i);
+      if (((r >> i) << i) != r) update((r - 1) >> i);
+    }
+  }
+
+  template <int cmd>
+  inline i64 e() {
+    if constexpr (cmd == 1) return INF;
+    if constexpr (cmd == 2) return -INF;
+    return 0;
+  }
+
+  template <int cmd>
+  inline void op(i64& a, const Node& b) {
+    if constexpr (cmd == 1) a = min(a, b.l1);
+    if constexpr (cmd == 2) a = max(a, b.g1);
+    if constexpr (cmd == 3) a += b.sum;
+  }
+
+  template <int cmd>
+  i64 inner_fold(int l, int r) {
+    if (l == r) return e<cmd>();
+    l += n, r += n;
+    for (int i = log; i >= 1; i--) {
+      if (((l >> i) << i) != l) push(l >> i);
+      if (((r >> i) << i) != r) push((r - 1) >> i);
+    }
+    i64 lx = e<cmd>(), rx = e<cmd>();
+    while (l < r) {
+      if (l & 1) op<cmd>(lx, v[l++]);
+      if (r & 1) op<cmd>(rx, v[--r]);
+      l >>= 1;
+      r >>= 1;
+    }
+    if constexpr (cmd == 1) lx = min(lx, rx);
+    if constexpr (cmd == 2) lx = max(lx, rx);
+    if constexpr (cmd == 3) lx += rx;
+    return lx;
+  }
+};
 ```
 
 ### 约瑟夫问题
@@ -89,13 +279,70 @@ ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第
 }
 ```
 
+### 字典序最小2sat
+
+```cpp
+const int N = 1e5 + 10;
+struct TwoSatBF {  // 暴力求解字典序最小的解
+  int n;
+  vector<int> G[N << 1];
+  bool slt[N << 1];
+  // 偶数点：false 奇数点：true 这样x^1就是反面
+  void init(int _n) {
+    n = _n;
+    for (int i = 0; i < (n << 1); ++i) {
+      G[i].clear();
+      slt[i] = false;
+    }
+  }
+  void addLimit(int x, int y) {
+    // 选了x就要选y，具体看情况使用
+    G[x].push_back(y);
+    G[y ^ 1].push_back(x ^ 1);
+  }
+  stack<int> st;
+  void clearst() {
+    while (st.size()) st.pop();
+  }
+  bool dfs(int u) {
+    if (slt[u ^ 1]) {
+      return false;
+    } else if (slt[u]) {
+      return true;
+    }
+    slt[u] = true;
+    st.push(u);
+    for (auto v : G[u]) {
+      if (!dfs(v)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  bool solve() {
+    for (int u = 0; u < (n << 1); u += 2) {
+      if (!slt[u] && !slt[u ^ 1]) {
+        clearst();
+        if (!dfs(u)) {
+          clearst();
+          if (!dfs(u ^ 1)) {
+            return fales;
+          }
+        }
+      }
+    }
+    return true;
+  }
+};
+```
+
 ### 二分图最大权匹配KM
 
 ```cpp
 // ECNU
 namespace R {
     int n;
-    int w[MAXN][MAXN], kx[MAXN], ky[MAXN], py[MAXN], vy[MAXN], slk[MAXN], pre[MAXN];
+    int w[N][N], kx[N], ky[N], py[N], vy[N], slk[N], pre[N];
 
     ll go() {
         for (int i = 1; i <= n; i++)
@@ -131,6 +378,88 @@ namespace R {
 }
 ```
 
+### HLPP
+
+```cpp
+struct HLPP {
+    struct Edge {
+        int v, rev;
+        ll cap;
+    };
+    int n, sp, tp, lim, ht, lcnt;
+    ll exf[N];
+    vector<Edge> G[N];
+    vector<int> hq[N], gap[N], h, sum;
+    void init(int nn, int s, int t) {
+        sp = s, tp = t, n = nn, lim = n + 1, ht = lcnt = 0;
+        for (int i = 1; i <= n; ++i) G[i].clear(), exf[i] = 0;
+    }
+    void add_edge(int u, int v, ll cap) {
+        G[u].push_back({v, int(G[v].size()), cap});
+        G[v].push_back({u, int(G[u].size()) - 1, 0});
+    }
+    void update(int u, int nh) {
+        ++lcnt;
+        if (h[u] != lim) --sum[h[u]];
+        h[u] = nh;
+        if (nh == lim) return;
+        ++sum[ht = nh];
+        gap[nh].push_back(u);
+        if (exf[u] > 0) hq[nh].push_back(u);
+    }
+    void relabel() {
+        queue<int> q;
+        for (int i = 0; i <= lim; ++i) hq[i].clear(), gap[i].clear();
+        h.assign(lim, lim), sum.assign(lim, 0), q.push(tp);
+        lcnt = ht = h[tp] = 0;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (Edge& e : G[u])
+                if (h[e.v] == lim && G[e.v][e.rev].cap) update(e.v, h[u] + 1), q.push(e.v);
+            ht = h[u];
+        }
+    }
+    void push(int u, Edge& e) {
+        if (!exf[e.v]) hq[h[e.v]].push_back(e.v);
+        ll df = min(exf[u], e.cap);
+        e.cap -= df, G[e.v][e.rev].cap += df;
+        exf[u] -= df, exf[e.v] += df;
+    }
+    void discharge(int u) {
+        int nh = lim;
+        if (h[u] == lim) return;
+        for (Edge& e : G[u]) {
+            if (!e.cap) continue;
+            if (h[u] == h[e.v] + 1) {
+                push(u, e);
+                if (exf[u] <= 0) return;
+            } else if (nh > h[e.v] + 1)
+                nh = h[e.v] + 1;
+        }
+        if (sum[h[u]] > 1)
+            update(u, nh);
+        else {
+            for (; ht >= h[u]; gap[ht--].clear())
+                for (int& i : gap[ht]) update(i, lim);
+        }
+    }
+    ll hlpp() {
+        exf[sp] = INF, exf[tp] = -INF, relabel();
+        for (Edge& e : G[sp]) push(sp, e);
+        for (; ~ht; --ht) {
+            while (!hq[ht].empty()) {
+                int u = hq[ht].back();
+                hq[ht].pop_back();
+                discharge(u);
+                if (lcnt > (n << 2)) relabel();
+            }
+        }
+        return exf[tp] + INF;
+    }
+};
+```
+
 ### 上下界网络流
 
 ```cpp
@@ -140,15 +469,15 @@ struct edge {
     int to, cap, rev;
 };
 
-const int MAXN = 60003;
-const int MAXM = 400003;
+const int N = 60003;
+const int M = 400003;
 
 struct graph {
     int n, m;
-    edge w[MAXM];
-    int fr[MAXM];
-    int num[MAXN], cur[MAXN], first[MAXN];
-    edge e[MAXM];
+    edge w[M];
+    int fr[M];
+    int num[N], cur[N], first[N];
+    edge e[M];
 
     void init(int n) {
         this->n = n;
@@ -179,8 +508,8 @@ struct graph {
         }
     }
 
-    int q[MAXN];
-    int dist[MAXN];
+    int q[N];
+    int dist[N];
     int t;
 
     bool bfs(int s) {
@@ -229,7 +558,7 @@ struct graph {
 };
 
 struct graph_bounds {
-    int in[MAXN];
+    int in[N];
     int S, T, sum, cur;
     graph g;
     int n;
@@ -301,412 +630,19 @@ void solve() {
 }
 ```
 
-### BigInt
-
-```cpp
-// wxh
-class BigInt {
-#define w size()
-
-    static constexpr int base = 1000000000;
-    static constexpr int base_digits = 9;
-
-    using vi = vector<int>;
-    using vll = vector<ll>;
-
-    vi z;
-    int f;
-
-    void trim() {
-        while (!z.empty() && z.back() == 0) {
-            z.pop_back();
-        }
-        if (z.empty()) {
-            f = 1;
-        }
-    }
-
-    void read(const string& s) {
-        f = 1;
-        z.clear();
-        int pos = 0;
-        while (pos < (int)s.w && (s[pos] == '-' || s[pos] == '+')) {
-            if (s[pos] == '-') {
-                f = -f;
-            }
-            ++pos;
-        }
-        for (int i = s.w - 1; i >= pos; i -= base_digits) {
-            int x = 0;
-            for (int j = max(pos, i - base_digits + 1); j <= i; j++) {
-                x = x * 10 + s[j] - '0';
-            }
-            z.push_back(x);
-        }
-        trim();
-    }
-
-    static vi convert_base(const vi& a, int old_digits, int new_digits) {
-        vll p(max(old_digits, new_digits) + 1);
-        p[0] = 1;
-        for (int i = 1; i < (int)p.w; i++) {
-            p[i] = p[i - 1] * 10;
-        }
-        vi res;
-        ll cur = 0;
-        int cur_digits = 0;
-        for (int i = 0; i < (int)a.w; i++) {
-            cur += a[i] * p[cur_digits];
-            cur_digits += old_digits;
-            while (cur_digits >= new_digits) {
-                res.push_back(cur % p[new_digits]);
-                cur /= p[new_digits];
-                cur_digits -= new_digits;
-            }
-        }
-        res.push_back(cur);
-        while (!res.empty() && res.back() == 0) {
-            res.pop_back();
-        }
-        return res;
-    }
-
-    static vll karatsuba(const vll& a, const vll& b) {
-        int n = a.w;
-        vll res(n + n);
-        if (n <= 32) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    res[i + j] += a[i] * b[j];
-                }
-            }
-            return res;
-        }
-        int k = n >> 1;
-        vll a1(a.begin(), a.begin() + k);
-        vll a2(a.begin() + k, a.end());
-        vll b1(b.begin(), b.begin() + k);
-        vll b2(b.begin() + k, b.end());
-        vll a1b1 = karatsuba(a1, b1);
-        vll a2b2 = karatsuba(a2, b2);
-        for (int i = 0; i < k; i++) {
-            a2[i] += a1[i];
-        }
-        for (int i = 0; i < k; i++) {
-            b2[i] += b1[i];
-        }
-        vll r = karatsuba(a2, b2);
-        for (int i = 0; i < (int)a1b1.w; i++) {
-            r[i] -= a1b1[i];
-        }
-        for (int i = 0; i < (int)a2b2.w; i++) {
-            r[i] -= a2b2[i];
-        }
-        for (int i = 0; i < (int)r.w; i++) {
-            res[i + k] += r[i];
-        }
-        for (int i = 0; i < (int)a1b1.w; i++) {
-            res[i] += a1b1[i];
-        }
-        for (int i = 0; i < (int)a2b2.w; i++) {
-            res[i + n] += a2b2[i];
-        }
-        return res;
-    }
-
-public:
-    BigInt() : f(1) {}
-    BigInt(ll v) { *this = v; }
-    BigInt(const string& s) { read(s); }
-
-    void operator=(const BigInt& v) {
-        f = v.f;
-        z = v.z;
-    }
-
-    void operator=(ll v) {
-        f = 1;
-        if (v < 0) {
-            f = -1, v = -v;
-        }
-        z.clear();
-        for (; v > 0; v = v / base) {
-            z.push_back(v % base);
-        }
-    }
-
-    BigInt operator+(const BigInt& v) const {
-        if (f == v.f) {
-            BigInt res = v;
-            for (int i = 0, carry = 0; i < (int)max(z.w, v.z.w) || carry; ++i) {
-                if (i == (int)res.z.w) {
-                    res.z.push_back(0);
-                }
-                res.z[i] += carry + (i < (int)z.w ? z[i] : 0);
-                carry = res.z[i] >= base;
-                if (carry) {
-                    res.z[i] -= base;
-                }
-            }
-            return res;
-        } else {
-            return *this - (-v);
-        }
-    }
-
-    BigInt operator-(const BigInt& v) const {
-        if (f == v.f) {
-            if (abs() >= v.abs()) {
-                BigInt res = *this;
-                for (int i = 0, carry = 0; i < (int)v.z.w || carry; ++i) {
-                    res.z[i] -= carry + (i < (int)v.z.w ? v.z[i] : 0);
-                    carry = res.z[i] < 0;
-                    if (carry) {
-                        res.z[i] += base;
-                    }
-                }
-                res.trim();
-                return res;
-            } else {
-                return -(v - *this);
-            }
-        } else {
-            return *this + (-v);
-        }
-    }
-
-    void operator*=(int v) {
-        if (v < 0) {
-            f = -f, v = -v;
-        }
-        for (int i = 0, carry = 0; i < (int)z.w || carry; ++i) {
-            if (i == (int)z.w) {
-                z.push_back(0);
-            }
-            ll cur = (ll)z[i] * v + carry;
-            carry = cur / base;
-            z[i] = cur % base;
-            // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur), "c"(base));
-        }
-        trim();
-    }
-
-    BigInt operator*(int v) const {
-        BigInt res = *this;
-        res *= v;
-        return res;
-    }
-
-    friend pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1) {
-        int norm = base / (b1.z.back() + 1);
-        BigInt a = a1.abs() * norm;
-        BigInt b = b1.abs() * norm;
-        BigInt q, r;
-        q.z.resize(a.z.w);
-        for (int i = a.z.w - 1; i >= 0; i--) {
-            r *= base;
-            r += a.z[i];
-            int s1 = b.z.w < r.z.w ? r.z[b.z.w] : 0;
-            int s2 = b.z.w - 1 < r.z.w ? r.z[b.z.w - 1] : 0;
-            int d = ((ll)s1 * base + s2) / b.z.back();
-            r -= b * d;
-            while (r < 0) {
-                r += b, --d;
-            }
-            q.z[i] = d;
-        }
-        q.f = a1.f * b1.f;
-        r.f = a1.f;
-        q.trim();
-        r.trim();
-        return make_pair(q, r / norm);
-    }
-
-    friend BigInt sqrt(const BigInt& a1) {
-        BigInt a = a1;
-        while (a.z.empty() || (int)a.z.w % 2 == 1) {
-            a.z.push_back(0);
-        }
-        int n = a.z.w;
-        int firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
-        int norm = base / (firstDigit + 1);
-        a *= norm;
-        a *= norm;
-        while (a.z.empty() || (int)a.z.w % 2 == 1) {
-            a.z.push_back(0);
-        }
-        BigInt r = (ll)a.z[n - 1] * base + a.z[n - 2];
-        firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
-        int q = firstDigit;
-        BigInt res;
-        for (int j = n / 2 - 1; j >= 0; j--) {
-            for (;; --q) {
-                BigInt r1 = (r - (res * 2 * base + q) * q) * base * base +
-                            (j > 0 ? (ll)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
-                if (r1 >= 0) {
-                    r = r1;
-                    break;
-                }
-            }
-            res *= base;
-            res += q;
-            if (j > 0) {
-                int d1 = res.z.w + 2 < r.z.w ? r.z[res.z.w + 2] : 0;
-                int d2 = res.z.w + 1 < r.z.w ? r.z[res.z.w + 1] : 0;
-                int d3 = res.z.w < r.z.w ? r.z[res.z.w] : 0;
-                q = ((ll)d1 * base * base + (ll)d2 * base + d3) / (firstDigit * 2);
-            }
-        }
-        res.trim();
-        return res / norm;
-    }
-
-    BigInt operator/(const BigInt& v) const { return divmod(*this, v).first; }
-    BigInt operator%(const BigInt& v) const { return divmod(*this, v).second; }
-
-    void operator/=(int v) {
-        if (v < 0) {
-            f = -f, v = -v;
-        }
-        for (int i = z.w - 1, rem = 0; i >= 0; --i) {
-            ll cur = z[i] + (ll)rem * base;
-            z[i] = cur / v;
-            rem = cur % v;
-        }
-        trim();
-    }
-
-    BigInt operator/(int v) const {
-        BigInt res = *this;
-        res /= v;
-        return res;
-    }
-
-    int operator%(int v) const {
-        if (v < 0) {
-            v = -v;
-        }
-        int m = 0;
-        for (int i = z.w - 1; i >= 0; --i) {
-            m = ((ll)m * base + z[i]) % v;
-        }
-        return m * f;
-    }
-
-    void operator+=(const BigInt& v) { *this = *this + v; }
-    void operator-=(const BigInt& v) { *this = *this - v; }
-    void operator*=(const BigInt& v) { *this = *this * v; }
-    void operator/=(const BigInt& v) { *this = *this / v; }
-
-    bool operator<(const BigInt& v) const {
-        if (f != v.f) {
-            return f < v.f;
-        }
-        if (z.w != v.z.w) {
-            return z.w * f < v.z.w * v.f;
-        }
-        for (int i = z.w - 1; i >= 0; i--) {
-            if (z[i] != v.z[i]) {
-                return z[i] * f < v.z[i] * f;
-            }
-        }
-        return false;
-    }
-
-    bool operator>(const BigInt& v) const { return v < *this; }
-    bool operator<=(const BigInt& v) const { return !(v < *this); }
-    bool operator>=(const BigInt& v) const { return !(*this < v); }
-    bool operator==(const BigInt& v) const { return !(*this < v) && !(v < *this); }
-    bool operator!=(const BigInt& v) const { return *this < v || v < *this; }
-
-    bool is_zero() const { return z.empty() || ((int)z.w == 1 && !z[0]); }
-
-    BigInt operator-() const {
-        BigInt res = *this;
-        res.f = -f;
-        return res;
-    }
-
-    BigInt abs() const {
-        BigInt res = *this;
-        res.f *= res.f;
-        return res;
-    }
-
-    ll long_value() const {
-        ll res = 0;
-        for (int i = z.w - 1; i >= 0; i--) {
-            res = res * base + z[i];
-        }
-        return res * f;
-    }
-
-    friend BigInt gcd(const BigInt& a, const BigInt& b) { return b.is_zero() ? a : gcd(b, a % b); }
-    friend BigInt lcm(const BigInt& a, const BigInt& b) { return a / gcd(a, b) * b; }
-
-    friend istream& operator>>(istream& is, BigInt& v) {
-        string s;
-        is >> s;
-        v.read(s);
-        return is;
-    }
-
-    friend ostream& operator<<(ostream& os, const BigInt& v) {
-        if (v.f == -1) {
-            os << '-';
-        }
-        os << (v.z.empty() ? 0 : v.z.back());
-        for (int i = v.z.w - 2; i >= 0; --i) {
-            os << setw(base_digits) << setfill('0') << v.z[i];
-        }
-        return os;
-    }
-
-    BigInt operator*(const BigInt& v) const {
-        vi a6 = convert_base(this->z, base_digits, 6);
-        vi b6 = convert_base(v.z, base_digits, 6);
-        vll a(a6.begin(), a6.end());
-        vll b(b6.begin(), b6.end());
-        while (a.w < b.w) {
-            a.push_back(0);
-        }
-        while (b.w < a.w) {
-            b.push_back(0);
-        }
-        while (a.w & (a.w - 1)) {
-            a.push_back(0);
-            b.push_back(0);
-        }
-        vll c = karatsuba(a, b);
-        BigInt res;
-        res.f = f * v.f;
-        for (int i = 0, carry = 0; i < (int)c.w; i++) {
-            ll cur = c[i] + carry;
-            res.z.push_back(cur % 1000000);
-            carry = cur / 1000000;
-        }
-        res.z = convert_base(res.z, 6, base_digits);
-        res.trim();
-        return res;
-    }
-
-#undef w
-};
-```
-
 ### Link-Cut Tree
 
 ```cpp
 // Chestnut
-const int MAXN = 50005;
+const int N = 50005;
 
 #define lc son[x][0]
 #define rc son[x][1]
 
 struct Splay {
-    int fa[MAXN], son[MAXN][2];
-    int st[MAXN];
-    bool rev[MAXN];
+    int fa[N], son[N][2];
+    int st[N];
+    bool rev[N];
     inline int which(int x) {
         for (int i = 0; i < 2; i++)
             if (son[fa[x]][i] == x) return i;
@@ -806,146 +742,13 @@ int main() {
 }
 ```
 
-### 后缀自动机
-
-```cpp
-// Chestnut
-char s[50100];
-
-struct samnode {
-    samnode *par, *ch[26];
-    int val;
-    samnode() {
-        par = 0;
-        memset(ch, 0, sizeof(ch));
-        val = 0;
-    }
-} node[100100], *root, *last;
-
-int size = 0;
-
-inline void init() { last = root = &node[0]; }
-
-inline void add(int c) {
-    samnode *p = last;
-    samnode *np = &node[++size];
-    np->val = p->val + 1;
-    while (p && !p->ch[c])
-        p->ch[c] = np, p = p->par;
-    if (!p) np->par = root;
-    else {
-        samnode *q = p->ch[c];
-        if (q->val == p->val + 1)
-            np->par = q;
-        else {
-            samnode *nq = &node[++size];
-            nq->val = p->val + 1;
-            memcpy(nq->ch, q->ch, sizeof(q->ch));
-            nq->par = q->par;
-            q->par = np->par = nq;
-            while (p && p->ch[c] == q)
-                p->ch[c] = nq, p = p->par;
-        }
-    }
-    last = np;
-}
-
-int main() {
-    init();
-    scanf("%s", s);
-    int n = strlen(s), ans = 0;
-    for (int i = 0; i < n; i++) add(s[i] - 'A');
-    for (int i = 1; i <= size; i++) ans += node[i].val - node[i].par->val;
-    printf("%d\n", ans);
-    return 0;
-}
-```
-
-+ 广义后缀自动机
-
-```cpp
-// Chestnut
-int v[100005], head[100005], tot, d[100005];
-
-struct node {
-    node *fa, *go[11];
-    int max;
-} *root, pool[4000005], *cnt;
-
-struct edge {
-    int go, next;
-} e[100005];
-
-void add(int x, int y) {
-    e[++tot] = (edge){y, head[x]}; head[x] = tot;
-    e[++tot] = (edge){x, head[y]}; head[y] = tot;
-}
-
-void init() { cnt = root = pool + 1; }
-
-node *newnode(int _val) {
-    (++cnt)->max = _val;
-    return cnt;
-}
-
-ostream& operator , (ostream& os, int a) {}
-
-node *extend(node *p, int c) {
-    node *np = newnode(p->max + 1);
-    while (p && !p->go[c]) p->go[c] = np, p = p->fa;
-    if (!p) np->fa = root;
-    else {
-        node *q = p->go[c];
-        if (p->max + 1 == q->max) np->fa = q;
-        else {
-            node *nq = newnode(p->max + 1);
-            memcpy(nq->go, q->go, sizeof q->go);
-            nq->fa = q->fa;
-            np->fa = q->fa = nq;
-            while (p && p->go[c] == q) p->go[c] = nq, p = p->fa;
-        }
-    }
-    return np;
-}
-
-ll solve() {
-    ll ans = 0;
-    for (node *i = root + 1; i <= cnt; i++)
-        ans += i->max - i->fa->max;
-    return ans;
-}
-
-void dfs(int x, int fa, node *p) {
-    node *t = extend(p, v[x]);
-    for (int i = head[x]; i; i = e[i].next)
-        if (e[i].go != fa)
-            dfs(e[i].go, x, t);
-}
-
-int n, c, x, y;
-
-int main() {
-    init();
-    scanf("%d%d", &n, &c);
-    for (int i = 1; i <= n; i++) scanf("%d", &v[i]);
-    for (int i = 1; i < n; i++) {
-        scanf("%d%d", &x, &y);
-        add(x, y);
-        d[x]++, d[y]++;
-    }
-    for (int i = 1; i <= n; i++)
-        if (d[i] == 1) dfs(i, 0, pool + 1);
-    printf("%lld", solve());
-}
-```
-
 ### 任意模数 NTT
 
 ```cpp
 // memset0
-const int MAXN = 4e5 + 10, G = 3, P[3] = {469762049, 998244353, 1004535809};
+const int N = 4e5 + 10, G = 3, P[3] = {469762049, 998244353, 1004535809};
 int n1, n2, k, n, p, p1, p2, M2;
-int a[MAXN], b[MAXN], f[3][MAXN], g[MAXN], rev[MAXN], ans[MAXN];
+int a[N], b[N], f[3][N], g[N], rev[N], ans[N];
 
 void ntt(int *a, int g, int p) {
     for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
@@ -1036,25 +839,6 @@ vector<line> getHL(vector<line>& L) { // 求半平面交, 半平面是逆时针�
     while (q.size() > 2 && !checkpos(q[1], q[0], q[q.size() - 1])) q.pop_front();
     vector<line> ans;
     for (int i = 0; i < q.size(); i++) ans.push_back(q[i]);
-    return ans;
-}
-ld closepoint(vector<V>& A, int l, int r) { // 最近点对, 先要按照 x 坐标排序 
-    if (r - l <= 5) {
-        ld ans = 1e20;
-        for (int i = l; i <= r; i++)
-            for (int j = i + 1; j <= r; j++) ans = min(ans, A[i].dis(A[j]));
-        return ans;
-    }
-    int mid = l + r >> 1;
-    ld ans = min(closepoint(A, l, mid), closepoint(A, mid + 1, r));
-    vector<V> B;
-    for (int i = l; i <= r; i++)
-        if (abs(A[i].x - A[mid].x) <= ans) B.push_back(A[i]);
-    sort(B.begin(), B.end(), [](V k1, V k2) {
-        return k1.y < k2.y;
-    });
-    for (int i = 0; i < B.size(); i++)
-        for (int j = i + 1; j < B.size() && B[j].y - B[i].y < ans; j++) ans = min(ans, B[i].dis(B[j]));
     return ans;
 }
 int checkposCC(circle k1, circle k2) { // 返回两个圆的公切线数量

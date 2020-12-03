@@ -14,20 +14,20 @@ jobs:
       - run: |
           cat header/Header-Book.md [0-9]*.md > book.md
           cat header/Header-non-Book.md [0-9]*.md > non-book.md
-      - uses: docker://pandoc/latex:2.11
+      - uses: docker://pandoc/latex:latest
         with: 
           entrypoint: /bin/sh
           args: |
-            -c "wget https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v1.6.0/Eisvogel-1.6.0.tar.gz &&
-            tar xvzf Eisvogel-1.6.0.tar.gz &&
+            -c "wget https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v2.0.0/Eisvogel-2.0.0.tar.gz &&
+            tar xvzf Eisvogel-2.0.0.tar.gz &&
             mkdir -p ~/.pandoc/templates/ &&
-            cp eisvogel.tex ~/.pandoc/templates/eisvogel.latex &&
-            apk --update add font-noto font-noto-cjk font-noto-cjk-extra ttf-ubuntu-font-family && 
+            cp eisvogel.latex ~/.pandoc/templates/eisvogel.latex &&
+            apk --update add font-noto font-noto-cjk font-noto-cjk-extra ttf-dejavu && 
             tlmgr update --self &&
-            tlmgr install ctex fvextra footnotebackref mdframed zref needspace titling pagecolor sourcesanspro sourcecodepro &&
+            tlmgr install ctex fvextra footnotebackref mdframed zref needspace titling pagecolor sourcesanspro sourcecodepro koma-script dejavu lineno &&
             mkdir output &&
-            pandoc --output=output/book.pdf book.md --shift-heading-level-by=-1 --template eisvogel --highlight-style kate --pdf-engine=xelatex &&
-            pandoc --output=output/non-book.pdf non-book.md --shift-heading-level-by=-1 --template eisvogel --highlight-style kate --pdf-engine=xelatex
+            pandoc --output=output/book.pdf book.md --shift-heading-level-by=-1 --metadata date=\"`date -u '+%Y-%m-%d'`($GITHUB_SHA)\" --template eisvogel --highlight-style kate --pdf-engine=xelatex &&
+            pandoc --output=output/non-book.pdf non-book.md --shift-heading-level-by=-1 --metadata date=\"`date -u '+%Y-%m-%d'`($GITHUB_SHA)\" --template eisvogel --highlight-style kate --pdf-engine=xelatex
             "
       - uses: actions/upload-artifact@master
         with:

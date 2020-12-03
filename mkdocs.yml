@@ -1,0 +1,9 @@
+# Contents
+nav:
+  - 输入 & 输出: 0-IO.md
+  - 数据结构: 1-Structure.md
+  - 图论: 2-Graph.md
+  - 字符串: 3-String.md
+  - 数学: 4-Math.md
+  - 计算几何: 5-Geometry.md
+  - 杂项: 6-Other.md
