@@ -131,6 +131,88 @@ namespace R {
 }
 ```
 
+### HLPP
+
+```cpp
+struct HLPP {
+    struct Edge {
+        int v, rev;
+        ll cap;
+    };
+    int n, sp, tp, lim, ht, lcnt;
+    ll exf[MAXN];
+    vector<Edge> G[MAXN];
+    vector<int> hq[MAXN], gap[MAXN], h, sum;
+    void init(int nn, int s, int t) {
+        sp = s, tp = t, n = nn, lim = n + 1, ht = lcnt = 0;
+        for (int i = 1; i <= n; ++i) G[i].clear(), exf[i] = 0;
+    }
+    void add_edge(int u, int v, ll cap) {
+        G[u].push_back({v, int(G[v].size()), cap});
+        G[v].push_back({u, int(G[u].size()) - 1, 0});
+    }
+    void update(int u, int nh) {
+        ++lcnt;
+        if (h[u] != lim) --sum[h[u]];
+        h[u] = nh;
+        if (nh == lim) return;
+        ++sum[ht = nh];
+        gap[nh].push_back(u);
+        if (exf[u] > 0) hq[nh].push_back(u);
+    }
+    void relabel() {
+        queue<int> q;
+        for (int i = 0; i <= lim; ++i) hq[i].clear(), gap[i].clear();
+        h.assign(lim, lim), sum.assign(lim, 0), q.push(tp);
+        lcnt = ht = h[tp] = 0;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (Edge& e : G[u])
+                if (h[e.v] == lim && G[e.v][e.rev].cap) update(e.v, h[u] + 1), q.push(e.v);
+            ht = h[u];
+        }
+    }
+    void push(int u, Edge& e) {
+        if (!exf[e.v]) hq[h[e.v]].push_back(e.v);
+        ll df = min(exf[u], e.cap);
+        e.cap -= df, G[e.v][e.rev].cap += df;
+        exf[u] -= df, exf[e.v] += df;
+    }
+    void discharge(int u) {
+        int nh = lim;
+        if (h[u] == lim) return;
+        for (Edge& e : G[u]) {
+            if (!e.cap) continue;
+            if (h[u] == h[e.v] + 1) {
+                push(u, e);
+                if (exf[u] <= 0) return;
+            } else if (nh > h[e.v] + 1)
+                nh = h[e.v] + 1;
+        }
+        if (sum[h[u]] > 1)
+            update(u, nh);
+        else {
+            for (; ht >= h[u]; gap[ht--].clear())
+                for (int& i : gap[ht]) update(i, lim);
+        }
+    }
+    ll hlpp() {
+        exf[sp] = INF, exf[tp] = -INF, relabel();
+        for (Edge& e : G[sp]) push(sp, e);
+        for (; ~ht; --ht) {
+            while (!hq[ht].empty()) {
+                int u = hq[ht].back();
+                hq[ht].pop_back();
+                discharge(u);
+                if (lcnt > (n << 2)) relabel();
+            }
+        }
+        return exf[tp] + INF;
+    }
+};
+```
+
 ### 上下界网络流
 
 ```cpp
