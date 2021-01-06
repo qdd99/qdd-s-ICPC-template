@@ -267,7 +267,11 @@ struct SegT {
     int size;
     vector<Node> t;
 
-    SegT(int n) : size(n < 2 ? n : 1 << (32 - __builtin_clz(n - 1))), t(2 * size) {}
+    SegT(int sz) {
+        size = 1;
+        while (size < sz) size <<= 1;
+        t.resize(2 * size);
+    }
 
     Node ask(int p, int pl, int pr, int l, int r) {
         if (l > pr || r < pl) return Node();
