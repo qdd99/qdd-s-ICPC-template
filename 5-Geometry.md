@@ -221,7 +221,7 @@ int inside(const vector<V>& s, const V& p) {
     return 1;
 }
 
-// 平面最近点对
+// 最近点对, 先要按照 x 坐标排序
 // min_dist(s, 0, s.size())
 ld min_dist(const vector<V>& s, int l, int r) {
     if (r - l <= 5) {
