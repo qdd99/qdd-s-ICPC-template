@@ -1120,25 +1120,6 @@ vector<line> getHL(vector<line>& L) { // 求半平面交, 半平面是逆时针�
     for (int i = 0; i < q.size(); i++) ans.push_back(q[i]);
     return ans;
 }
-ld closepoint(vector<V>& A, int l, int r) { // 最近点对, 先要按照 x 坐标排序 
-    if (r - l <= 5) {
-        ld ans = 1e20;
-        for (int i = l; i <= r; i++)
-            for (int j = i + 1; j <= r; j++) ans = min(ans, A[i].dis(A[j]));
-        return ans;
-    }
-    int mid = l + r >> 1;
-    ld ans = min(closepoint(A, l, mid), closepoint(A, mid + 1, r));
-    vector<V> B;
-    for (int i = l; i <= r; i++)
-        if (abs(A[i].x - A[mid].x) <= ans) B.push_back(A[i]);
-    sort(B.begin(), B.end(), [](V k1, V k2) {
-        return k1.y < k2.y;
-    });
-    for (int i = 0; i < B.size(); i++)
-        for (int j = i + 1; j < B.size() && B[j].y - B[i].y < ans; j++) ans = min(ans, B[i].dis(B[j]));
-    return ans;
-}
 int checkposCC(circle k1, circle k2) { // 返回两个圆的公切线数量
     if (cmp(k1.r, k2.r) == -1) swap(k1, k2);
     ld dis = k1.o.dis(k2.o);
