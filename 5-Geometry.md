@@ -220,6 +220,33 @@ int inside(const vector<V>& s, const V& p) {
     }
     return 1;
 }
+
+// 平面最近点对
+// min_dist(s, 0, s.size())
+ld min_dist(const vector<V>& s, int l, int r) {
+    if (r - l <= 5) {
+        ld ret = 1e100;
+        for (int i = l; i < r; i++) {
+            for (int j = i + 1; j < r; j++) {
+                ret = min(ret, dist(s[i], s[j]));
+            }
+        }
+        return ret;
+    }
+    int m = (l + r) >> 1;
+    ld ret = min(min_dist(s, l, m), min_dist(s, m, r));
+    vector<V> q;
+    for (int i = l; i < r; i++) {
+        if (abs(s[i].x - s[m].x) <= ret) q.push_back(s[i]);
+    }
+    sort(q.begin(), q.end(), [](const V& a, const V& b) { return a.y < b.y; });
+    for (int i = 1; i < q.size(); i++) {
+        for (int j = i - 1; j >= 0 && q[j].y >= q[i].y - ret; j--) {
+            ret = min(ret, dist(q[i], q[j]));
+        }
+    }
+    return ret;
+}
 ```
 
 ### 圆
