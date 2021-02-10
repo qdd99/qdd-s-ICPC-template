@@ -499,8 +499,7 @@ void init_inv() {
     }
     ifac[MAXN - 1] = qk(fac[MAXN - 1], MOD - 2, MOD);
     for (int i = MAXN - 2; i >= 0; i--) {
-        ifac[i] = ifac[i + 1] * (i + 1);
-        ifac[i] %= MOD;
+        ifac[i] = ifac[i + 1] * (i + 1) % MOD;
     }
 }
 
