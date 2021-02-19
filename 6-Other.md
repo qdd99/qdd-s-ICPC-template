@@ -133,18 +133,22 @@ ostream& operator << (ostream& os, const Frac& f) {
 
 ```cpp
 // 二分闭区间[l, r]
-// 可行下界
-while (l < r) {
-    mid = (l + r) / 2;
-    if (check(mid)) r = mid;
-    else l = mid + 1;
+template <class T, class F>
+T min_left(T l, T r, F f) {
+    while (l < r) {
+        T p = l + (r - l) / 2;
+        f(p) ? r = p : l = p + 1;
+    }
+    return l;
 }
 
-// 可行上界
-while (l < r) {
-    mid = (l + r + 1) / 2;
-    if (check(mid)) l = mid;
-    else r = mid - 1;
+template <class T, class F>
+T max_right(T l, T r, F f) {
+    while (l < r) {
+        T p = l + (r - l + 1) / 2;
+        f(p) ? l = p : r = p - 1;
+    }
+    return l;
 }
 ```
 
