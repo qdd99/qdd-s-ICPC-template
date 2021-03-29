@@ -3,12 +3,12 @@
 ### 链式前向星
 
 ```cpp
-int ecnt, mp[MAXN];
+int ecnt, mp[N];
 
 struct Edge {
     int to, nxt;
     Edge(int to = 0, int nxt = 0) : to(to), nxt(nxt) {}
-} es[MAXM];
+} es[M];
 
 void mp_init() {
     memset(mp, -1, (n + 2) * sizeof(int));
@@ -33,8 +33,8 @@ struct Edge {
     Edge(int to = 0, int val = 0) : to(to), val(val) {}
 };
 
-vector<Edge> G[MAXN];
-ll dis[MAXN];
+vector<Edge> G[N];
+ll dis[N];
 
 void dijkstra(int s) {
     using pii = pair<ll, int>;
@@ -106,8 +106,8 @@ for (int k = 0; k < n; k++) {
 ### 拓扑排序
 
 ```cpp
-int n, deg[MAXN], dis[MAXN];
-vector<int> G[MAXN];
+int n, deg[N], dis[N];
+vector<int> G[N];
 
 bool topo(vector<int>& ans) {
     queue<int> q;
@@ -159,7 +159,7 @@ ll kruskal() {
 ### LCA
 
 ```cpp
-int dep[MAXN], up[MAXN][22]; // 22 = ((int)log2(MAXN) + 1)
+int dep[N], up[N][22]; // 22 = ((int)log2(N) + 1)
 
 void dfs(int u, int pa) {
     dep[u] = dep[pa] + 1;
@@ -334,8 +334,8 @@ struct MCMF {
 
 ```cpp
 namespace stoer_wagner {
-    bool vis[MAXN], in[MAXN];
-    int G[MAXN][MAXN], w[MAXN];
+    bool vis[N], in[N];
+    int G[N][N], w[N];
 
     void init() {
         memset(G, 0, sizeof(G));
@@ -394,8 +394,8 @@ namespace stoer_wagner {
 
 ```cpp
 // 点权
-vector<int> G[MAXN];
-int pa[MAXN], sz[MAXN], dep[MAXN], dfn[MAXN], maxc[MAXN], top[MAXN], clk;
+vector<int> G[N];
+int pa[N], sz[N], dep[N], dfn[N], maxc[N], top[N], clk;
 
 void dfs1(int u) {
     sz[u] = 1;
@@ -453,7 +453,7 @@ ll go(int u, int v) {
 + 割点
 
 ```cpp
-int dfn[MAXN], low[MAXN], clk;
+int dfn[N], low[N], clk;
 
 void init() { clk = 0; memset(dfn, 0, sizeof(dfn)); }
 
@@ -475,7 +475,7 @@ void tarjan(int u, int pa) {
 + 桥
 
 ```cpp
-int dfn[MAXN], low[MAXN], clk;
+int dfn[N], low[N], clk;
 
 void init() { clk = 0; memset(dfn, 0, sizeof(dfn)); }
 
@@ -496,14 +496,14 @@ void tarjan(int u, int pa) {
 + 强连通分量缩点
 
 ```cpp
-int dfn[MAXN], low[MAXN], clk, tot, color[MAXN];
-vector<int> scc[MAXN];
+int dfn[N], low[N], clk, tot, color[N];
+vector<int> scc[N];
 
 void init() { tot = clk = 0; memset(dfn, 0, sizeof dfn); }
 
 void tarjan(int u) {
-    static int st[MAXN], p;
-    static bool in[MAXN];
+    static int st[N], p;
+    static bool in[N];
     dfn[u] = low[u] = ++clk;
     st[p++] = u;
     in[u] = true;
@@ -531,7 +531,7 @@ void tarjan(int u) {
 + 2-SAT
 
 ```cpp
-// MAXN 开两倍
+// N 开两倍
 void two_sat() {
     for (int i = 1; i <= n * 2; i++) {
         if (!dfn[i]) tarjan(i);
@@ -555,8 +555,8 @@ void two_sat() {
 
 ```cpp
 // rt是G中入度为0的点（可能需要建超级源点）
-int n, deg[MAXN], dep[MAXN], up[MAXN][22];
-vector<int> G[MAXN], rG[MAXN], dt[MAXN];
+int n, deg[N], dep[N], up[N][22];
+vector<int> G[N], rG[N], dt[N];
 
 bool topo(vector<int>& ans, int rt) {
     queue<int> q;
@@ -611,12 +611,12 @@ void go(int rt) {
 + 一般有向图
 
 ```cpp
-vector<int> G[MAXN], rG[MAXN];
-vector<int> dt[MAXN];
+vector<int> G[N], rG[N];
+vector<int> dt[N];
 
 namespace tl {
-    int pa[MAXN], dfn[MAXN], clk, rdfn[MAXN];
-    int c[MAXN], best[MAXN], sdom[MAXN], idom[MAXN];
+    int pa[N], dfn[N], clk, rdfn[N];
+    int c[N], best[N], sdom[N], idom[N];
 
     void init(int n) {
         clk = 0;

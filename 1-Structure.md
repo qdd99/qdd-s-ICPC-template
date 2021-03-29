@@ -36,7 +36,7 @@ void merge(int a, int b) {
 ```cpp
 // 下标从0开始
 struct RMQ {
-    int st[MAXN][22]; // 22 = ((int)log2(MAXN) + 1)
+    int st[N][22]; // 22 = ((int)log2(N) + 1)
 
     int xlog(int x) { return 31 - __builtin_clz(x); }
 
@@ -62,7 +62,7 @@ struct RMQ {
 
 ```cpp
 struct RMQ {
-    int st[11][11][MAXN][MAXN]; // 11 = ((int)log2(MAXN) + 1)
+    int st[11][11][N][N]; // 11 = ((int)log2(N) + 1)
 
     int xlog(int x) { return 31 - __builtin_clz(x); }
 
@@ -124,7 +124,7 @@ for (int i = 0, j = 0; i + k <= n; i++) {
 // 下标从1开始
 struct Tbit {
     int size;
-    ll t[MAXN];
+    ll t[N];
 
     int lowbit(int x) { return x & (-x); }
 
@@ -191,7 +191,7 @@ ll range_sum(int l, int r) {
 
 ```cpp
 struct Tbit {
-    ll t[MAXN][MAXN];
+    ll t[N][N];
 
     int lowbit(int x) { return x & (-x); }
 
@@ -411,7 +411,7 @@ ll query(int l, int r) { return ask(1, 1, size, l, r); }
 struct Node {
     int lc, rc, val;
     Node(int lc = 0, int rc = 0, int val = 0) : lc(lc), rc(rc), val(val) {}
-} t[20 * MAXN];
+} t[20 * N];
 
 int cnt;
 
@@ -631,7 +631,7 @@ namespace tr {
 ```cpp
 struct Node {
     int x, y, z, sum, ans;
-} p[MAXN], q[MAXN];
+} p[N], q[N];
 
 void CDQ(int l, int r) {
     if (l == r) return;

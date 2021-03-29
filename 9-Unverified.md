@@ -95,7 +95,7 @@ ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第
 // ECNU
 namespace R {
     int n;
-    int w[MAXN][MAXN], kx[MAXN], ky[MAXN], py[MAXN], vy[MAXN], slk[MAXN], pre[MAXN];
+    int w[N][N], kx[N], ky[N], py[N], vy[N], slk[N], pre[N];
 
     ll go() {
         for (int i = 1; i <= n; i++)
@@ -140,9 +140,9 @@ struct HLPP {
         ll cap;
     };
     int n, sp, tp, lim, ht, lcnt;
-    ll exf[MAXN];
-    vector<Edge> G[MAXN];
-    vector<int> hq[MAXN], gap[MAXN], h, sum;
+    ll exf[N];
+    vector<Edge> G[N];
+    vector<int> hq[N], gap[N], h, sum;
     void init(int nn, int s, int t) {
         sp = s, tp = t, n = nn, lim = n + 1, ht = lcnt = 0;
         for (int i = 1; i <= n; ++i) G[i].clear(), exf[i] = 0;
@@ -222,15 +222,15 @@ struct edge {
     int to, cap, rev;
 };
 
-const int MAXN = 60003;
-const int MAXM = 400003;
+const int N = 60003;
+const int M = 400003;
 
 struct graph {
     int n, m;
-    edge w[MAXM];
-    int fr[MAXM];
-    int num[MAXN], cur[MAXN], first[MAXN];
-    edge e[MAXM];
+    edge w[M];
+    int fr[M];
+    int num[N], cur[N], first[N];
+    edge e[M];
 
     void init(int n) {
         this->n = n;
@@ -261,8 +261,8 @@ struct graph {
         }
     }
 
-    int q[MAXN];
-    int dist[MAXN];
+    int q[N];
+    int dist[N];
     int t;
 
     bool bfs(int s) {
@@ -311,7 +311,7 @@ struct graph {
 };
 
 struct graph_bounds {
-    int in[MAXN];
+    int in[N];
     int S, T, sum, cur;
     graph g;
     int n;
@@ -780,15 +780,15 @@ public:
 
 ```cpp
 // Chestnut
-const int MAXN = 50005;
+const int N = 50005;
 
 #define lc son[x][0]
 #define rc son[x][1]
 
 struct Splay {
-    int fa[MAXN], son[MAXN][2];
-    int st[MAXN];
-    bool rev[MAXN];
+    int fa[N], son[N][2];
+    int st[N];
+    bool rev[N];
     inline int which(int x) {
         for (int i = 0; i < 2; i++)
             if (son[fa[x]][i] == x) return i;
@@ -1025,9 +1025,9 @@ int main() {
 
 ```cpp
 // memset0
-const int MAXN = 4e5 + 10, G = 3, P[3] = {469762049, 998244353, 1004535809};
+const int N = 4e5 + 10, G = 3, P[3] = {469762049, 998244353, 1004535809};
 int n1, n2, k, n, p, p1, p2, M2;
-int a[MAXN], b[MAXN], f[3][MAXN], g[MAXN], rev[MAXN], ans[MAXN];
+int a[N], b[N], f[3][N], g[N], rev[N], ans[N];
 
 void ntt(int *a, int g, int p) {
     for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
