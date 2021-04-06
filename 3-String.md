@@ -6,6 +6,40 @@
 // open hack不要用哈希
 using ull = unsigned long long;
 
+const int x = 135, p = 1e9 + 9;
+
+ull xp[N];
+
+void init_xp() {
+    xp[0] = 1;
+    for (int i = 1; i < N; i++) {
+        xp[i] = xp[i - 1] * x % p;
+    }
+}
+
+struct Hash {
+    vector<ull> h;
+
+    Hash() : h(1) {}
+
+    void add(const string &s) {
+        ull res = h.back();
+        for (char c : s) {
+            res = (res * x + c) % p;
+            h.push_back(res);
+        }
+    }
+
+    ull get(int l, int r) {
+        r++;
+        return (h[r] - h[l] * xp[r - l] % p + p) % p;
+    }
+};
+```
+
++ 双哈希
+
+```cpp
 const int x = 135, p1 = 1e9 + 7, p2 = 1e9 + 9;
 const ull mask32 = ~(0u);
 
