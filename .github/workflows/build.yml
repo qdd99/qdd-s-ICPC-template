@@ -14,7 +14,7 @@ jobs:
       - run: |
           cat header/Header-Book.md [0-9]*.md > book.md
           cat header/Header-non-Book.md [0-9]*.md > non-book.md
-      - uses: docker://pandoc/latex:2.11
+      - uses: docker://pandoc/latex:latest
         with: 
           entrypoint: /bin/sh
           args: |
