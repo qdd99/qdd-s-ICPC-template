@@ -26,8 +26,8 @@ jobs:
             tlmgr update --self &&
             tlmgr install ctex fvextra footnotebackref mdframed zref needspace titling pagecolor sourcesanspro sourcecodepro &&
             mkdir output &&
-            pandoc --output=output/book.pdf book.md --shift-heading-level-by=-1 --template eisvogel --highlight-style kate --pdf-engine=xelatex &&
-            pandoc --output=output/non-book.pdf non-book.md --shift-heading-level-by=-1 --template eisvogel --highlight-style kate --pdf-engine=xelatex
+            pandoc --output=output/book.pdf book.md --shift-heading-level-by=-1 --metadata date=\"`date -u '+%Y-%m-%d'`($GITHUB_SHA)\" --template eisvogel --highlight-style kate --pdf-engine=xelatex &&
+            pandoc --output=output/non-book.pdf non-book.md --shift-heading-level-by=-1 --metadata date=\"`date -u '+%Y-%m-%d'`($GITHUB_SHA)\" --template eisvogel --highlight-style kate --pdf-engine=xelatex
             "
       - uses: actions/upload-artifact@master
         with:
