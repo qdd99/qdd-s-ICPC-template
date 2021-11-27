@@ -557,7 +557,7 @@ vector<int> inv_cantor(int x, int n) {
 // n 方程个数，m 变量个数，a 是 n*(m+1) 的增广矩阵，free 是否为自由变量
 // 返回自由变量个数，-1 无解
 const double EPS = 1e-8;
-const int N = 2000 + 7;
+const int N = 500 + 7;
 
 double x[N];
 bool free_x[N];
