@@ -101,28 +101,6 @@ bool isprime(int x) {
     }
     return true;
 }
-
-// O(logn)
-// 前置：快速乘、快速幂
-// int范围只需检查2, 7, 61
-bool isprime(ll n) {
-    if (n < 3) return n == 2;
-    if (!(n & 1)) return false;
-    ll d = n - 1, r = 0;
-    while (!(d & 1)) d >>= 1, r++;
-    static vector<ll> A = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
-    for (ll a : A) {
-        ll t = qk(a, d, n);
-        if (t <= 1 || t == n - 1) continue;
-        for (int i = 0; i < r; i++) {
-            t = mul(t, t, n);
-            if (t == 1) return false;
-            if (t == n - 1) break;
-        }
-        if (t != 1 && t != n - 1) return false;
-    }
-    return true;
-}
 ```
 
 ### 线性筛
@@ -315,10 +293,40 @@ vector<int> getf(int x) {
 }
 ```
 
-### Pollard-Rho
+### Miller & Pollard
 
 ```cpp
-mt19937_64 rng(time(0));
+ll mul(ll a, ll b, ll p) { return (ll)(__int128(a) * b % p); }
+
+ll qk(ll a, ll b, ll p) {
+    ll ans = 1 % p;
+    for (a %= p; b; b >>= 1, a = mul(a, a, p))
+        if (b & 1) ans = mul(ans, a, p);
+    return ans;
+}
+
+// O(logn)
+// int范围只需检查2, 7, 61
+bool isprime(ll n) {
+    if (n < 3) return n == 2;
+    if (!(n & 1)) return false;
+    ll d = n - 1, r = 0;
+    while (!(d & 1)) d >>= 1, r++;
+    static vector<ll> A = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
+    for (ll a : A) {
+        ll t = qk(a, d, n);
+        if (t <= 1 || t == n - 1) continue;
+        for (int i = 0; i < r; i++) {
+            t = mul(t, t, n);
+            if (t == 1) return false;
+            if (t == n - 1) break;
+        }
+        if (t != 1 && t != n - 1) return false;
+    }
+    return true;
+}
+
+mt19937_64 rng(42);
 
 ll pollard_rho(ll n, ll c) {
     ll x = rng() % (n - 1) + 1, y = x;
