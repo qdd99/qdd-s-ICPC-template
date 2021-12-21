@@ -250,159 +250,144 @@ ll range_sum(int x, int y, int xx, int yy) {
 
 ```cpp
 // 下标从1开始
-struct Node {
-    int val;
-    Node(int val = -INF) : val(val) {}
-};
-
-Node merge(const Node& a, const Node& b) {
-    return Node(max(a.val, b.val));
-}
-
-struct SegT {
-#define lc (p << 1)
-#define rc (p << 1 | 1)
-#define mid ((pl + pr) >> 1)
-
+template <class S>
+struct segtree {
     int size;
-    vector<Node> t;
+    vector<S> d;
 
-    SegT(int sz) {
+    void pull(int p) { d[p] = op(d[p * 2], d[p * 2 + 1]); }
+
+    segtree(int n) {
         size = 1;
-        while (size < sz) size <<= 1;
-        t.resize(2 * size);
+        while (size < n) size <<= 1;
+        d.assign(2 * size, e());
     }
 
-    Node ask(int p, int pl, int pr, int l, int r) {
-        if (l > pr || r < pl) return Node();
-        if (l <= pl && r >= pr) return t[p];
-        return merge(ask(lc, pl, mid, l, r), ask(rc, mid + 1, pr, l, r));
+    segtree(const vector<S>& v) : segtree(v.size()) {
+        copy(v.begin(), v.end(), d.begin() + size);
+        for (int i = size - 1; i >= 1; i--) pull(i);
     }
 
-    void update(int k, int val) {
-        int p = size + k - 1;
-        t[p] = Node(val);
-        for (p >>= 1; p > 0; p >>= 1) {
-            t[p] = merge(t[lc], t[rc]);
-        }
+    S ask(int ql, int qr, int p, int l, int r) {
+        if (ql > r || qr < l) return e();
+        if (ql <= l && qr >= r) return d[p];
+        S vl = ask(ql, qr, p * 2, l, (l + r) >> 1);
+        S vr = ask(ql, qr, p * 2 + 1, ((l + r) >> 1) + 1, r);
+        return op(vl, vr);
     }
 
-    Node query(int l, int r) { return ask(1, 1, size, l, r); }
+    void set(int p, S x) {
+        p += size - 1;
+        d[p] = x;
+        for (p >>= 1; p > 0; p >>= 1) pull(p);
+    }
 
-#undef lc
-#undef rc
-#undef mid
+    S get(int p) { return d[p + size - 1]; }
+    S query(int l, int r) { return ask(l, r, 1, 1, size); }
+
+    S op(S a, S b) { return max(a, b); }
+    S e() { return -INF; }
 };
 ```
 
 + 权值线段树：单点修改，第k大
 
 ```cpp
-void add(int x, ll val) {
-    int p = size + x - 1;
-    t[p].val += val;
-    for (p >>= 1; p > 0; p >>= 1) {
-        t[p].val += val;
-    }
+int ask(ll k, int p, int l, int r) {
+    if (l == r) return l;
+    if (d[p * 2] >= k) return ask(k, p * 2, l, (l + r) >> 1);
+    return ask(k - d[p * 2], p * 2 + 1, ((l + r) >> 1) + 1, r);
 }
 
-int ask(int p, int pl, int pr, ll k) {
-    if (pl == pr) return pl;
-    if (k <= t[lc].val) return ask(lc, pl, mid, k);
-    return ask(rc, mid + 1, pr, k - t[lc].val);
-}
+int query(ll k) { return ask(k, 1, 1, size); }
 
-int query(ll k) { return ask(1, 1, size, k); }
+S op(S a, S b) { return a + b; }
+S e() { return 0; }
 ```
 
 + 区间加，区间和
 
 ```cpp
-struct Node {
-    ll val, lazy;
-};
+template <class S, class F>
+struct lazy_segtree {
+#define args int p, int l, int r
+#define lc p * 2, l, (l + r) >> 1
+#define rc p * 2 + 1, ((l + r) >> 1) + 1, r
 
-void pushdown(int p, int pl, int pr) {
-    if (!t[p].lazy) return;  // 如果是区间赋值，选取一个数据范围外的值
-    t[lc].val += t[p].lazy * (mid - pl + 1);
-    t[rc].val += t[p].lazy * (pr - mid);
-    t[lc].lazy += t[p].lazy;
-    t[rc].lazy += t[p].lazy;
-    t[p].lazy = 0;
-}
+    int size;
+    vector<S> d;
+    vector<F> lz;
 
-ll ask(int p, int pl, int pr, int l, int r) {
-    if (l > pr || r < pl) return 0;
-    if (l <= pl && r >= pr) return t[p].val;
-    pushdown(p, pl, pr);
-    ll vl = ask(lc, pl, mid, l, r);
-    ll vr = ask(rc, mid + 1, pr, l, r);
-    return vl + vr;
-}
+    void pull(int p) { d[p] = op(d[p * 2], d[p * 2 + 1]); }
 
-void modify(int p, int pl, int pr, int l, int r, int val) {
-    if (l > pr || r < pl) return;
-    if (l <= pl && r >= pr) {
-        t[p].val += 1LL * val * (pr - pl + 1);
-        t[p].lazy += val;
-        return;
+    void apply(F f, args) {
+        d[p] = mapping(d[p], f, l, r);
+        if (p < size) lz[p] = composition(f, lz[p]);
     }
-    pushdown(p, pl, pr);
-    modify(lc, pl, mid, l, r, val);
-    modify(rc, mid + 1, pr, l, r, val);
-    t[p].val = t[lc].val + t[rc].val;
-}
 
-void update(int l, int r, int val) { modify(1, 1, size, l, r, val); }
-ll query(int l, int r) { return ask(1, 1, size, l, r); }
+    void push(args) {
+        if (lz[p] == id()) return;
+        apply(lz[p], lc);
+        apply(lz[p], rc);
+        lz[p] = id();
+    }
+
+    S ask(int ql, int qr, args) {
+        if (ql > r || qr < l) return e();
+        if (ql <= l && qr >= r) return d[p];
+        push(p, l, r);
+        S vl = ask(ql, qr, lc);
+        S vr = ask(ql, qr, rc);
+        return op(vl, vr);
+    }
+
+    void modify(int ql, int qr, F f, args) {
+        if (ql > r || qr < l) return;
+        if (ql <= l && qr >= r) {
+            apply(f, p, l, r);
+            return;
+        }
+        push(p, l, r);
+        modify(ql, qr, f, lc);
+        modify(ql, qr, f, rc);
+        pull(p);
+    }
+
+#undef args
+#undef lc
+#undef rc
+
+    lazy_segtree(int n) {
+        size = 1;
+        while (size < n) size <<= 1;
+        d.assign(2 * size, e());
+        lz.assign(size, id());
+    }
+
+    lazy_segtree(const vector<S>& v) : lazy_segtree(v.size()) {
+        copy(v.begin(), v.end(), d.begin() + size);
+        for (int i = size - 1; i >= 1; i--) pull(i);
+    }
+
+    void update(int l, int r, F f) { modify(l, r, f, 1, 1, size); }
+    S query(int l, int r) { return ask(l, r, 1, 1, size); }
+
+    S op(S a, S b) { return a + b; }
+    S e() { return 0; }
+    S mapping(S a, F f, int l, int r) { return a + f * (r - l + 1); }
+    F composition(F f, F g) { return f + g; }  // f：外层函数 g：内层函数
+    F id() { return 0; }  // 如果是区间赋值，选取一个数据范围外的值
+};
 ```
 
 + 区间乘混加，区间和取模
 
 ```cpp
-struct Node {
-    ll val, mul, add;
-    Node() : val(0), add(0), mul(1) {}
-};
-
-void pushdown(int p, int pl, int pr) {
-    if (t[p].mul == 1 && t[p].add == 0) return;
-    t[lc].val = (t[lc].val * t[p].mul % MOD + (mid - pl + 1) * t[p].add % MOD) % MOD;
-    t[rc].val = (t[rc].val * t[p].mul % MOD + (pr - mid) * t[p].add % MOD) % MOD;
-    t[lc].mul = t[p].mul * t[lc].mul % MOD;
-    t[rc].mul = t[p].mul * t[rc].mul % MOD;
-    t[lc].add = (t[lc].add * t[p].mul % MOD + t[p].add) % MOD;
-    t[rc].add = (t[rc].add * t[p].mul % MOD + t[p].add) % MOD;
-    t[p].mul = 1;
-    t[p].add = 0;
-}
-
-ll ask(int p, int pl, int pr, int l, int r) {
-    if (l > pr || r < pl) return 0;
-    if (l <= pl && r >= pr) return t[p].val;
-    pushdown(p, pl, pr);
-    ll vl = ask(lc, pl, mid, l, r);
-    ll vr = ask(rc, mid + 1, pr, l, r);
-    return (vl + vr) % MOD;
-}
-
-// x' = ax + b
-void modify(int p, int pl, int pr, int l, int r, int a, int b) {
-    if (l > pr || r < pl) return;
-    if (l <= pl && r >= pr) {
-        t[p].val = (t[p].val * a % MOD + 1LL * (pr - pl + 1) * b % MOD) % MOD;
-        t[p].mul = t[p].mul * a % MOD;
-        t[p].add = (t[p].add * a % MOD + b) % MOD;
-        return;
-    }
-    pushdown(p, pl, pr);
-    modify(lc, pl, mid, l, r, a, b);
-    modify(rc, mid + 1, pr, l, r, a, b);
-    t[p].val = (t[lc].val + t[rc].val) % MOD;
-}
-
-void update(int l, int r, int a, int b) { modify(1, 1, size, l, r, a, b); }
-ll query(int l, int r) { return ask(1, 1, size, l, r); }
+S op(S a, S b) { return (a + b) % MOD; }
+S e() { return 0; }
+S mapping(S a, F f, int l, int r) { return (a * f.first % MOD + (r - l + 1) * f.second % MOD) % MOD; }
+F composition(F f, F g) { return F{(g.first * f.first) % MOD, (g.second * f.first % MOD + f.second) % MOD}; }
+F id() { return F{1, 0}; }
 ```
 
 ### 动态开点线段树
