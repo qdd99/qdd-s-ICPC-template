@@ -266,6 +266,24 @@ ll solve(ll x, ll base) {
 }
 ```
 
+### 大范围洗牌算法
+
+```cpp
+vector<int> randset(int l, int r, int k) {
+    // assert(l <= r && k <= r - l + 1);
+    unordered_map<int, int> p;
+    for (int i = l; i < l + k; i++) p[i] = i;
+    for (int i = l; i < l + k; i++) {
+        int j = randint(i, r);
+        if (!p.count(j)) p[j] = j;
+        swap(p[i], p[j]);
+    }
+    vector<int> a(k);
+    for (int i = 0; i < k; i++) a[i] = p[i + l];
+    return a;
+}
+```
+
 ### 表达式求值
 
 ```py
