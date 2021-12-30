@@ -38,8 +38,6 @@ void merge(int a, int b) {
 struct RMQ {
     int st[N][22]; // 22 = ((int)log2(N) + 1)
 
-    int xlog(int x) { return 31 - __builtin_clz(x); }
-
     void init(int *a, int n) {
         for (int i = 0; i < n; i++) {
             st[i][0] = a[i];
@@ -52,7 +50,7 @@ struct RMQ {
     }
 
     int query(int l, int r) {
-        int x = xlog(r - l + 1);
+        int x = __lg(r - l + 1);
         return max(st[l][x], st[r - (1 << x) + 1][x]);
     }
 };
@@ -63,8 +61,6 @@ struct RMQ {
 ```cpp
 struct RMQ {
     int st[11][11][N][N]; // 11 = ((int)log2(N) + 1)
-
-    int xlog(int x) { return 31 - __builtin_clz(x); }
 
     void init(int n, int m) {
         for (int i = 0; i < n; i++) {
@@ -89,8 +85,8 @@ struct RMQ {
     }
 
     int query(int r1, int c1, int r2, int c2) {
-        int x = xlog(r2 - r1 + 1);
-        int y = xlog(c2 - c1 + 1);
+        int x = __lg(r2 - r1 + 1);
+        int y = __lg(c2 - c1 + 1);
         int m1 = st[x][y][r1][c1];
         int m2 = st[x][y][r1][c2 - (1 << y) + 1];
         int m3 = st[x][y][r2 - (1 << x) + 1][c1];
@@ -123,35 +119,26 @@ for (int i = 0, j = 0; i + k <= n; i++) {
 // 支持第k大的BIT
 // 下标从1开始
 struct Tbit {
-    int size;
-    ll t[N];
-
-    int lowbit(int x) { return x & (-x); }
-
-    void init(int sz) {
-        size = sz + 1;
-        memset(t, 0, (sz + 2) * sizeof(ll));
-    }
-
+    int n;
+    vector<ll> t;
+    Tbit(int n) : n(n), t(n + 1) {}
     void add(int p, ll x) {
-        if (p <= 0) return;
-        for (; p <= size; p += lowbit(p)) t[p] += x;
+        // assert(p > 0);
+        for (; p <= n; p += p & -p) t[p] += x;
     }
-
     ll get(int p) {
-        ll sum = 0;
-        for (; p > 0; p -= lowbit(p)) sum += t[p];
-        return sum;
+        ll a = 0;
+        for (; p > 0; p -= p & -p) a += t[p];
+        return a;
     }
-
     void update(int p, ll x) { add(p, x - query(p, p)); }
     ll query(int l, int r) { return get(r) - get(l - 1); }
 
     int kth(ll k) {
         int p = 0;
-        for (int i = 20; i >= 0; i--) {
+        for (int i = __lg(n); i >= 0; i--) {
             int p_ = p + (1 << i);
-            if (p_ <= size && t[p_] < k) {
+            if (p_ <= n && t[p_] < k) {
                 k -= t[p_];
                 p = p_;
             }
