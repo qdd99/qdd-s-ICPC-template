@@ -1,134 +1,5 @@
 ## 杂项
 
-### 防爆vector
-
-```cpp
-template<class T>
-class vector_s : public vector<T> {
-public:
-    vector_s(size_t n = 0, const T& x = T()) : vector<T>(n, x) {}
-    T& operator [] (size_t n) { return this->at(n); }
-    const T& operator [] (size_t n) const { return this->at(n); }
-};
-
-#define vector vector_s
-```
-
-### pair_hash
-
-```cpp
-template<class T1, class T2>
-struct pair_hash {
-    size_t operator () (const pair<T1, T2>& p) const {
-        return hash<T1>()(p.first) * 19260817 + hash<T2>()(p.second);
-    }
-};
-
-unordered_set<pair<int, int>, pair_hash<int, int> > st;
-unordered_map<pair<int, int>, int, pair_hash<int, int> > mp;
-```
-
-### updmax/min
-
-```cpp
-template<class T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
-template<class T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
-```
-
-### 离散化
-
-```cpp
-// 重复元素id不同
-template<class T>
-vector<int> dc(const vector<T>& a, int start_id) {
-    int n = a.size();
-    vector<pair<T, int> > t(n);
-    for (int i = 0; i < n; i++) {
-        t[i] = make_pair(a[i], i);
-    }
-    sort(t.begin(), t.end());
-    vector<int> id(n);
-    for (int i = 0; i < n; i++) {
-        id[t[i].second] = start_id + i;
-    }
-    return id;
-}
-
-// 重复元素id相同
-template<class T>
-vector<int> unique_dc(const vector<T>& a, int start_id) {
-    int n = a.size();
-    vector<T> t(a);
-    sort(t.begin(), t.end());
-    t.resize(unique(t.begin(), t.end()) - t.begin());
-    vector<int> id(n);
-    for (int i = 0; i < n; i++) {
-        id[i] = start_id + lower_bound(t.begin(), t.end(), a[i]) - t.begin();
-    }
-    return id;
-}
-```
-
-### 合并同类项
-
-```cpp
-template <class T>
-vector<pair<T, int> > norm(vector<T>& v) {
-    // sort(v.begin(), v.end());
-    vector<pair<T, int> > p;
-    for (int i = 0; i < (int)v.size(); i++) {
-        if (i == 0 || v[i] != v[i - 1])
-            p.emplace_back(v[i], 1);
-        else
-            p.back().second++;
-    }
-    return p;
-}
-```
-
-### 加强版优先队列
-
-```cpp
-struct heap {
-    priority_queue<int> q1, q2;
-    void push(int x) { q1.push(x); }
-    void erase(int x) { q2.push(x); }
-    int top() {
-        while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
-        return q1.top();
-    }
-    void pop() {
-        while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
-        q1.pop();
-    }
-    int size() { return q1.size() - q2.size(); }
-};
-```
-
-### 分数
-
-```cpp
-struct Frac {
-    ll x, y;
-
-    Frac(ll p = 0, ll q = 1) {
-        ll d = __gcd(p, q);
-        x = p / d, y = q / d;
-        if (y < 0) x = -x, y = -y;
-    }
-
-    Frac operator + (const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
-    Frac operator - (const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
-    Frac operator * (const Frac& b) { return Frac(x * b.x, y * b.y); }
-    Frac operator / (const Frac& b) { return Frac(x * b.y, y * b.x); }
-};
-
-ostream& operator << (ostream& os, const Frac& f) {
-    if (f.y == 1) return os << f.x;
-    else return os << f.x << '/' << f.y;
-}
-```
-
 ### 二分答案
 
 ```cpp
@@ -352,6 +223,606 @@ g++ std.cpp -o std.exe -O2 -std=c++11
 goto loop
 ```
 
+### pb_ds
+
+```cpp
+// 平衡树
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template<class T>
+using rank_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+template<class Key, class T>
+using rank_map = tree<Key, T, less<Key>, rb_tree_tag, tree_order_statistics_node_update>;
+
+// 优先队列
+#include <ext/pb_ds/priority_queue.hpp>
+using namespace __gnu_pbds;
+template<class T, class Cmp = less<T> >
+using pair_heap = __gnu_pbds::priority_queue<T, Cmp>;
+```
+
+### 防爆vector
+
+```cpp
+template<class T>
+class vector_s : public vector<T> {
+public:
+    vector_s(size_t n = 0, const T& x = T()) : vector<T>(n, x) {}
+    T& operator [] (size_t n) { return this->at(n); }
+    const T& operator [] (size_t n) const { return this->at(n); }
+};
+
+#define vector vector_s
+```
+
+### pair_hash
+
+```cpp
+template<class T1, class T2>
+struct pair_hash {
+    size_t operator () (const pair<T1, T2>& p) const {
+        return hash<T1>()(p.first) * 19260817 + hash<T2>()(p.second);
+    }
+};
+
+unordered_set<pair<int, int>, pair_hash<int, int> > st;
+unordered_map<pair<int, int>, int, pair_hash<int, int> > mp;
+```
+
+### updmax/min
+
+```cpp
+template<class T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
+template<class T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
+```
+
+### 离散化
+
+```cpp
+// 重复元素id不同
+template<class T>
+vector<int> dc(const vector<T>& a, int start_id) {
+    int n = a.size();
+    vector<pair<T, int> > t(n);
+    for (int i = 0; i < n; i++) {
+        t[i] = make_pair(a[i], i);
+    }
+    sort(t.begin(), t.end());
+    vector<int> id(n);
+    for (int i = 0; i < n; i++) {
+        id[t[i].second] = start_id + i;
+    }
+    return id;
+}
+
+// 重复元素id相同
+template<class T>
+vector<int> unique_dc(const vector<T>& a, int start_id) {
+    int n = a.size();
+    vector<T> t(a);
+    sort(t.begin(), t.end());
+    t.resize(unique(t.begin(), t.end()) - t.begin());
+    vector<int> id(n);
+    for (int i = 0; i < n; i++) {
+        id[i] = start_id + lower_bound(t.begin(), t.end(), a[i]) - t.begin();
+    }
+    return id;
+}
+```
+
+### 合并同类项
+
+```cpp
+template <class T>
+vector<pair<T, int> > norm(vector<T>& v) {
+    // sort(v.begin(), v.end());
+    vector<pair<T, int> > p;
+    for (int i = 0; i < (int)v.size(); i++) {
+        if (i == 0 || v[i] != v[i - 1])
+            p.emplace_back(v[i], 1);
+        else
+            p.back().second++;
+    }
+    return p;
+}
+```
+
+### 加强版优先队列
+
+```cpp
+struct heap {
+    priority_queue<int> q1, q2;
+    void push(int x) { q1.push(x); }
+    void erase(int x) { q2.push(x); }
+    int top() {
+        while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
+        return q1.top();
+    }
+    void pop() {
+        while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
+        q1.pop();
+    }
+    int size() { return q1.size() - q2.size(); }
+};
+```
+
+### 分数
+
+```cpp
+struct Frac {
+    ll x, y;
+
+    Frac(ll p = 0, ll q = 1) {
+        ll d = __gcd(p, q);
+        x = p / d, y = q / d;
+        if (y < 0) x = -x, y = -y;
+    }
+
+    Frac operator + (const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
+    Frac operator - (const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
+    Frac operator * (const Frac& b) { return Frac(x * b.x, y * b.y); }
+    Frac operator / (const Frac& b) { return Frac(x * b.y, y * b.x); }
+};
+
+ostream& operator << (ostream& os, const Frac& f) {
+    if (f.y == 1) return os << f.x;
+    else return os << f.x << '/' << f.y;
+}
+```
+
+### ModInt
+
+```cpp
+template <const ll p>
+struct Z {
+    ll v;
+    constexpr Z(ll _v = 0) : v(_v) { v %= p, v < 0 && (v += p); }
+    operator ll() const { return v; }
+    bool operator==(const Z& o) const { return v == o.v; }
+    bool operator!=(const Z& o) const { return v != o.v; }
+    Z operator-() const { return Z(p - v); }
+    Z& operator+=(const Z& o) {
+        (v += o.v) >= p && (v -= p);
+        return *this;
+    }
+    Z& operator-=(const Z& o) {
+        (v -= o.v) < 0 && (v += p);
+        return *this;
+    }
+    Z& operator*=(const Z& o) {
+        v = v * o.v % p;
+        return *this;
+    }
+    Z& operator++() { return *this += 1; }
+    Z& operator--() { return *this -= 1; }
+    Z operator++(int) {
+        Z r = *this;
+        ++*this;
+        return r;
+    }
+    Z operator--(int) {
+        Z r = *this;
+        --*this;
+        return r;
+    }
+    Z operator+(const Z& o) const { return Z(*this) += o; }
+    Z operator-(const Z& o) const { return Z(*this) -= o; }
+    Z operator*(const Z& o) const { return Z(*this) *= o; }
+    Z pow(ll b) const {
+        Z a = *this, s = 1;
+        for (; b; b >>= 1, a *= a)
+            if (b & 1) s *= a;
+        return s;
+    }
+    Z inv() const { return pow(p - 2); }
+    Z& operator/=(const Z& o) { return *this *= o.inv(); }
+    Z operator/(const Z& o) const { return Z(*this) /= o; }
+    friend ostream& operator<<(ostream& os, const Z& a) { return os << a.v; }
+    friend istream& operator>>(istream& is, Z& a) {
+        ll v;
+        is >> v;
+        a = Z(v);
+        return is;
+    }
+};
+
+const ll MOD = 998244353;
+using Mint = Z<MOD>;
+```
+
+### BigInt
+
+```cpp
+// wxh
+class BigInt {
+#define w size()
+
+    static constexpr int base = 1000000000;
+    static constexpr int base_digits = 9;
+
+    using vi = vector<int>;
+    using vll = vector<ll>;
+
+    vi z;
+    int f;
+
+    void trim() {
+        while (!z.empty() && z.back() == 0) {
+            z.pop_back();
+        }
+        if (z.empty()) {
+            f = 1;
+        }
+    }
+
+    void read(const string& s) {
+        f = 1;
+        z.clear();
+        int pos = 0;
+        while (pos < (int)s.w && (s[pos] == '-' || s[pos] == '+')) {
+            if (s[pos] == '-') {
+                f = -f;
+            }
+            ++pos;
+        }
+        for (int i = s.w - 1; i >= pos; i -= base_digits) {
+            int x = 0;
+            for (int j = max(pos, i - base_digits + 1); j <= i; j++) {
+                x = x * 10 + s[j] - '0';
+            }
+            z.push_back(x);
+        }
+        trim();
+    }
+
+    static vi convert_base(const vi& a, int old_digits, int new_digits) {
+        vll p(max(old_digits, new_digits) + 1);
+        p[0] = 1;
+        for (int i = 1; i < (int)p.w; i++) {
+            p[i] = p[i - 1] * 10;
+        }
+        vi res;
+        ll cur = 0;
+        int cur_digits = 0;
+        for (int i = 0; i < (int)a.w; i++) {
+            cur += a[i] * p[cur_digits];
+            cur_digits += old_digits;
+            while (cur_digits >= new_digits) {
+                res.push_back(cur % p[new_digits]);
+                cur /= p[new_digits];
+                cur_digits -= new_digits;
+            }
+        }
+        res.push_back(cur);
+        while (!res.empty() && res.back() == 0) {
+            res.pop_back();
+        }
+        return res;
+    }
+
+    static vll karatsuba(const vll& a, const vll& b) {
+        int n = a.w;
+        vll res(n + n);
+        if (n <= 32) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    res[i + j] += a[i] * b[j];
+                }
+            }
+            return res;
+        }
+        int k = n >> 1;
+        vll a1(a.begin(), a.begin() + k);
+        vll a2(a.begin() + k, a.end());
+        vll b1(b.begin(), b.begin() + k);
+        vll b2(b.begin() + k, b.end());
+        vll a1b1 = karatsuba(a1, b1);
+        vll a2b2 = karatsuba(a2, b2);
+        for (int i = 0; i < k; i++) {
+            a2[i] += a1[i];
+        }
+        for (int i = 0; i < k; i++) {
+            b2[i] += b1[i];
+        }
+        vll r = karatsuba(a2, b2);
+        for (int i = 0; i < (int)a1b1.w; i++) {
+            r[i] -= a1b1[i];
+        }
+        for (int i = 0; i < (int)a2b2.w; i++) {
+            r[i] -= a2b2[i];
+        }
+        for (int i = 0; i < (int)r.w; i++) {
+            res[i + k] += r[i];
+        }
+        for (int i = 0; i < (int)a1b1.w; i++) {
+            res[i] += a1b1[i];
+        }
+        for (int i = 0; i < (int)a2b2.w; i++) {
+            res[i + n] += a2b2[i];
+        }
+        return res;
+    }
+
+public:
+    BigInt() : f(1) {}
+    BigInt(ll v) { *this = v; }
+    BigInt(const string& s) { read(s); }
+
+    void operator=(const BigInt& v) {
+        f = v.f;
+        z = v.z;
+    }
+
+    void operator=(ll v) {
+        f = 1;
+        if (v < 0) {
+            f = -1, v = -v;
+        }
+        z.clear();
+        for (; v > 0; v = v / base) {
+            z.push_back(v % base);
+        }
+    }
+
+    BigInt operator+(const BigInt& v) const {
+        if (f == v.f) {
+            BigInt res = v;
+            for (int i = 0, carry = 0; i < (int)max(z.w, v.z.w) || carry; ++i) {
+                if (i == (int)res.z.w) {
+                    res.z.push_back(0);
+                }
+                res.z[i] += carry + (i < (int)z.w ? z[i] : 0);
+                carry = res.z[i] >= base;
+                if (carry) {
+                    res.z[i] -= base;
+                }
+            }
+            return res;
+        } else {
+            return *this - (-v);
+        }
+    }
+
+    BigInt operator-(const BigInt& v) const {
+        if (f == v.f) {
+            if (abs() >= v.abs()) {
+                BigInt res = *this;
+                for (int i = 0, carry = 0; i < (int)v.z.w || carry; ++i) {
+                    res.z[i] -= carry + (i < (int)v.z.w ? v.z[i] : 0);
+                    carry = res.z[i] < 0;
+                    if (carry) {
+                        res.z[i] += base;
+                    }
+                }
+                res.trim();
+                return res;
+            } else {
+                return -(v - *this);
+            }
+        } else {
+            return *this + (-v);
+        }
+    }
+
+    void operator*=(int v) {
+        if (v < 0) {
+            f = -f, v = -v;
+        }
+        for (int i = 0, carry = 0; i < (int)z.w || carry; ++i) {
+            if (i == (int)z.w) {
+                z.push_back(0);
+            }
+            ll cur = (ll)z[i] * v + carry;
+            carry = cur / base;
+            z[i] = cur % base;
+            // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur), "c"(base));
+        }
+        trim();
+    }
+
+    BigInt operator*(int v) const {
+        BigInt res = *this;
+        res *= v;
+        return res;
+    }
+
+    friend pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1) {
+        int norm = base / (b1.z.back() + 1);
+        BigInt a = a1.abs() * norm;
+        BigInt b = b1.abs() * norm;
+        BigInt q, r;
+        q.z.resize(a.z.w);
+        for (int i = a.z.w - 1; i >= 0; i--) {
+            r *= base;
+            r += a.z[i];
+            int s1 = b.z.w < r.z.w ? r.z[b.z.w] : 0;
+            int s2 = b.z.w - 1 < r.z.w ? r.z[b.z.w - 1] : 0;
+            int d = ((ll)s1 * base + s2) / b.z.back();
+            r -= b * d;
+            while (r < 0) {
+                r += b, --d;
+            }
+            q.z[i] = d;
+        }
+        q.f = a1.f * b1.f;
+        r.f = a1.f;
+        q.trim();
+        r.trim();
+        return make_pair(q, r / norm);
+    }
+
+    friend BigInt sqrt(const BigInt& a1) {
+        BigInt a = a1;
+        while (a.z.empty() || (int)a.z.w % 2 == 1) {
+            a.z.push_back(0);
+        }
+        int n = a.z.w;
+        int firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
+        int norm = base / (firstDigit + 1);
+        a *= norm;
+        a *= norm;
+        while (a.z.empty() || (int)a.z.w % 2 == 1) {
+            a.z.push_back(0);
+        }
+        BigInt r = (ll)a.z[n - 1] * base + a.z[n - 2];
+        firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
+        int q = firstDigit;
+        BigInt res;
+        for (int j = n / 2 - 1; j >= 0; j--) {
+            for (;; --q) {
+                BigInt r1 = (r - (res * 2 * base + q) * q) * base * base +
+                            (j > 0 ? (ll)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
+                if (r1 >= 0) {
+                    r = r1;
+                    break;
+                }
+            }
+            res *= base;
+            res += q;
+            if (j > 0) {
+                int d1 = res.z.w + 2 < r.z.w ? r.z[res.z.w + 2] : 0;
+                int d2 = res.z.w + 1 < r.z.w ? r.z[res.z.w + 1] : 0;
+                int d3 = res.z.w < r.z.w ? r.z[res.z.w] : 0;
+                q = ((ll)d1 * base * base + (ll)d2 * base + d3) / (firstDigit * 2);
+            }
+        }
+        res.trim();
+        return res / norm;
+    }
+
+    BigInt operator/(const BigInt& v) const { return divmod(*this, v).first; }
+    BigInt operator%(const BigInt& v) const { return divmod(*this, v).second; }
+
+    void operator/=(int v) {
+        if (v < 0) {
+            f = -f, v = -v;
+        }
+        for (int i = z.w - 1, rem = 0; i >= 0; --i) {
+            ll cur = z[i] + (ll)rem * base;
+            z[i] = cur / v;
+            rem = cur % v;
+        }
+        trim();
+    }
+
+    BigInt operator/(int v) const {
+        BigInt res = *this;
+        res /= v;
+        return res;
+    }
+
+    int operator%(int v) const {
+        if (v < 0) {
+            v = -v;
+        }
+        int m = 0;
+        for (int i = z.w - 1; i >= 0; --i) {
+            m = ((ll)m * base + z[i]) % v;
+        }
+        return m * f;
+    }
+
+    void operator+=(const BigInt& v) { *this = *this + v; }
+    void operator-=(const BigInt& v) { *this = *this - v; }
+    void operator*=(const BigInt& v) { *this = *this * v; }
+    void operator/=(const BigInt& v) { *this = *this / v; }
+
+    bool operator<(const BigInt& v) const {
+        if (f != v.f) {
+            return f < v.f;
+        }
+        if (z.w != v.z.w) {
+            return z.w * f < v.z.w * v.f;
+        }
+        for (int i = z.w - 1; i >= 0; i--) {
+            if (z[i] != v.z[i]) {
+                return z[i] * f < v.z[i] * f;
+            }
+        }
+        return false;
+    }
+
+    bool operator>(const BigInt& v) const { return v < *this; }
+    bool operator<=(const BigInt& v) const { return !(v < *this); }
+    bool operator>=(const BigInt& v) const { return !(*this < v); }
+    bool operator==(const BigInt& v) const { return !(*this < v) && !(v < *this); }
+    bool operator!=(const BigInt& v) const { return *this < v || v < *this; }
+
+    bool is_zero() const { return z.empty() || ((int)z.w == 1 && !z[0]); }
+
+    BigInt operator-() const {
+        BigInt res = *this;
+        res.f = -f;
+        return res;
+    }
+
+    BigInt abs() const {
+        BigInt res = *this;
+        res.f *= res.f;
+        return res;
+    }
+
+    ll long_value() const {
+        ll res = 0;
+        for (int i = z.w - 1; i >= 0; i--) {
+            res = res * base + z[i];
+        }
+        return res * f;
+    }
+
+    friend BigInt gcd(const BigInt& a, const BigInt& b) { return b.is_zero() ? a : gcd(b, a % b); }
+    friend BigInt lcm(const BigInt& a, const BigInt& b) { return a / gcd(a, b) * b; }
+
+    friend istream& operator>>(istream& is, BigInt& v) {
+        string s;
+        is >> s;
+        v.read(s);
+        return is;
+    }
+
+    friend ostream& operator<<(ostream& os, const BigInt& v) {
+        if (v.f == -1) {
+            os << '-';
+        }
+        os << (v.z.empty() ? 0 : v.z.back());
+        for (int i = v.z.w - 2; i >= 0; --i) {
+            os << setw(base_digits) << setfill('0') << v.z[i];
+        }
+        return os;
+    }
+
+    BigInt operator*(const BigInt& v) const {
+        vi a6 = convert_base(this->z, base_digits, 6);
+        vi b6 = convert_base(v.z, base_digits, 6);
+        vll a(a6.begin(), a6.end());
+        vll b(b6.begin(), b6.end());
+        while (a.w < b.w) {
+            a.push_back(0);
+        }
+        while (b.w < a.w) {
+            b.push_back(0);
+        }
+        while (a.w & (a.w - 1)) {
+            a.push_back(0);
+            b.push_back(0);
+        }
+        vll c = karatsuba(a, b);
+        BigInt res;
+        res.f = f * v.f;
+        for (int i = 0, carry = 0; i < (int)c.w; i++) {
+            ll cur = c[i] + carry;
+            res.z.push_back(cur % 1000000);
+            carry = cur / 1000000;
+        }
+        res.z = convert_base(res.z, 6, base_digits);
+        res.trim();
+        return res;
+    }
+
+#undef w
+};
+```
+
 ### Java
 
 + Main
@@ -502,22 +973,4 @@ fmt = new DecimalFormat("000000000.00");
 // 12345.6789 -> "000012345.68"
 // 12345.0 -> "000012345.00"
 // 0.0 -> "000000000.00"
-```
-
-### pb_ds
-
-```cpp
-// 平衡树
-#include <ext/pb_ds/assoc_container.hpp>
-using namespace __gnu_pbds;
-template<class T>
-using rank_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
-template<class Key, class T>
-using rank_map = tree<Key, T, less<Key>, rb_tree_tag, tree_order_statistics_node_update>;
-
-// 优先队列
-#include <ext/pb_ds/priority_queue.hpp>
-using namespace __gnu_pbds;
-template<class T, class Cmp = less<T> >
-using pair_heap = __gnu_pbds::priority_queue<T, Cmp>;
 ```
