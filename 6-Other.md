@@ -380,6 +380,7 @@ struct Z {
     operator ll() const { return v; }
     bool operator==(const Z& o) const { return v == o.v; }
     bool operator!=(const Z& o) const { return v != o.v; }
+    bool operator<(const Z& o) const { return v < o.v; }
     Z operator-() const { return Z(p - v); }
     Z& operator+=(const Z& o) {
         (v += o.v) >= p && (v -= p);
@@ -405,9 +406,6 @@ struct Z {
         --*this;
         return r;
     }
-    Z operator+(const Z& o) const { return Z(*this) += o; }
-    Z operator-(const Z& o) const { return Z(*this) -= o; }
-    Z operator*(const Z& o) const { return Z(*this) *= o; }
     Z pow(ll b) const {
         Z a = *this, s = 1;
         for (; b; b >>= 1, a *= a)
@@ -416,7 +414,38 @@ struct Z {
     }
     Z inv() const { return pow(p - 2); }
     Z& operator/=(const Z& o) { return *this *= o.inv(); }
-    Z operator/(const Z& o) const { return Z(*this) /= o; }
+    template <class T>
+    Z operator+(T o) const {
+        return Z(*this) += o;
+    }
+    template <class T>
+    Z operator-(T o) const {
+        return Z(*this) -= o;
+    }
+    template <class T>
+    Z operator*(T o) const {
+        return Z(*this) *= o;
+    }
+    template <class T>
+    Z operator/(T o) const {
+        return Z(*this) /= o;
+    }
+    template <class T>
+    friend Z operator+(T a, const Z& b) {
+        return Z(a) += b;
+    }
+    template <class T>
+    friend Z operator-(T a, const Z& b) {
+        return Z(a) -= b;
+    }
+    template <class T>
+    friend Z operator*(T a, const Z& b) {
+        return Z(a) *= b;
+    }
+    template <class T>
+    friend Z operator/(T a, const Z& b) {
+        return Z(a) /= b;
+    }
     friend ostream& operator<<(ostream& os, const Z& a) { return os << a.v; }
     friend istream& operator>>(istream& is, Z& a) {
         ll v;
