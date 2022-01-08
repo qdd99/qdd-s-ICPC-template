@@ -633,16 +633,35 @@ int gauss(vector<vector<double> >& a, int n, int m) {
 ### 线性基
 
 ```cpp
-ll a[65];
-
-void insert(ll x) {
-    for (int i = 60; i >= 0; i--) {
-        if ((x >> i) & 1) {
-            if (a[i]) x ^= a[i];
-            else { a[i] = x; break; }
-        }
+struct Basis {
+    vector<ll> a;
+    void insert(ll x) {
+        x = minxor(x);
+        if (!x) return;
+        for (ll& i : a)
+            if ((i ^ x) < i) i ^= x;
+        a.push_back(x);
+        sort(a.begin(), a.end());
     }
-}
+    bool can(ll x) { return !minxor(x); }
+    ll maxxor(ll x = 0) {
+        for (ll i : a) x = max(x, x ^ i);
+        return x;
+    }
+    ll minxor(ll x = 0) {
+        for (ll i : a) x = min(x, x ^ i);
+        return x;
+    }
+    ll kth(ll k) {  // 1st is 0
+        int sz = a.size();
+        if (k > (1LL << sz)) return -1;
+        k--;
+        ll ans = 0;
+        for (int i = 0; i < sz; i++)
+            if (k >> i & 1) ans ^= a[i];
+        return ans;
+    }
+};
 ```
 
 ### 中国剩余定理
