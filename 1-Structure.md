@@ -4,10 +4,17 @@
 
 ```cpp
 struct dsu {
-    vector<int> p;
-    dsu(int n) : p(n) { iota(p.begin(), p.end(), 0); }
+    vector<int> p, sz;
+    dsu(int n) : p(n), sz(n, 1) { iota(p.begin(), p.end(), 0); }
     int find(int x) { return (x == p[x]) ? x : p[x] = find(p[x]); }
-    void merge(int a, int b) { p[find(a)] = find(b); }
+    bool merge(int x, int y) {
+        x = find(x), y = find(y);
+        if (x == y) return 0;
+        p[x] = y;
+        sz[y] += sz[x];
+        sz[x] = 0;
+        return 1;
+    }
 };
 ```
 
