@@ -244,6 +244,7 @@ using pair_heap = __gnu_pbds::priority_queue<T, Cmp>;
 ### 防爆vector
 
 ```cpp
+namespace std {
 template<class T>
 class vector_s : public vector<T> {
 public:
@@ -251,6 +252,7 @@ public:
     T& operator [] (size_t n) { return this->at(n); }
     const T& operator [] (size_t n) const { return this->at(n); }
 };
+}
 
 #define vector vector_s
 ```
