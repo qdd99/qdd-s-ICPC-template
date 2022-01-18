@@ -82,6 +82,14 @@ class Scanner {
     }
 
 public:
+    string next() {
+        string s;
+        char c = nc();
+        while (c <= 32) c = nc();
+        for (; c > 32; c = nc()) s += c;
+        return s;
+    }
+
     int nextInt() {
         int x = 0, sgn = 1;
         char c = nc();
