@@ -30,6 +30,7 @@ struct Hash {
         }
     }
 
+    // 0-indexed, [l, r]
     ull get(int l, int r) {
         r++;
         return (h[r] - h[l] * xp[r - l] % p + p) % p;
@@ -68,6 +69,7 @@ struct Hash {
         }
     }
 
+    // 0-indexed, [l, r]
     ull get(int l, int r) {
         r++;
         int len = r - l;
