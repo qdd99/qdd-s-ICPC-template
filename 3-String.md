@@ -362,6 +362,50 @@ struct Palindromic_Tree {
 } pt;
 ```
 
+### 后缀自动机
+
+```cpp
+// 下标从 1 开始
+// rsort 中的数组 a 是拓扑序 [1, sz)
+struct SAM {
+    static constexpr int M = N << 1;
+    int t[M][26], len[M], fa[M], sz = 2, last = 1;
+    void init() {
+        memset(t, 0, (sz + 2) * sizeof t[0]);
+        sz = 2;
+        last = 1;
+    }
+    void ins(int ch) {
+        int p = last, np = last = sz++;
+        len[np] = len[p] + 1;
+        for (; p && !t[p][ch]; p = fa[p]) t[p][ch] = np;
+        if (!p) {
+            fa[np] = 1;
+            return;
+        }
+        int q = t[p][ch];
+        if (len[q] == len[p] + 1) {
+            fa[np] = q;
+        } else {
+            int nq = sz++;
+            len[nq] = len[p] + 1;
+            memcpy(t[nq], t[q], sizeof t[0]);
+            fa[nq] = fa[q];
+            fa[np] = fa[q] = nq;
+            for (; t[p][ch] == q; p = fa[p]) t[p][ch] = nq;
+        }
+    }
+
+    int c[M] = {1}, a[M];
+    void rsort() {
+        for (int i = 1; i < sz; ++i) c[i] = 0;
+        for (int i = 1; i < sz; ++i) c[len[i]]++;
+        for (int i = 1; i < sz; ++i) c[i] += c[i - 1];
+        for (int i = 1; i < sz; ++i) a[--c[len[i]]] = i;
+    }
+};
+```
+
 ### 后缀数组
 
 ```cpp
