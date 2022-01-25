@@ -406,6 +406,45 @@ struct SAM {
 };
 ```
 
++ 广义后缀自动机（在线版）
+
+```cpp
+// 插入新串前 置 last 为 1
+struct SAM {
+    static constexpr int M = N << 1;
+    int t[M][26], len[M], fa[M], sz = 2, last = 1;
+    void init() {
+        memset(t, 0, (sz + 2) * sizeof t[0]);
+        sz = 2;
+        last = 1;
+    }
+    void ins(int ch) {
+        int p = last, np = 0, nq = 0, q = -1;
+        if (!t[p][ch]) {
+            np = sz++;
+            len[np] = len[p] + 1;
+            for (; p && !t[p][ch]; p = fa[p]) t[p][ch] = np;
+        }
+        if (!p) {
+            fa[np] = 1;
+        } else {
+            q = t[p][ch];
+            if (len[p] + 1 == len[q]) {
+                fa[np] = q;
+            } else {
+                nq = sz++;
+                len[nq] = len[p] + 1;
+                memcpy(t[nq], t[q], sizeof t[0]);
+                fa[nq] = fa[q];
+                fa[np] = fa[q] = nq;
+                for (; t[p][ch] == q; p = fa[p]) t[p][ch] = nq;
+            }
+        }
+        last = np ? np : nq ? nq : q;
+    }
+};
+```
+
 ### 后缀数组
 
 ```cpp
