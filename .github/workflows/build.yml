@@ -18,11 +18,11 @@ jobs:
         with: 
           entrypoint: /bin/sh
           args: |
-            -c "wget https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v1.6.0/Eisvogel-1.6.0.tar.gz &&
-            tar xvzf Eisvogel-1.6.0.tar.gz &&
+            -c "wget https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v2.0.0/Eisvogel-2.0.0.tar.gz &&
+            tar xvzf Eisvogel-2.0.0.tar.gz &&
             mkdir -p ~/.pandoc/templates/ &&
-            cp eisvogel.tex ~/.pandoc/templates/eisvogel.latex &&
-            apk --update add font-noto font-noto-cjk font-noto-cjk-extra ttf-ubuntu-font-family && 
+            cp eisvogel.latex ~/.pandoc/templates/eisvogel.latex &&
+            apk --update add font-noto font-noto-cjk font-noto-cjk-extra ttf-freefont && 
             tlmgr update --self &&
             tlmgr install ctex fvextra footnotebackref mdframed zref needspace titling pagecolor sourcesanspro sourcecodepro &&
             mkdir output &&
