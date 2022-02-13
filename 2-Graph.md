@@ -49,7 +49,7 @@ void dijkstra(int s) {
         if (dis[u] < p.first) continue;
         for (Edge& e : G[u]) {
             int v = e.to;
-            if (updmin(dis[v], dis[u] + e.val)) {
+            if (umin(dis[v], dis[u] + e.val)) {
                 q.emplace(dis[v], v);
             }
         }
@@ -407,7 +407,7 @@ void dfs1(int u) {
             dep[v] = dep[u] + 1;
             dfs1(v);
             sz[u] += sz[v];
-            if (updmax(maxs, sz[v])) maxc[u] = v;
+            if (umax(maxs, sz[v])) maxc[u] = v;
         }
     }
 }

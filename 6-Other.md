@@ -45,7 +45,7 @@ while (l < r - 2) {
 }
 int maxval = f(l), ans = l;
 for (int i = l + 1; i <= r; i++) {
-    if (updmax(maxval, f(i))) ans = i;
+    if (umax(maxval, f(i))) ans = i;
 }
 ```
 
@@ -274,8 +274,8 @@ unordered_map<pair<int, int>, int, pair_hash<int, int> > mp;
 ### updmax/min
 
 ```cpp
-template<class T> inline bool updmax(T &a, T b) { return a < b ? a = b, 1 : 0; }
-template<class T> inline bool updmin(T &a, T b) { return a > b ? a = b, 1 : 0; }
+template <class T, class U> bool umax(T& a, U b) { return a < b ? a = b, 1 : 0; }
+template <class T, class U> bool umin(T& a, U b) { return a > b ? a = b, 1 : 0; }
 ```
 
 ### 离散化
