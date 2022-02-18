@@ -603,6 +603,52 @@ namespace tr {
 }
 ```
 
+### 珂朵莉树
+
+```cpp
+// for Q assign operation it takes Qlogn time in total
+template <class T>
+struct interval_set {
+    map<pair<int, int>, T> mp;  // {r,l}=val
+    interval_set(int l, int r, T v = T()) { mp[{r, l}] = v; }
+
+    // assign a[i]=val for l<=i<=r
+    // returns affected ranges before performing this assign operation
+    vector<pair<pair<int, int>, T>> assign(int l, int r, T v) {
+        auto b = mp.lower_bound({l, 0})->first;
+        if (b.second != l) {
+            T v = mp[b];
+            mp.erase(b);
+            mp[{l - 1, b.second}] = v;
+            mp[{b.first, l}] = v;
+        }
+
+        auto e = mp.lower_bound({r, 0})->first;
+        if (e.first != r) {
+            T v = mp[e];
+            mp.erase(e);
+            mp[{e.first, r + 1}] = v;
+            mp[{r, e.second}] = v;
+        }
+
+        vector<pair<pair<int, int>, T>> ret;
+        auto itt = mp.lower_bound({l, 0});
+        while (true) {
+            if (itt == mp.end() || itt->first.first > r) break;
+            ret.push_back({{itt->first.second, itt->first.first}, itt->second});
+            ++itt;
+        }
+
+        for (auto it : ret) mp.erase({it.first.second, it.first.first});
+
+        mp[{r, l}] = v;
+        return ret;
+    }
+
+    T operator[](int i) const { return mp.lower_bound({i, 0})->second; }
+};
+```
+
 ### CDQ 分治
 
 + 三维偏序（不严格）
