@@ -617,30 +617,25 @@ struct interval_set {
     vector<pair<pair<int, int>, T>> assign(int l, int r, T v) {
         auto b = mp.lower_bound({l, 0})->first;
         if (b.second != l) {
-            T v = mp[b];
+            T z = mp[b];
             mp.erase(b);
-            mp[{l - 1, b.second}] = v;
-            mp[{b.first, l}] = v;
+            mp[{l - 1, b.second}] = z;
+            mp[{b.first, l}] = z;
         }
 
         auto e = mp.lower_bound({r, 0})->first;
         if (e.first != r) {
-            T v = mp[e];
+            T z = mp[e];
             mp.erase(e);
-            mp[{e.first, r + 1}] = v;
-            mp[{r, e.second}] = v;
+            mp[{e.first, r + 1}] = z;
+            mp[{r, e.second}] = z;
         }
 
         vector<pair<pair<int, int>, T>> ret;
-        auto itt = mp.lower_bound({l, 0});
-        while (true) {
-            if (itt == mp.end() || itt->first.first > r) break;
-            ret.push_back({{itt->first.second, itt->first.first}, itt->second});
-            ++itt;
+        for (auto it = mp.lower_bound({l, 0}); it != mp.end() && it->first.first <= r; ++it) {
+            ret.push_back({{it->first.second, it->first.first}, it->second});
         }
-
         for (auto it : ret) mp.erase({it.first.second, it.first.first});
-
         mp[{r, l}] = v;
         return ret;
     }
