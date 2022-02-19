@@ -155,6 +155,25 @@ struct Tbit {
 };
 ```
 
++ 下标从 0 开始
+
+```cpp
+struct Tbit {
+    int n;
+    vector<ll> t;
+    Tbit(int n) : n(n), t(n) {}
+    void add(int p, ll x) {
+        // assert(p >= 0);
+        for (; p < n; p |= p + 1) t[p] += x;
+    }
+    ll get(int p) {
+        ll a = 0;
+        for (; p >= 0; p = (p & (p + 1)) - 1) a += t[p];
+        return a;
+    }
+};
+```
+
 + 区间加，单点查询
 
 ```cpp
