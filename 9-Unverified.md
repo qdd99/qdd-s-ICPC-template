@@ -2,14 +2,6 @@
 
 **版权归原作者所有 部分代码有风格调整 不保证内容的正确性**
 
-### 最长上升子序列
-
-```cpp
-// Chestnut
-S[d[i] = lower_bound(S, S + i, a[i] - 1) - S] = min(S[d[i]], a[i]);
-ans = max(ans, d[i]);
-```
-
 ### 约瑟夫问题
 
 ```cpp
