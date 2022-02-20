@@ -102,6 +102,20 @@ void subset(int k, int n) {
 }
 ```
 
+### 最长不下降子序列
+
+```cpp
+template <class T>
+int lis(const vector<T>& a) {
+    vector<T> dp(a.size() + 1, numeric_limits<T>::max());
+    T mx = dp[0];
+    for (auto& x : a) *upper_bound(dp.begin(), dp.end(), x) = x;  // use lower_bound for increasing
+    int ans = 0;
+    while (dp[ans] != mx) ++ans;
+    return ans;
+}
+```
+
 ### 数位 dp
 
 ```cpp
