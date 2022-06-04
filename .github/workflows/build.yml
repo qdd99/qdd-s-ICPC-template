@@ -22,9 +22,9 @@ jobs:
             tar xvzf Eisvogel-2.0.0.tar.gz &&
             mkdir -p ~/.pandoc/templates/ &&
             cp eisvogel.latex ~/.pandoc/templates/eisvogel.latex &&
-            apk --update add font-noto font-noto-cjk font-noto-cjk-extra ttf-freefont && 
+            apk --update add font-noto font-noto-cjk font-noto-cjk-extra ttf-dejavu && 
             tlmgr update --self &&
-            tlmgr install ctex fvextra footnotebackref mdframed zref needspace titling pagecolor sourcesanspro sourcecodepro &&
+            tlmgr install ctex fvextra footnotebackref mdframed zref needspace titling pagecolor sourcesanspro sourcecodepro koma-script dejavu lineno &&
             mkdir output &&
             pandoc --output=output/book.pdf book.md --shift-heading-level-by=-1 --metadata date=\"`date -u '+%Y-%m-%d'`($GITHUB_SHA)\" --template eisvogel --highlight-style kate --pdf-engine=xelatex &&
             pandoc --output=output/non-book.pdf non-book.md --shift-heading-level-by=-1 --metadata date=\"`date -u '+%Y-%m-%d'`($GITHUB_SHA)\" --template eisvogel --highlight-style kate --pdf-engine=xelatex
