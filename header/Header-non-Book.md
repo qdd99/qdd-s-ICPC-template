@@ -7,7 +7,7 @@ fontsize: 9pt
 linestretch: 1.0
 mainfont: Noto Sans Light
 sansfont: Noto Sans Light
-monofont: Ubuntu Mono
+monofont: DejaVu Sans Mono
 CJKmainfont: Noto Sans CJK SC Light
 toc: true
 ...
