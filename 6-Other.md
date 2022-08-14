@@ -119,6 +119,38 @@ int lis(const vector<T>& a) {
 ### 数位 dp
 
 ```cpp
+// Kick Start 2022 数位和整除数位积的数的个数
+const int N = 110;
+ll dp[15][N][N], a[15];
+int mod;
+
+ll dfs(int pos, int sum, int tot, bool limit) {
+    if (sum > mod) return 0;
+    if (pos == -1) return (sum == mod) && (tot == 0);
+    if (!limit && dp[pos][sum][tot] != -1) return dp[pos][sum][tot];
+    ll ret = 0;
+    int ed = limit ? a[pos] : 9;
+    for (int i = 0; i <= ed; i++) {
+        ret += dfs(pos - 1, sum + i, (sum == 0 && i == 0) ? 1 : (tot * i) % mod, limit && i == a[pos]);
+    }
+    if (!limit) dp[pos][sum][tot] = ret;
+    return ret;
+}
+
+ll cal(ll x) {
+    ll sz = 0;
+    while (x) {
+        a[sz++] = x % 10;
+        x /= 10;
+    }
+    ll ans = 0;
+    for (mod = 1; mod < N; mod++) {
+        memset(dp, -1, sizeof(dp));
+        ans += dfs(sz - 1, 0, 1, true);
+    }
+    return ans;
+}
+
 // 小于等于 x 的 base 进制下回文数个数
 ll dp[20][20][20][2], tmp[20], a[20];
 
