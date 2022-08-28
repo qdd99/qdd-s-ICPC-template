@@ -341,6 +341,29 @@ template <class T, class U> bool umax(T& a, U b) { return a < b ? a = b, 1 : 0; 
 template <class T, class U> bool umin(T& a, U b) { return a > b ? a = b, 1 : 0; }
 ```
 
+### split/join
+
+```cpp
+vector<string> split(const string& s, string sep) {
+    size_t b = 0, e;
+    vector<string> res;
+    while ((e = s.find(sep, b)) != string::npos) {
+        res.push_back(s.substr(b, e - b));
+        b = e + sep.size();
+    }
+    res.push_back(s.substr(b));
+    return res;
+}
+
+template <class T>
+string join(const vector<T>& v, string sep) {
+    stringstream ss;
+    bool f = 0;
+    for (const T& x : v) (f ? ss << sep : ss) << x, f = 1;
+    return ss.str();
+}
+```
+
 ### 离散化
 
 ```cpp
