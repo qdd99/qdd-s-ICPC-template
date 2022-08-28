@@ -196,14 +196,14 @@ int lca(int u, int v) {
 ```cpp
 const int INF = 0x7fffffff;
 
-struct DEdge {
-    int to, cap;
-    DEdge(int to, int cap) : to(to), cap(cap) {}
-};
-
 struct Dinic {
+    struct Edge {
+        int to, cap;
+        Edge(int to, int cap) : to(to), cap(cap) {}
+    };
+
     int n, s, t;
-    vector<DEdge> es;
+    vector<Edge> es;
     vector<vector<int> > G;
     vector<int> dis, cur;
 
@@ -225,7 +225,7 @@ struct Dinic {
             int u = q.front();
             q.pop();
             for (int i : G[u]) {
-                DEdge& e = es[i];
+                Edge& e = es[i];
                 if (!dis[e.to] && e.cap > 0) {
                     dis[e.to] = dis[u] + 1;
                     q.push(e.to);
@@ -238,8 +238,8 @@ struct Dinic {
     int dfs(int u, int cap) {
         if (u == t || cap == 0) return cap;
         int tmp = cap, f;
-        for (int& i = cur[u]; i < G[u].size(); i++) {
-            DEdge& e = es[G[u][i]];
+        for (int& i = cur[u]; i < (int)G[u].size(); i++) {
+            Edge& e = es[G[u][i]];
             if (dis[e.to] == dis[u] + 1) {
                 f = dfs(e.to, min(cap, e.cap));
                 e.cap -= f;
@@ -267,14 +267,14 @@ struct Dinic {
 ```cpp
 const int INF = 0x7fffffff;
 
-struct MEdge {
-    int from, to, cap, cost;
-    MEdge(int from, int to, int cap, int cost) : from(from), to(to), cap(cap), cost(cost) {}
-};
-
 struct MCMF {
+    struct Edge {
+        int from, to, cap, cost;
+        Edge(int from, int to, int cap, int cost) : from(from), to(to), cap(cap), cost(cost) {}
+    };
+
     int n, s, t, flow, cost;
-    vector<MEdge> es;
+    vector<Edge> es;
     vector<vector<int> > G;
     vector<int> d, p, a, in;  // dis, prev, add
 
@@ -300,7 +300,7 @@ struct MCMF {
             q.pop();
             in[u] = 0;
             for (int& i : G[u]) {
-                MEdge& e = es[i];
+                Edge& e = es[i];
                 if (e.cap && d[e.to] > d[u] + e.cost) {
                     d[e.to] = d[u] + e.cost;
                     p[e.to] = i;
