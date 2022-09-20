@@ -14,6 +14,7 @@ int sgn(ld x) { return x < -EPS ? -1 : x > EPS; }
 
 // 不要直接使用sgn
 bool eq(ld x, ld y) { return sgn(x - y) == 0; }
+bool neq(ld x, ld y) { return sgn(x - y) != 0; }
 bool lt(ld x, ld y) { return sgn(x - y) < 0; }
 bool gt(ld x, ld y) { return sgn(x - y) > 0; }
 bool leq(ld x, ld y) { return sgn(x - y) <= 0; }
