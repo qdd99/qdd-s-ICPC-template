@@ -125,10 +125,10 @@ for (int i = 0, j = 0; i + k <= n; i++) {
 ```cpp
 // 支持第k大的BIT
 // 下标从1开始
-struct Tbit {
+struct fenwick {
     int n;
     vector<ll> t;
-    Tbit(int n) : n(n), t(n + 1) {}
+    fenwick(int n) : n(n), t(n + 1) {}
     void add(int p, ll x) {
         // assert(p > 0);
         for (; p <= n; p += p & -p) t[p] += x;
@@ -158,10 +158,10 @@ struct Tbit {
 + 下标从 0 开始
 
 ```cpp
-struct Tbit {
+struct fenwick {
     int n;
     vector<ll> t;
-    Tbit(int n) : n(n), t(n) {}
+    fenwick(int n) : n(n), t(n) {}
     void add(int p, ll x) {
         // assert(p >= 0);
         for (; p < n; p |= p + 1) t[p] += x;
@@ -186,7 +186,7 @@ void range_add(int l, int r, ll x) {
 + 区间加，区间和
 
 ```cpp
-Tbit t1, t2;
+fenwick t1, t2;
 
 void range_add(int l, int r, ll x) {
     t1.add(l, x);
@@ -203,7 +203,7 @@ ll range_sum(int l, int r) {
 + 二维
 
 ```cpp
-struct Tbit {
+struct fenwick {
     ll t[N][N];
 
     int lowbit(int x) { return x & (-x); }
@@ -229,7 +229,7 @@ struct Tbit {
 + 二维区间加，区间和
 
 ```cpp
-Tbit t0, t1, t2, t3;
+fenwick t0, t1, t2, t3;
 
 void add4(int x, int y, ll d) {
     t0.add(x, y, d);
