@@ -265,22 +265,25 @@ struct Dinic {
 + 最小费用流
 
 ```cpp
-const int INF = 0x7fffffff;
+const ll INF = 1e15;
 
 struct MCMF {
     struct Edge {
-        int from, to, cap, cost;
-        Edge(int from, int to, int cap, int cost) : from(from), to(to), cap(cap), cost(cost) {}
+        int from, to;
+        ll cap, cost;
+        Edge(int from, int to, ll cap, ll cost) : from(from), to(to), cap(cap), cost(cost) {}
     };
 
-    int n, s, t, flow, cost;
+    int n, s, t;
+    ll flow, cost;
     vector<Edge> es;
     vector<vector<int> > G;
-    vector<int> d, p, a, in;  // dis, prev, add
+    vector<ll> d, a;  // dis, add, prev
+    vector<int> p, in;
 
     MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), G(n + 1), p(n + 1), a(n + 1) {}
 
-    void add_edge(int u, int v, int cap, int cost) {
+    void add_edge(int u, int v, ll cap, ll cost) {
         G[u].push_back(es.size());
         es.emplace_back(u, v, cap, cost);
         G[v].push_back(es.size());
