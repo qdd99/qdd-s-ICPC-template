@@ -126,28 +126,31 @@ struct Hash2D {
 
 ```cpp
 // "aba" => "#a#b#a#"
-string make(string& s) {
-    string t = "#";
-    for (int i = 0; i < s.size(); i++) {
-        t.push_back(s[i]);
-        t.push_back('#');
-    }
-    return t;
-}
+struct Manacher {
+    vector<int> d;
 
-void manacher(string& s, vector<int>& d) {
-    int n = s.size();
-    d.resize(n);
-    for (int i = 0, l = 0, r = -1; i < n; i++) {
-        int k = (i > r) ? 1 : min(d[l + r - i], r - i);
-        while (i - k >= 0 && i + k < n && s[i - k] == s[i + k]) k++;
-        d[i] = --k;
-        if (i + k > r) {
-            l = i - k;
-            r = i + k;
+    Manacher(const string& s) {
+        string t = "#";
+        for (int i = 0; i < s.size(); i++) {
+            t.push_back(s[i]);
+            t.push_back('#');
+        }
+        int n = t.size();
+        d.resize(n);
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 1 : min(d[l + r - i], r - i);
+            while (i - k >= 0 && i + k < n && t[i - k] == t[i + k]) k++;
+            d[i] = --k;
+            if (i + k > r) {
+                l = i - k;
+                r = i + k;
+            }
         }
     }
-}
+
+    // 0-indexed [l, r]
+    bool is_p(int l, int r) { return d[l + r + 1] >= r - l + 1; }
+};
 ```
 
 ### KMP
