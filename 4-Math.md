@@ -459,8 +459,7 @@ ll inv(ll x) { return qk(x, MOD - 2, MOD); }
 // EXGCD
 // gcd(a, p) = 1时有逆元
 ll inv(ll a, ll p) {
-    ll x, y;
-    ll d = exgcd(a, p, x, y);
+    auto [d, x, y] = exgcd(a, p);
     if (d == 1) return (x % p + p) % p;
     return -1;
 }
@@ -665,9 +664,9 @@ struct Basis {
 ```cpp
 // 前置：exgcd
 ll excrt(vector<ll>& m, vector<ll>& r) {
-    ll M = m[0], R = r[0], x, y, d;
+    ll M = m[0], R = r[0];
     for (int i = 1; i < m.size(); i++) {
-        d = exgcd(M, m[i], x, y);
+        auto [d, x, y] = exgcd(M, m[i]);
         if ((r[i] - R) % d) return -1;
         x = mul(x, (r[i] - R) / d, m[i] / d);
         R += x * M;
