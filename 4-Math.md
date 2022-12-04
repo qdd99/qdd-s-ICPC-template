@@ -388,15 +388,11 @@ void get_phi() {
 
 ```cpp
 // ax + by = gcd(a, b)
-ll exgcd(ll a, ll b, ll &x, ll &y) {
-    if (b == 0) {
-        x = 1;
-        y = 0;
-        return a;
-    }
-    ll d = exgcd(b, a % b, y, x);
-    y -= a / b * x;
-    return d;
+// return {gcd, x, y}
+array<ll, 3> exgcd(ll a, ll b) {
+    if (b == 0) return {a, 1, 0};
+    auto [d, x, y] = exgcd(b, a % b);
+    return {d, y, x - a / b * y};
 }
 ```
 
