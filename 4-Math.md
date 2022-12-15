@@ -454,7 +454,7 @@ ll h(ll a, ll b, ll c, ll n) {
 ### 逆元
 
 ```cpp
-ll inv(ll x) { return qk(x, MOD - 2, MOD); }
+ll inv(ll x) { return qk(x, P - 2, P); }
 
 // EXGCD
 // gcd(a, p) = 1时有逆元
@@ -470,7 +470,7 @@ ll inv[N];
 void init_inv() {
     inv[1] = 1;
     for (int i = 2; i < N; i++) {
-        inv[i] = 1LL * (MOD - MOD / i) * inv[MOD % i] % MOD;
+        inv[i] = 1LL * (P - P / i) * inv[P % i] % P;
     }
 }
 ```
@@ -486,7 +486,7 @@ void initC() {
     for (int i = 1; i < N; i++) {
         C[i][0] = 1;
         for (int j = 1; j <= i; j++) {
-            C[i][j] = (C[i - 1][j] + C[i - 1][j - 1]) % MOD;
+            C[i][j] = (C[i - 1][j] + C[i - 1][j - 1]) % P;
         }
     }
 }
@@ -498,24 +498,24 @@ ll fac[N], ifac[N];
 void init_inv() {
     fac[0] = 1;
     for (int i = 1; i < N; i++) {
-        fac[i] = fac[i - 1] * i % MOD;
+        fac[i] = fac[i - 1] * i % P;
     }
-    ifac[N - 1] = qk(fac[N - 1], MOD - 2, MOD);
+    ifac[N - 1] = qk(fac[N - 1], P - 2, P);
     for (int i = N - 2; i >= 0; i--) {
-        ifac[i] = ifac[i + 1] * (i + 1) % MOD;
+        ifac[i] = ifac[i + 1] * (i + 1) % P;
     }
 }
 
 ll C(int n, int m) {
     if (n < m || m < 0) return 0;
-    return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
+    return fac[n] * ifac[m] % P * ifac[n - m] % P;
 }
 
 // Lucas
 ll C(ll n, ll m) {
     if (n < m || m < 0) return 0;
-    if (n < MOD && m < MOD) return fac[n] * ifac[m] % MOD * ifac[n - m] % MOD;
-    return C(n / MOD, m / MOD) * C(n % MOD, m % MOD) % MOD;
+    if (n < P && m < P) return fac[n] * ifac[m] % P * ifac[n - m] % P;
+    return C(n / P, m / P) * C(n % P, m % P) % P;
 }
 
 // 可重复组合数
@@ -759,21 +759,21 @@ ll SGSB(ll x, ll b, ll p) {
 ll Quadratic_residue(ll a) {
     if (a == 0) return 0;
     ll b;
-    do b = rng() % MOD;
-    while (qk(b, (MOD - 1) >> 1, MOD) != MOD - 1);
-    ll s = MOD - 1, t = 0, f = 1;
+    do b = rng() % P;
+    while (qk(b, (P - 1) >> 1, P) != P - 1);
+    ll s = P - 1, t = 0, f = 1;
     while (!(s & 1)) s >>= 1, t++, f <<= 1;
     t--, f >>= 1;
-    ll x = qk(a, (s + 1) >> 1, MOD), inv_a = qk(a, MOD - 2, MOD);
+    ll x = qk(a, (s + 1) >> 1, P), inv_a = qk(a, P - 2, P);
     while (t) {
         f >>= 1;
-        if (qk(inv_a * x % MOD * x % MOD, f, MOD) != 1) {
-            (x *= qk(b, s, MOD)) %= MOD;
+        if (qk(inv_a * x % P * x % P, f, P) != 1) {
+            (x *= qk(b, s, P)) %= P;
         }
         t--, s <<= 1;
     }
-    if (x * x % MOD != a) return -1;
-    return min(x, MOD - x);
+    if (x * x % P != a) return -1;
+    return min(x, P - x);
 }
 ```
 
@@ -816,25 +816,25 @@ void go(vector<cp>& a, vector<cp>& b) {
 + NTT
 
 ```cpp
-const int MOD = 998244353, G = 3, IG = 332748118;
+const int P = 998244353, G = 3, IG = 332748118;
 
 int n1, n2, n, k, rev[N];
 
 void ntt(vector<ll>& a, int p) {
     for (int i = 0; i < n; i++) if (i < rev[i]) swap(a[i], a[rev[i]]);
     for (int h = 1; h < n; h <<= 1) {
-        ll wn = qk(p == 1 ? G : IG, (MOD - 1) / (h << 1), MOD);
+        ll wn = qk(p == 1 ? G : IG, (P - 1) / (h << 1), P);
         for (int i = 0; i < n; i += (h << 1)) {
             ll w = 1;
-            for (int j = 0; j < h; j++, (w *= wn) %= MOD) {
-                ll x = a[i + j], y = w * a[i + j + h] % MOD;
-                a[i + j] = (x + y) % MOD, a[i + j + h] = (x - y + MOD) % MOD;
+            for (int j = 0; j < h; j++, (w *= wn) %= P) {
+                ll x = a[i + j], y = w * a[i + j + h] % P;
+                a[i + j] = (x + y) % P, a[i + j + h] = (x - y + P) % P;
             }
         }
     }
     if (p == -1) {
-        ll ninv = qk(n, MOD - 2, MOD);
-        for (int i = 0; i < n; i++) (a[i] *= ninv) %= MOD;
+        ll ninv = qk(n, P - 2, P);
+        for (int i = 0; i < n; i++) (a[i] *= ninv) %= P;
     }
 }
 
@@ -844,7 +844,7 @@ void go(vector<ll>& a, vector<ll>& b) {
     a.resize(n); b.resize(n);
     for (int i = 0; i < n; i++) rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (k - 1));
     ntt(a, 1); ntt(b, 1);
-    for (int i = 0; i < n; i++) (a[i] *= b[i]) %= MOD;
+    for (int i = 0; i < n; i++) (a[i] *= b[i]) %= P;
     ntt(a, -1);
 }
 ```
@@ -860,14 +860,14 @@ void rOR(ll& a, ll& b) { b -= a; }
 
 void XOR(ll& a, ll& b) {
     ll x = a, y = b;
-    a = (x + y) % MOD;
-    b = (x - y + MOD) % MOD;
+    a = (x + y) % P;
+    b = (x - y + P) % P;
 }
 void rXOR(ll& a, ll& b) {
-    static ll inv2 = (MOD + 1) / 2;
+    static ll inv2 = (P + 1) / 2;
     ll x = a, y = b;
-    a = (x + y) * inv2 % MOD;
-    b = (x - y + MOD) * inv2 % MOD;
+    a = (x + y) * inv2 % P;
+    b = (x - y + P) * inv2 % P;
 }
 
 template<class T>
@@ -906,7 +906,7 @@ double asr(double l, double r) { return asr(l, r, EPS, simpson(l, r)); }
 namespace BerlekampMassey {
     using V = vector<ll>;
 
-    void up(ll & a, ll b) { (a += b) %= MOD; }
+    void up(ll & a, ll b) { (a += b) %= P; }
 
     V mul(const V& a, const V& b, const V& m, int k) {
         V r(2 * k - 1);
@@ -923,7 +923,7 @@ namespace BerlekampMassey {
 
     V pow(ll n, const V& m) {
         int k = (int)m.size() - 1;
-        assert(m[k] == -1 || m[k] == MOD - 1);
+        assert(m[k] == -1 || m[k] == P - 1);
         V r(k), x(k);
         r[0] = x[1] = 1;
         for (; n; n >>= 1, x = mul(x, x, m, k))
@@ -937,11 +937,11 @@ namespace BerlekampMassey {
         // x[n] = sum[a[i]*x[n-i],{i,1,k}]
         int k = (int)a.size() - 1;
         if (n <= k) return x[n - 1];
-        if (a.size() == 2) return x[0] * qk(a[0], n - 1, MOD) % MOD;
+        if (a.size() == 2) return x[0] * qk(a[0], n - 1, P) % P;
         V r = pow(n - 1, a);
         ll ans = 0;
         for (int i = 0; i < k; i++) up(ans, r[i] * x[i]);
-        return (ans + MOD) % MOD;
+        return (ans + P) % P;
     }
 
     V BM(const V& x) {
@@ -952,7 +952,7 @@ namespace BerlekampMassey {
             for (int i = 0; i <= L; i++) up(d, C[i] * x[n - i]);
             if (d == 0) { ++m; continue; }
             V T = C;
-            ll c = MOD - d * inv(b, MOD) % MOD;
+            ll c = P - d * inv(b, P) % P;
             C.resize(max(C.size(), size_t(B.size() + m)));
             for (int i = 0; i < (int)B.size(); i++) up(C[i + m], c * B[i]);
             if (2 * L > n) { ++m; continue; }
@@ -971,16 +971,16 @@ namespace BerlekampMassey {
 ll La(const vector<pair<ll, ll> >& v, ll k) {
     ll ret = 0;
     for (int i = 0; i < v.size(); i++) {
-        ll up = v[i].second % MOD, down = 1;
+        ll up = v[i].second % P, down = 1;
         for (int j = 0; j < v.size(); j++) {
             if (i != j) {
-                (up *= (k - v[j].first) % MOD) %= MOD;
-                (down *= (v[i].first - v[j].first) % MOD) %= MOD;
+                (up *= (k - v[j].first) % P) %= P;
+                (down *= (v[i].first - v[j].first) % P) %= P;
             }
         }
-        if (up < 0) up += MOD;
-        if (down < 0) down += MOD;
-        (ret += up * inv(down) % MOD) %= MOD;
+        if (up < 0) up += P;
+        if (down < 0) down += P;
+        (ret += up * inv(down) % P) %= P;
     }
     return ret;
 }

@@ -396,10 +396,10 @@ struct lazy_segtree {
 + 区间乘混加，区间和取模
 
 ```cpp
-S op(S a, S b) { return (a + b) % MOD; }
+S op(S a, S b) { return (a + b) % P; }
 S e() { return 0; }
-S mapping(S a, F f, int l, int r) { return (a * f.first % MOD + (r - l + 1) * f.second % MOD) % MOD; }
-F composition(F f, F g) { return F{(g.first * f.first) % MOD, (g.second * f.first % MOD + f.second) % MOD}; }
+S mapping(S a, F f, int l, int r) { return (a * f.first % P + (r - l + 1) * f.second % P) % P; }
+F composition(F f, F g) { return F{(g.first * f.first) % P, (g.second * f.first % P + f.second) % P}; }
 F id() { return F{1, 0}; }
 ```
 
