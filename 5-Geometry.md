@@ -14,11 +14,11 @@ int sgn(ld x) { return x < -EPS ? -1 : x > EPS; }
 
 // 不要直接使用sgn
 bool eq(ld x, ld y) { return sgn(x - y) == 0; }
-bool neq(ld x, ld y) { return sgn(x - y) != 0; }
+bool ne(ld x, ld y) { return sgn(x - y) != 0; }
 bool lt(ld x, ld y) { return sgn(x - y) < 0; }
 bool gt(ld x, ld y) { return sgn(x - y) > 0; }
-bool leq(ld x, ld y) { return sgn(x - y) <= 0; }
-bool geq(ld x, ld y) { return sgn(x - y) >= 0; }
+bool le(ld x, ld y) { return sgn(x - y) <= 0; }
+bool ge(ld x, ld y) { return sgn(x - y) >= 0; }
 
 struct V {
     ld x, y;
@@ -75,14 +75,14 @@ V rot(const V& p, ld r) {
 V rot_ccw90(const V& p) { return V(-p.y, p.x); }
 V rot_cw90(const V& p) { return V(p.y, -p.x); }
 
-// 点在线段上 leq(dot(...), 0) 包含端点 lt(dot(...), 0) 则不包含
+// 点在线段上 le(dot(...), 0) 包含端点 lt(dot(...), 0) 则不包含
 bool p_on_seg(const V& p, const V& a, const V& b) {
-    return eq(det(p - a, b - a), 0) && leq(dot(p - a, p - b), 0);
+    return eq(det(p - a, b - a), 0) && le(dot(p - a, p - b), 0);
 }
 
-// 点在射线上 geq(dot(...), 0) 包含端点 gt(dot(...), 0) 则不包含
+// 点在射线上 ge(dot(...), 0) 包含端点 gt(dot(...), 0) 则不包含
 bool p_on_ray(const V& p, const V& a, const V& b) {
-    return eq(det(p - a, b - a), 0) && geq(dot(p - a, b - a), 0);
+    return eq(det(p - a, b - a), 0) && ge(dot(p - a, b - a), 0);
 }
 
 // 点到直线距离
@@ -175,16 +175,16 @@ int inside(const vector<V>& s, const V& p) {
     for (int i = 0; i < s.size(); i++) {
         V a = s[i], b = s[(i + 1) % s.size()];
         if (p_on_seg(p, a, b)) return 0;
-        if (leq(a.y, b.y)) swap(a, b);
+        if (le(a.y, b.y)) swap(a, b);
         if (gt(p.y, a.y)) continue;
-        if (leq(p.y, b.y)) continue;
+        if (le(p.y, b.y)) continue;
         cnt += gt(cross(b, a, p), 0);
     }
     return (cnt & 1) ? 1 : -1;
 }
 
 // 构建凸包 点不可以重复
-// lt(cross(...), 0) 边上可以有点 leq(cross(...), 0) 则不能
+// lt(cross(...), 0) 边上可以有点 le(cross(...), 0) 则不能
 // 会改变输入点的顺序
 vector<V> convex_hull(vector<V>& s) {
     // assert(s.size() >= 3);
@@ -192,12 +192,12 @@ vector<V> convex_hull(vector<V>& s) {
     vector<V> ret(2 * s.size());
     int sz = 0;
     for (int i = 0; i < s.size(); i++) {
-        while (sz > 1 && leq(cross(ret[sz - 1], s[i], ret[sz - 2]), 0)) sz--;
+        while (sz > 1 && le(cross(ret[sz - 1], s[i], ret[sz - 2]), 0)) sz--;
         ret[sz++] = s[i];
     }
     int k = sz;
     for (int i = s.size() - 2; i >= 0; i--) {
-        while (sz > k && leq(cross(ret[sz - 1], s[i], ret[sz - 2]), 0)) sz--;
+        while (sz > k && le(cross(ret[sz - 1], s[i], ret[sz - 2]), 0)) sz--;
         ret[sz++] = s[i];
     }
     ret.resize(sz - (s.size() > 1));
