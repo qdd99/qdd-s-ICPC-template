@@ -712,3 +712,19 @@ void go() {
     CDQ(1, k);
 }
 ```
+
+### 莫队
+
+```cpp
+int unit = max(1, int(n / sqrt(q)));
+sort(qry.begin(), qry.end(), [&](auto &a, auto &b) {
+    if (a.l / unit != b.l / unit) return a.l < b.l;
+    return ((a.l / unit) & 1) ? a.r < b.r : a.r > b.r;
+});
+
+// [l, r)
+while (l > q.l) add_left(--l);
+while (r < q.r) add_right(r++);
+while (l < q.l) delete_left(l++);
+while (r > q.r) delete_right(--r);
+```
