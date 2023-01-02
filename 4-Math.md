@@ -967,43 +967,22 @@ namespace BerlekampMassey {
 ### 拉格朗日插值
 
 ```cpp
-// 求 f(k) 的值，O(n^2)
-ll La(const vector<pair<ll, ll> >& v, ll k) {
-    ll ret = 0;
-    for (int i = 0; i < v.size(); i++) {
-        ll up = v[i].second % P, down = 1;
-        for (int j = 0; j < v.size(); j++) {
-            if (i != j) {
-                (up *= (k - v[j].first) % P) %= P;
-                (down *= (v[i].first - v[j].first) % P) %= P;
-            }
+// 求 f(x) 的系数表达式，O(n^2)
+template <class T>
+vector<T> La(vector<T> x, vector<T> y) {
+    int n = x.size();
+    vector<T> ret(n), sum(n);
+    ret[0] = y[0], sum[0] = 1;
+    for (int i = 1; i < n; i++) {
+        for (int j = n - 1; j >= i; j--) {
+            y[j] = (y[j] - y[j - 1]) / (x[j] - x[j - i]);
         }
-        if (up < 0) up += P;
-        if (down < 0) down += P;
-        (ret += up * inv(down) % P) %= P;
-    }
-    return ret;
-}
-
-// 求 f(x) 的系数表达式，O(n * 2^n)（适合打表）
-vector<double> La(vector<pair<double, double> > v) {
-    int n = v.size(), t;
-    vector<double> ret(n);
-    double p, q;
-    for (int i = 0; i < n; i++) {
-        p = v[i].second;
-        for (int j = 0; j < n; j++) {
-            p /= (i == j) ? 1 : (v[i].first - v[j].first);
+        for (int j = i; j; j--) {
+            sum[j] = -sum[j] * x[i - 1] + sum[j - 1];
+            ret[j] += sum[j] * y[i];
         }
-        for (int j = 0; j < (1 << n); j++) {
-            q = 1, t = 0;
-            for (int k = 0; k < n; k++) {
-                if (i == k) continue;
-                if ((j >> k) & 1) q *= -v[k].first;
-                else t++;
-            }
-            ret[t] += p * q / 2;
-        }
+        sum[0] = -sum[0] * x[i - 1];
+        ret[0] += sum[0] * y[i];
     }
     return ret;
 }
