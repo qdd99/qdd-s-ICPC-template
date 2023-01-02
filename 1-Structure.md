@@ -3,16 +3,16 @@
 ### 并查集
 
 ```cpp
+// pa 为负数表示集合大小
 struct dsu {
-    vector<int> p, sz;
-    dsu(int n) : p(n), sz(n, 1) { iota(p.begin(), p.end(), 0); }
-    int find(int x) { return (x == p[x]) ? x : p[x] = find(p[x]); }
+    vector<int> p;
+    dsu(int n) : p(n, -1) {}
+    int find(int x) { return (p[x] < 0) ? x : p[x] = find(p[x]); }
     bool merge(int x, int y) {
         x = find(x), y = find(y);
         if (x == y) return 0;
+        p[y] += p[x];
         p[x] = y;
-        sz[y] += sz[x];
-        sz[x] = 0;
         return 1;
     }
 };
@@ -21,18 +21,17 @@ struct dsu {
 + 动态开点并查集
 
 ```cpp
-// pa 为负数表示集合大小
 unordered_map<int, int> pa;
 
 void _set(int x) { if (!pa.count(x)) pa[x] = -1; }
 int find(int x) { return (pa[x] < 0) ? x : pa[x] = find(pa[x]); }
 
-void merge(int a, int b) {
-    int x = find(a), y = find(b);
+void merge(int x, int y) {
+    x = find(x), y = find(y);
     if (x == y) return;
-    if (pa[x] > pa[y]) swap(x, y);
-    pa[x] += pa[y];
-    pa[y] = x;
+    if (pa[x] < pa[y]) swap(x, y);
+    pa[y] += pa[x];
+    pa[x] = y;
 }
 ```
 
