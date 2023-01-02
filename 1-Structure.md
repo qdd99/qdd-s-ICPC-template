@@ -3,7 +3,6 @@
 ### 并查集
 
 ```cpp
-// pa 为负数表示集合大小
 struct dsu {
     vector<int> p;
     dsu(int n) : p(n, -1) {}
