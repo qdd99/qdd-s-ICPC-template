@@ -556,7 +556,10 @@ vector<int> inv_cantor(int x, int n) {
 
 ### 高斯消元
 
++ 浮点数版本
+
 ```cpp
+// n 方程个数，m 变量个数，a 是 n*(m+1) 的增广矩阵
 const double EPS = 1e-8;
 
 int gauss(vector<vector<double>> a, vector<double>& ans) {
@@ -594,6 +597,35 @@ int gauss(vector<vector<double>> a, vector<double>& ans) {
         for (int j = 0; j < m; j++) sum += ans[j] * a[i][j];
         if (abs(sum - a[i][m]) > EPS) return -1;  // no solution
     }
+    for (int i = 0; i < m; i++)
+        if (pos[i] == -1) return 2;  // infinte solutions
+    return 1;                        // unique solution
+}
+```
+
++ 异或方程组
+
+```cpp
+const int N = 2010;
+
+int gauss(int n, int m, vector<bitset<N>> a, bitset<N>& ans) {
+    vector<int> pos(m, -1);
+    for (int r = 0, c = 0; r < n && c < m; ++c) {
+        int k = r;
+        while (k < n && !a[k][c]) k++;
+        if (k == n) continue;
+        swap(a[r], a[k]);
+        pos[c] = r;
+        for (int i = 0; i < n; i++)
+            if (i != r && a[i][c]) a[i] ^= a[r];
+        ++r;
+    }
+    ans.reset();
+    for (int i = 0; i < m; i++) {
+        if (pos[i] != -1) ans[i] = a[pos[i]][m];
+    }
+    for (int i = 0; i < n; i++)
+        if (((ans & a[i]).count() & 1) != a[i][m]) return -1;  // no solution
     for (int i = 0; i < m; i++)
         if (pos[i] == -1) return 2;  // infinte solutions
     return 1;                        // unique solution
