@@ -557,71 +557,46 @@ vector<int> inv_cantor(int x, int n) {
 ### 高斯消元
 
 ```cpp
-// n 方程个数，m 变量个数，a 是 n*(m+1) 的增广矩阵，free 是否为自由变量
-// 返回自由变量个数，-1 无解
 const double EPS = 1e-8;
-const int N = 500 + 7;
 
-double x[N];
-bool free_x[N];
-
-int sgn(double x) { return x < -EPS ? -1 : x > EPS; }
-
-int gauss(vector<vector<double> >& a, int n, int m) {
-    fill(x, x + m + 1, 0);
-    fill(free_x, free_x + m + 1, true);
-
-    // 求上三角矩阵
-    int r = 0, c = 0;
-    while (r < n && c < m) {
-        int mr = r;
-        for (int i = r + 1; i < n; i++) {
-            if (abs(a[i][c]) > abs(a[mr][c])) mr = i;
-        }
-        if (mr != r) swap(a[r], a[mr]);
-        if (!sgn(a[r][c])) {
-            a[r][c] = 0;
-            ++c;
+int gauss(vector<vector<double>> a, vector<double>& ans) {
+    int n = (int)a.size(), m = (int)a[0].size() - 1;
+    vector<int> pos(m, -1);
+    double det = 1;
+    int rank = 0;
+    for (int r = 0, c = 0; r < n && c < m; ++c) {
+        int k = r;
+        for (int i = r; i < n; i++)
+            if (abs(a[i][c]) > abs(a[k][c])) k = i;
+        if (abs(a[k][c]) < EPS) {
+            det = 0;
             continue;
         }
-        for (int i = r + 1; i < n; i++) {
-            if (a[i][c]) {
+        swap(a[r], a[k]);
+        if (r != k) det = -det;
+        det *= a[r][c];
+        pos[c] = r;
+        for (int i = 0; i < n; i++) {
+            if (i != r && abs(a[i][c]) > EPS) {
                 double t = a[i][c] / a[r][c];
                 for (int j = c; j <= m; j++) a[i][j] -= a[r][j] * t;
             }
         }
-        ++r, ++c;
+        ++r;
+        ++rank;
     }
-    for (int i = r; i < n; i++) {
-        if (sgn(a[i][m])) return -1;
+    ans.assign(m, 0);
+    for (int i = 0; i < m; i++) {
+        if (pos[i] != -1) ans[i] = a[pos[i]][m] / a[pos[i]][i];
     }
-
-    // 求解 x0, x1, ..., xm-1
-    if (r < m) {
-        for (int i = r - 1; i >= 0; i--) {
-            int fcnt = 0, k = -1;
-            for (int j = 0; j < m; j++) {
-                if (sgn(a[i][j]) && free_x[j]) {
-                    ++fcnt;
-                    k = j;
-                }
-            }
-            if (fcnt > 0) continue;
-            double s = a[i][m];
-            for (int j = 0; j < m; j++) {
-                if (j != k) s -= a[i][j] * x[j];
-            }
-            x[k] = s / a[i][k];
-            free_x[k] = 0;
-        }
-        return m - r;
+    for (int i = 0; i < n; i++) {
+        double sum = 0;
+        for (int j = 0; j < m; j++) sum += ans[j] * a[i][j];
+        if (abs(sum - a[i][m]) > EPS) return -1;  // no solution
     }
-    for (int i = m - 1; i >= 0; i--) {
-        double s = a[i][m];
-        for (int j = i + 1; j < m; j++) s -= a[i][j] * x[j];
-        x[i] = s / a[i][i];
-    }
-    return 0;
+    for (int i = 0; i < m; i++)
+        if (pos[i] == -1) return 2;  // infinte solutions
+    return 1;                        // unique solution
 }
 ```
 
