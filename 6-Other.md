@@ -102,6 +102,20 @@ void subset(int k, int n) {
 }
 ```
 
+### 高维前缀和
+
+```cpp
+// 子集和
+for (int i = 0; i < k; i++)
+  for (int s = 0; s < (1 << k); s++)
+    if ((s >> i) & 1) dp[s] += dp[s - (1 << i)];
+
+// 超集和
+for (int i = 0; i < k; i++)
+  for (int s = 0; s < (1 << k); s++)
+    if (!((s >> i) & 1)) dp[s] += dp[s + (1 << i)];
+```
+
 ### 最长不下降子序列
 
 ```cpp
