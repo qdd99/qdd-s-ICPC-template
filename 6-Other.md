@@ -6,20 +6,20 @@
 // 二分闭区间[l, r]
 template <class T, class F>
 T min_left(T l, T r, F f) {
-    while (l < r) {
-        T p = l + (r - l) / 2;
-        f(p) ? r = p : l = p + 1;
-    }
-    return l;
+  while (l < r) {
+    T p = l + (r - l) / 2;
+    f(p) ? r = p : l = p + 1;
+  }
+  return l;
 }
 
 template <class T, class F>
 T max_right(T l, T r, F f) {
-    while (l < r) {
-        T p = l + (r - l + 1) / 2;
-        f(p) ? l = p : r = p - 1;
-    }
-    return l;
+  while (l < r) {
+    T p = l + (r - l + 1) / 2;
+    f(p) ? l = p : r = p - 1;
+  }
+  return l;
 }
 ```
 
@@ -29,23 +29,23 @@ T max_right(T l, T r, F f) {
 // 实数范围
 double l, r, mid1, mid2;
 for (int i = 0; i < 75; i++) {
-    mid1 = (l * 5 + r * 4) / 9;
-    mid2 = (l * 4 + r * 5) / 9;
-    if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
-    else l = mid1;
+  mid1 = (l * 5 + r * 4) / 9;
+  mid2 = (l * 4 + r * 5) / 9;
+  if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
+  else l = mid1;
 }
 
 // 整数范围
 int l, r, mid1, mid2;
 while (l < r - 2) {
-    mid1 = (l + r) / 2;
-    mid2 = mid1 + 1;
-    if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
-    else l = mid1;
+  mid1 = (l + r) / 2;
+  mid2 = mid1 + 1;
+  if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
+  else l = mid1;
 }
 int maxval = f(l), ans = l;
 for (int i = l + 1; i <= r; i++) {
-    if (umax(maxval, f(i))) ans = i;
+  if (umax(maxval, f(i))) ans = i;
 }
 ```
 
@@ -54,33 +54,33 @@ for (int i = l + 1; i <= r; i++) {
 ```cpp
 // 0 ~ 6 对应 周一 ~ 周日
 int zeller(int y, int m, int d) {
-    if (m <= 2) m += 12, y--;
-    return (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
+  if (m <= 2) m += 12, y--;
+  return (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
 }
 
 // date_to_int(1, 1, 1) = 1721426
 // date_to_int(2019, 10, 27) = 2458784
 int date_to_int(int y, int m, int d) {
-    return
-    1461 * (y + 4800 + (m - 14) / 12) / 4 +
-    367 * (m - 2 - (m - 14) / 12 * 12) / 12 -
-    3 * ((y + 4900 + (m - 14) / 12) / 100) / 4 +
-    d - 32075;
+  return
+  1461 * (y + 4800 + (m - 14) / 12) / 4 +
+  367 * (m - 2 - (m - 14) / 12 * 12) / 12 -
+  3 * ((y + 4900 + (m - 14) / 12) / 100) / 4 +
+  d - 32075;
 }
 
 void int_to_date(int jd, int &y, int &m, int &d) {
-    int x, n, i, j;
+  int x, n, i, j;
 
-    x = jd + 68569;
-    n = 4 * x / 146097;
-    x -= (146097 * n + 3) / 4;
-    i = (4000 * (x + 1)) / 1461001;
-    x -= 1461 * i / 4 - 31;
-    j = 80 * x / 2447;
-    d = x - 2447 * j / 80;
-    x = j / 11;
-    m = j + 2 - 12 * x;
-    y = 100 * (n - 49) + i + x;
+  x = jd + 68569;
+  n = 4 * x / 146097;
+  x -= (146097 * n + 3) / 4;
+  i = (4000 * (x + 1)) / 1461001;
+  x -= 1461 * i / 4 - 31;
+  j = 80 * x / 2447;
+  d = x - 2447 * j / 80;
+  x = j / 11;
+  m = j + 2 - 12 * x;
+  y = 100 * (n - 49) + i + x;
 }
 ```
 
@@ -93,12 +93,12 @@ for (int t = (x - 1) & x; t; t = (t - 1) & x)
 // 枚举大小为 k 的子集
 // 注意 k 不能为 0
 void subset(int k, int n) {
-    int t = (1 << k) - 1;
-    while (t < (1 << n)) {
-        // do something
-        int x = t & -t, y = t + x;
-        t = ((t & ~y) / x >> 1) | y;
-    }
+  int t = (1 << k) - 1;
+  while (t < (1 << n)) {
+    // do something
+    int x = t & -t, y = t + x;
+    t = ((t & ~y) / x >> 1) | y;
+  }
 }
 ```
 
@@ -107,12 +107,12 @@ void subset(int k, int n) {
 ```cpp
 template <class T>
 int lis(const vector<T>& a) {
-    vector<T> dp(a.size() + 1, numeric_limits<T>::max());
-    T mx = dp[0];
-    for (auto& x : a) *upper_bound(dp.begin(), dp.end(), x) = x;  // use lower_bound for increasing
-    int ans = 0;
-    while (dp[ans] != mx) ++ans;
-    return ans;
+  vector<T> dp(a.size() + 1, numeric_limits<T>::max());
+  T mx = dp[0];
+  for (auto& x : a) *upper_bound(dp.begin(), dp.end(), x) = x;  // use lower_bound for increasing
+  int ans = 0;
+  while (dp[ans] != mx) ++ans;
+  return ans;
 }
 ```
 
@@ -122,9 +122,9 @@ int lis(const vector<T>& a) {
 int g(int n) { return n ^ (n >> 1); }
 
 int rev_g(int g) {
-    int n = 0;
-    for (; g; g >>= 1) n ^= g;
-    return n;
+  int n = 0;
+  for (; g; g >>= 1) n ^= g;
+  return n;
 }
 ```
 
@@ -137,61 +137,61 @@ ll dp[15][N][N], a[15];
 int mod;
 
 ll dfs(int pos, int sum, int tot, bool limit) {
-    if (sum > mod) return 0;
-    if (pos == -1) return (sum == mod) && (tot == 0);
-    if (!limit && dp[pos][sum][tot] != -1) return dp[pos][sum][tot];
-    ll ret = 0;
-    int ed = limit ? a[pos] : 9;
-    for (int i = 0; i <= ed; i++) {
-        ret += dfs(pos - 1, sum + i, (sum == 0 && i == 0) ? 1 : (tot * i) % mod, limit && i == a[pos]);
-    }
-    if (!limit) dp[pos][sum][tot] = ret;
-    return ret;
+  if (sum > mod) return 0;
+  if (pos == -1) return (sum == mod) && (tot == 0);
+  if (!limit && dp[pos][sum][tot] != -1) return dp[pos][sum][tot];
+  ll ret = 0;
+  int ed = limit ? a[pos] : 9;
+  for (int i = 0; i <= ed; i++) {
+    ret += dfs(pos - 1, sum + i, (sum == 0 && i == 0) ? 1 : (tot * i) % mod, limit && i == a[pos]);
+  }
+  if (!limit) dp[pos][sum][tot] = ret;
+  return ret;
 }
 
 ll cal(ll x) {
-    ll sz = 0;
-    while (x) {
-        a[sz++] = x % 10;
-        x /= 10;
-    }
-    ll ans = 0;
-    for (mod = 1; mod < N; mod++) {
-        memset(dp, -1, sizeof(dp));
-        ans += dfs(sz - 1, 0, 1, true);
-    }
-    return ans;
+  ll sz = 0;
+  while (x) {
+    a[sz++] = x % 10;
+    x /= 10;
+  }
+  ll ans = 0;
+  for (mod = 1; mod < N; mod++) {
+    memset(dp, -1, sizeof(dp));
+    ans += dfs(sz - 1, 0, 1, true);
+  }
+  return ans;
 }
 
 // 小于等于 x 的 base 进制下回文数个数
 ll dp[20][20][20][2], tmp[20], a[20];
 
 ll dfs(ll base, ll pos, ll len, ll s, bool limit) {
-    if (pos == -1) return s;
-    if (!limit && dp[base][pos][len][s] != -1) return dp[base][pos][len][s];
-    ll ret = 0;
-    ll ed = limit ? a[pos] : base - 1;
-    for (int i = 0; i <= ed; i++) {
-        tmp[pos] = i;
-        if (len == pos)
-            ret += dfs(base, pos - 1, len - (i == 0), s, limit && i == a[pos]);
-        else if (s && pos < (len + 1) / 2)
-            ret += dfs(base, pos - 1, len, tmp[len - pos] == i, limit && i == a[pos]);
-        else
-            ret += dfs(base, pos - 1, len, s, limit && i == a[pos]);
-    }
-    if (!limit) dp[base][pos][len][s] = ret;
-    return ret;
+  if (pos == -1) return s;
+  if (!limit && dp[base][pos][len][s] != -1) return dp[base][pos][len][s];
+  ll ret = 0;
+  ll ed = limit ? a[pos] : base - 1;
+  for (int i = 0; i <= ed; i++) {
+    tmp[pos] = i;
+    if (len == pos)
+      ret += dfs(base, pos - 1, len - (i == 0), s, limit && i == a[pos]);
+    else if (s && pos < (len + 1) / 2)
+      ret += dfs(base, pos - 1, len, tmp[len - pos] == i, limit && i == a[pos]);
+    else
+      ret += dfs(base, pos - 1, len, s, limit && i == a[pos]);
+  }
+  if (!limit) dp[base][pos][len][s] = ret;
+  return ret;
 }
 
 ll solve(ll x, ll base) {
-    memset(dp, -1, sizeof(dp));
-    ll sz = 0;
-    while (x) {
-        a[sz++] = x % base;
-        x /= base;
-    }
-    return dfs(base, sz - 1, sz - 1, 1, true);
+  memset(dp, -1, sizeof(dp));
+  ll sz = 0;
+  while (x) {
+    a[sz++] = x % base;
+    x /= base;
+  }
+  return dfs(base, sz - 1, sz - 1, 1, true);
 }
 ```
 
@@ -199,17 +199,17 @@ ll solve(ll x, ll base) {
 
 ```cpp
 vector<int> randset(int l, int r, int k) {
-    // assert(l <= r && k <= r - l + 1);
-    unordered_map<int, int> p;
-    for (int i = l; i < l + k; i++) p[i] = i;
-    for (int i = l; i < l + k; i++) {
-        int j = randint(i, r);
-        if (!p.count(j)) p[j] = j;
-        swap(p[i], p[j]);
-    }
-    vector<int> a(k);
-    for (int i = 0; i < k; i++) a[i] = p[i + l];
-    return a;
+  // assert(l <= r && k <= r - l + 1);
+  unordered_map<int, int> p;
+  for (int i = l; i < l + k; i++) p[i] = i;
+  for (int i = l; i < l + k; i++) {
+    int j = randint(i, r);
+    if (!p.count(j)) p[j] = j;
+    swap(p[i], p[j]);
+  }
+  vector<int> a(k);
+  for (int i = 0; i < k; i++) a[i] = p[i + l];
+  return a;
 }
 ```
 
@@ -306,9 +306,9 @@ namespace std {
 template<class T>
 class vector_s : public vector<T> {
 public:
-    vector_s(size_t n = 0, const T& x = T()) : vector<T>(n, x) {}
-    T& operator [] (size_t n) { return this->at(n); }
-    const T& operator [] (size_t n) const { return this->at(n); }
+  vector_s(size_t n = 0, const T& x = T()) : vector<T>(n, x) {}
+  T& operator [] (size_t n) { return this->at(n); }
+  const T& operator [] (size_t n) const { return this->at(n); }
 };
 }
 
@@ -320,27 +320,27 @@ public:
 ```cpp
 template<class T1, class T2>
 struct pair_hash {
-    size_t operator () (const pair<T1, T2>& p) const {
-        return hash<T1>()(p.first) * 19260817 + hash<T2>()(p.second);
-    }
+  size_t operator () (const pair<T1, T2>& p) const {
+    return hash<T1>()(p.first) * 19260817 + hash<T2>()(p.second);
+  }
 };
 
 unordered_set<pair<int, int>, pair_hash<int, int> > st;
 unordered_map<pair<int, int>, int, pair_hash<int, int> > mp;
 
 struct custom_hash {
-    static uint64_t splitmix64(uint64_t x) {
-        // http://xorshift.di.unimi.it/splitmix64.c
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
+  static uint64_t splitmix64(uint64_t x) {
+    // http://xorshift.di.unimi.it/splitmix64.c
+    x += 0x9e3779b97f4a7c15;
+    x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+    x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+    return x ^ (x >> 31);
+  }
 
-    size_t operator()(uint64_t x) const {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+  size_t operator()(uint64_t x) const {
+    static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+    return splitmix64(x + FIXED_RANDOM);
+  }
 };
 
 unordered_map<ll, int, custom_hash> safe_map;
@@ -357,22 +357,22 @@ template <class T, class U> bool umin(T& a, U b) { return a > b ? a = b, 1 : 0; 
 
 ```cpp
 vector<string> split(const string& s, string sep) {
-    size_t b = 0, e;
-    vector<string> res;
-    while ((e = s.find(sep, b)) != string::npos) {
-        res.push_back(s.substr(b, e - b));
-        b = e + sep.size();
-    }
-    res.push_back(s.substr(b));
-    return res;
+  size_t b = 0, e;
+  vector<string> res;
+  while ((e = s.find(sep, b)) != string::npos) {
+    res.push_back(s.substr(b, e - b));
+    b = e + sep.size();
+  }
+  res.push_back(s.substr(b));
+  return res;
 }
 
 template <class T>
 string join(const vector<T>& v, string sep) {
-    stringstream ss;
-    bool f = 0;
-    for (const T& x : v) (f ? ss << sep : ss) << x, f = 1;
-    return ss.str();
+  stringstream ss;
+  bool f = 0;
+  for (const T& x : v) (f ? ss << sep : ss) << x, f = 1;
+  return ss.str();
 }
 ```
 
@@ -382,31 +382,31 @@ string join(const vector<T>& v, string sep) {
 // 重复元素id不同
 template<class T>
 vector<int> dc(const vector<T>& a, int start_id) {
-    int n = a.size();
-    vector<pair<T, int> > t(n);
-    for (int i = 0; i < n; i++) {
-        t[i] = make_pair(a[i], i);
-    }
-    sort(t.begin(), t.end());
-    vector<int> id(n);
-    for (int i = 0; i < n; i++) {
-        id[t[i].second] = start_id + i;
-    }
-    return id;
+  int n = a.size();
+  vector<pair<T, int> > t(n);
+  for (int i = 0; i < n; i++) {
+    t[i] = make_pair(a[i], i);
+  }
+  sort(t.begin(), t.end());
+  vector<int> id(n);
+  for (int i = 0; i < n; i++) {
+    id[t[i].second] = start_id + i;
+  }
+  return id;
 }
 
 // 重复元素id相同
 template<class T>
 vector<int> unique_dc(const vector<T>& a, int start_id) {
-    int n = a.size();
-    vector<T> t(a);
-    sort(t.begin(), t.end());
-    t.resize(unique(t.begin(), t.end()) - t.begin());
-    vector<int> id(n);
-    for (int i = 0; i < n; i++) {
-        id[i] = start_id + lower_bound(t.begin(), t.end(), a[i]) - t.begin();
-    }
-    return id;
+  int n = a.size();
+  vector<T> t(a);
+  sort(t.begin(), t.end());
+  t.resize(unique(t.begin(), t.end()) - t.begin());
+  vector<int> id(n);
+  for (int i = 0; i < n; i++) {
+    id[i] = start_id + lower_bound(t.begin(), t.end(), a[i]) - t.begin();
+  }
+  return id;
 }
 ```
 
@@ -415,15 +415,15 @@ vector<int> unique_dc(const vector<T>& a, int start_id) {
 ```cpp
 template <class T>
 vector<pair<T, int> > norm(vector<T>& v) {
-    // sort(v.begin(), v.end());
-    vector<pair<T, int> > p;
-    for (int i = 0; i < (int)v.size(); i++) {
-        if (i == 0 || v[i] != v[i - 1])
-            p.emplace_back(v[i], 1);
-        else
-            p.back().second++;
-    }
-    return p;
+  // sort(v.begin(), v.end());
+  vector<pair<T, int> > p;
+  for (int i = 0; i < (int)v.size(); i++) {
+    if (i == 0 || v[i] != v[i - 1])
+      p.emplace_back(v[i], 1);
+    else
+      p.back().second++;
+  }
+  return p;
 }
 ```
 
@@ -431,18 +431,18 @@ vector<pair<T, int> > norm(vector<T>& v) {
 
 ```cpp
 struct heap {
-    priority_queue<int> q1, q2;
-    void push(int x) { q1.push(x); }
-    void erase(int x) { q2.push(x); }
-    int top() {
-        while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
-        return q1.top();
-    }
-    void pop() {
-        while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
-        q1.pop();
-    }
-    int size() { return q1.size() - q2.size(); }
+  priority_queue<int> q1, q2;
+  void push(int x) { q1.push(x); }
+  void erase(int x) { q2.push(x); }
+  int top() {
+    while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
+    return q1.top();
+  }
+  void pop() {
+    while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
+    q1.pop();
+  }
+  int size() { return q1.size() - q2.size(); }
 };
 ```
 
@@ -450,23 +450,23 @@ struct heap {
 
 ```cpp
 struct Frac {
-    ll x, y;
+  ll x, y;
 
-    Frac(ll p = 0, ll q = 1) {
-        ll d = __gcd(p, q);
-        x = p / d, y = q / d;
-        if (y < 0) x = -x, y = -y;
-    }
+  Frac(ll p = 0, ll q = 1) {
+    ll d = __gcd(p, q);
+    x = p / d, y = q / d;
+    if (y < 0) x = -x, y = -y;
+  }
 
-    Frac operator + (const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
-    Frac operator - (const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
-    Frac operator * (const Frac& b) { return Frac(x * b.x, y * b.y); }
-    Frac operator / (const Frac& b) { return Frac(x * b.y, y * b.x); }
+  Frac operator + (const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
+  Frac operator - (const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
+  Frac operator * (const Frac& b) { return Frac(x * b.x, y * b.y); }
+  Frac operator / (const Frac& b) { return Frac(x * b.y, y * b.x); }
 };
 
 ostream& operator << (ostream& os, const Frac& f) {
-    if (f.y == 1) return os << f.x;
-    else return os << f.x << '/' << f.y;
+  if (f.y == 1) return os << f.x;
+  else return os << f.x << '/' << f.y;
 }
 ```
 
@@ -643,387 +643,387 @@ using Mint = Modular<std::integral_constant<decay<decltype(md)>::type, md>>;
 class BigInt {
 #define w size()
 
-    static constexpr int base = 1000000000;
-    static constexpr int base_digits = 9;
+  static constexpr int base = 1000000000;
+  static constexpr int base_digits = 9;
 
-    using vi = vector<int>;
-    using vll = vector<ll>;
+  using vi = vector<int>;
+  using vll = vector<ll>;
 
-    vi z;
-    int f;
+  vi z;
+  int f;
 
-    void trim() {
-        while (!z.empty() && z.back() == 0) {
-            z.pop_back();
-        }
-        if (z.empty()) {
-            f = 1;
-        }
+  void trim() {
+    while (!z.empty() && z.back() == 0) {
+      z.pop_back();
     }
-
-    void read(const string& s) {
-        f = 1;
-        z.clear();
-        int pos = 0;
-        while (pos < (int)s.w && (s[pos] == '-' || s[pos] == '+')) {
-            if (s[pos] == '-') {
-                f = -f;
-            }
-            ++pos;
-        }
-        for (int i = s.w - 1; i >= pos; i -= base_digits) {
-            int x = 0;
-            for (int j = max(pos, i - base_digits + 1); j <= i; j++) {
-                x = x * 10 + s[j] - '0';
-            }
-            z.push_back(x);
-        }
-        trim();
+    if (z.empty()) {
+      f = 1;
     }
+  }
 
-    static vi convert_base(const vi& a, int old_digits, int new_digits) {
-        vll p(max(old_digits, new_digits) + 1);
-        p[0] = 1;
-        for (int i = 1; i < (int)p.w; i++) {
-            p[i] = p[i - 1] * 10;
-        }
-        vi res;
-        ll cur = 0;
-        int cur_digits = 0;
-        for (int i = 0; i < (int)a.w; i++) {
-            cur += a[i] * p[cur_digits];
-            cur_digits += old_digits;
-            while (cur_digits >= new_digits) {
-                res.push_back(cur % p[new_digits]);
-                cur /= p[new_digits];
-                cur_digits -= new_digits;
-            }
-        }
-        res.push_back(cur);
-        while (!res.empty() && res.back() == 0) {
-            res.pop_back();
-        }
-        return res;
+  void read(const string& s) {
+    f = 1;
+    z.clear();
+    int pos = 0;
+    while (pos < (int)s.w && (s[pos] == '-' || s[pos] == '+')) {
+      if (s[pos] == '-') {
+        f = -f;
+      }
+      ++pos;
     }
+    for (int i = s.w - 1; i >= pos; i -= base_digits) {
+      int x = 0;
+      for (int j = max(pos, i - base_digits + 1); j <= i; j++) {
+        x = x * 10 + s[j] - '0';
+      }
+      z.push_back(x);
+    }
+    trim();
+  }
 
-    static vll karatsuba(const vll& a, const vll& b) {
-        int n = a.w;
-        vll res(n + n);
-        if (n <= 32) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    res[i + j] += a[i] * b[j];
-                }
-            }
-            return res;
-        }
-        int k = n >> 1;
-        vll a1(a.begin(), a.begin() + k);
-        vll a2(a.begin() + k, a.end());
-        vll b1(b.begin(), b.begin() + k);
-        vll b2(b.begin() + k, b.end());
-        vll a1b1 = karatsuba(a1, b1);
-        vll a2b2 = karatsuba(a2, b2);
-        for (int i = 0; i < k; i++) {
-            a2[i] += a1[i];
-        }
-        for (int i = 0; i < k; i++) {
-            b2[i] += b1[i];
-        }
-        vll r = karatsuba(a2, b2);
-        for (int i = 0; i < (int)a1b1.w; i++) {
-            r[i] -= a1b1[i];
-        }
-        for (int i = 0; i < (int)a2b2.w; i++) {
-            r[i] -= a2b2[i];
-        }
-        for (int i = 0; i < (int)r.w; i++) {
-            res[i + k] += r[i];
-        }
-        for (int i = 0; i < (int)a1b1.w; i++) {
-            res[i] += a1b1[i];
-        }
-        for (int i = 0; i < (int)a2b2.w; i++) {
-            res[i + n] += a2b2[i];
-        }
-        return res;
+  static vi convert_base(const vi& a, int old_digits, int new_digits) {
+    vll p(max(old_digits, new_digits) + 1);
+    p[0] = 1;
+    for (int i = 1; i < (int)p.w; i++) {
+      p[i] = p[i - 1] * 10;
     }
+    vi res;
+    ll cur = 0;
+    int cur_digits = 0;
+    for (int i = 0; i < (int)a.w; i++) {
+      cur += a[i] * p[cur_digits];
+      cur_digits += old_digits;
+      while (cur_digits >= new_digits) {
+        res.push_back(cur % p[new_digits]);
+        cur /= p[new_digits];
+        cur_digits -= new_digits;
+      }
+    }
+    res.push_back(cur);
+    while (!res.empty() && res.back() == 0) {
+      res.pop_back();
+    }
+    return res;
+  }
+
+  static vll karatsuba(const vll& a, const vll& b) {
+    int n = a.w;
+    vll res(n + n);
+    if (n <= 32) {
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          res[i + j] += a[i] * b[j];
+        }
+      }
+      return res;
+    }
+    int k = n >> 1;
+    vll a1(a.begin(), a.begin() + k);
+    vll a2(a.begin() + k, a.end());
+    vll b1(b.begin(), b.begin() + k);
+    vll b2(b.begin() + k, b.end());
+    vll a1b1 = karatsuba(a1, b1);
+    vll a2b2 = karatsuba(a2, b2);
+    for (int i = 0; i < k; i++) {
+      a2[i] += a1[i];
+    }
+    for (int i = 0; i < k; i++) {
+      b2[i] += b1[i];
+    }
+    vll r = karatsuba(a2, b2);
+    for (int i = 0; i < (int)a1b1.w; i++) {
+      r[i] -= a1b1[i];
+    }
+    for (int i = 0; i < (int)a2b2.w; i++) {
+      r[i] -= a2b2[i];
+    }
+    for (int i = 0; i < (int)r.w; i++) {
+      res[i + k] += r[i];
+    }
+    for (int i = 0; i < (int)a1b1.w; i++) {
+      res[i] += a1b1[i];
+    }
+    for (int i = 0; i < (int)a2b2.w; i++) {
+      res[i + n] += a2b2[i];
+    }
+    return res;
+  }
 
 public:
-    BigInt() : f(1) {}
-    BigInt(ll v) { *this = v; }
-    BigInt(const string& s) { read(s); }
+  BigInt() : f(1) {}
+  BigInt(ll v) { *this = v; }
+  BigInt(const string& s) { read(s); }
 
-    void operator=(const BigInt& v) {
-        f = v.f;
-        z = v.z;
+  void operator=(const BigInt& v) {
+    f = v.f;
+    z = v.z;
+  }
+
+  void operator=(ll v) {
+    f = 1;
+    if (v < 0) {
+      f = -1, v = -v;
     }
-
-    void operator=(ll v) {
-        f = 1;
-        if (v < 0) {
-            f = -1, v = -v;
-        }
-        z.clear();
-        for (; v > 0; v = v / base) {
-            z.push_back(v % base);
-        }
+    z.clear();
+    for (; v > 0; v = v / base) {
+      z.push_back(v % base);
     }
+  }
 
-    BigInt operator+(const BigInt& v) const {
-        if (f == v.f) {
-            BigInt res = v;
-            for (int i = 0, carry = 0; i < (int)max(z.w, v.z.w) || carry; ++i) {
-                if (i == (int)res.z.w) {
-                    res.z.push_back(0);
-                }
-                res.z[i] += carry + (i < (int)z.w ? z[i] : 0);
-                carry = res.z[i] >= base;
-                if (carry) {
-                    res.z[i] -= base;
-                }
-            }
-            return res;
-        } else {
-            return *this - (-v);
+  BigInt operator+(const BigInt& v) const {
+    if (f == v.f) {
+      BigInt res = v;
+      for (int i = 0, carry = 0; i < (int)max(z.w, v.z.w) || carry; ++i) {
+        if (i == (int)res.z.w) {
+          res.z.push_back(0);
         }
+        res.z[i] += carry + (i < (int)z.w ? z[i] : 0);
+        carry = res.z[i] >= base;
+        if (carry) {
+          res.z[i] -= base;
+        }
+      }
+      return res;
+    } else {
+      return *this - (-v);
     }
+  }
 
-    BigInt operator-(const BigInt& v) const {
-        if (f == v.f) {
-            if (abs() >= v.abs()) {
-                BigInt res = *this;
-                for (int i = 0, carry = 0; i < (int)v.z.w || carry; ++i) {
-                    res.z[i] -= carry + (i < (int)v.z.w ? v.z[i] : 0);
-                    carry = res.z[i] < 0;
-                    if (carry) {
-                        res.z[i] += base;
-                    }
-                }
-                res.trim();
-                return res;
-            } else {
-                return -(v - *this);
-            }
-        } else {
-            return *this + (-v);
-        }
-    }
-
-    void operator*=(int v) {
-        if (v < 0) {
-            f = -f, v = -v;
-        }
-        for (int i = 0, carry = 0; i < (int)z.w || carry; ++i) {
-            if (i == (int)z.w) {
-                z.push_back(0);
-            }
-            ll cur = (ll)z[i] * v + carry;
-            carry = cur / base;
-            z[i] = cur % base;
-            // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur), "c"(base));
-        }
-        trim();
-    }
-
-    BigInt operator*(int v) const {
+  BigInt operator-(const BigInt& v) const {
+    if (f == v.f) {
+      if (abs() >= v.abs()) {
         BigInt res = *this;
-        res *= v;
-        return res;
-    }
-
-    friend pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1) {
-        int norm = base / (b1.z.back() + 1);
-        BigInt a = a1.abs() * norm;
-        BigInt b = b1.abs() * norm;
-        BigInt q, r;
-        q.z.resize(a.z.w);
-        for (int i = a.z.w - 1; i >= 0; i--) {
-            r *= base;
-            r += a.z[i];
-            int s1 = b.z.w < r.z.w ? r.z[b.z.w] : 0;
-            int s2 = b.z.w - 1 < r.z.w ? r.z[b.z.w - 1] : 0;
-            int d = ((ll)s1 * base + s2) / b.z.back();
-            r -= b * d;
-            while (r < 0) {
-                r += b, --d;
-            }
-            q.z[i] = d;
-        }
-        q.f = a1.f * b1.f;
-        r.f = a1.f;
-        q.trim();
-        r.trim();
-        return make_pair(q, r / norm);
-    }
-
-    friend BigInt sqrt(const BigInt& a1) {
-        BigInt a = a1;
-        while (a.z.empty() || (int)a.z.w % 2 == 1) {
-            a.z.push_back(0);
-        }
-        int n = a.z.w;
-        int firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
-        int norm = base / (firstDigit + 1);
-        a *= norm;
-        a *= norm;
-        while (a.z.empty() || (int)a.z.w % 2 == 1) {
-            a.z.push_back(0);
-        }
-        BigInt r = (ll)a.z[n - 1] * base + a.z[n - 2];
-        firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
-        int q = firstDigit;
-        BigInt res;
-        for (int j = n / 2 - 1; j >= 0; j--) {
-            for (;; --q) {
-                BigInt r1 = (r - (res * 2 * base + q) * q) * base * base +
-                            (j > 0 ? (ll)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
-                if (r1 >= 0) {
-                    r = r1;
-                    break;
-                }
-            }
-            res *= base;
-            res += q;
-            if (j > 0) {
-                int d1 = res.z.w + 2 < r.z.w ? r.z[res.z.w + 2] : 0;
-                int d2 = res.z.w + 1 < r.z.w ? r.z[res.z.w + 1] : 0;
-                int d3 = res.z.w < r.z.w ? r.z[res.z.w] : 0;
-                q = ((ll)d1 * base * base + (ll)d2 * base + d3) / (firstDigit * 2);
-            }
+        for (int i = 0, carry = 0; i < (int)v.z.w || carry; ++i) {
+          res.z[i] -= carry + (i < (int)v.z.w ? v.z[i] : 0);
+          carry = res.z[i] < 0;
+          if (carry) {
+            res.z[i] += base;
+          }
         }
         res.trim();
-        return res / norm;
-    }
-
-    BigInt operator/(const BigInt& v) const { return divmod(*this, v).first; }
-    BigInt operator%(const BigInt& v) const { return divmod(*this, v).second; }
-
-    void operator/=(int v) {
-        if (v < 0) {
-            f = -f, v = -v;
-        }
-        for (int i = z.w - 1, rem = 0; i >= 0; --i) {
-            ll cur = z[i] + (ll)rem * base;
-            z[i] = cur / v;
-            rem = cur % v;
-        }
-        trim();
-    }
-
-    BigInt operator/(int v) const {
-        BigInt res = *this;
-        res /= v;
         return res;
+      } else {
+        return -(v - *this);
+      }
+    } else {
+      return *this + (-v);
     }
+  }
 
-    int operator%(int v) const {
-        if (v < 0) {
-            v = -v;
-        }
-        int m = 0;
-        for (int i = z.w - 1; i >= 0; --i) {
-            m = ((ll)m * base + z[i]) % v;
-        }
-        return m * f;
+  void operator*=(int v) {
+    if (v < 0) {
+      f = -f, v = -v;
     }
-
-    void operator+=(const BigInt& v) { *this = *this + v; }
-    void operator-=(const BigInt& v) { *this = *this - v; }
-    void operator*=(const BigInt& v) { *this = *this * v; }
-    void operator/=(const BigInt& v) { *this = *this / v; }
-
-    bool operator<(const BigInt& v) const {
-        if (f != v.f) {
-            return f < v.f;
-        }
-        if (z.w != v.z.w) {
-            return z.w * f < v.z.w * v.f;
-        }
-        for (int i = z.w - 1; i >= 0; i--) {
-            if (z[i] != v.z[i]) {
-                return z[i] * f < v.z[i] * f;
-            }
-        }
-        return false;
+    for (int i = 0, carry = 0; i < (int)z.w || carry; ++i) {
+      if (i == (int)z.w) {
+        z.push_back(0);
+      }
+      ll cur = (ll)z[i] * v + carry;
+      carry = cur / base;
+      z[i] = cur % base;
+      // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur), "c"(base));
     }
+    trim();
+  }
 
-    bool operator>(const BigInt& v) const { return v < *this; }
-    bool operator<=(const BigInt& v) const { return !(v < *this); }
-    bool operator>=(const BigInt& v) const { return !(*this < v); }
-    bool operator==(const BigInt& v) const { return !(*this < v) && !(v < *this); }
-    bool operator!=(const BigInt& v) const { return *this < v || v < *this; }
+  BigInt operator*(int v) const {
+    BigInt res = *this;
+    res *= v;
+    return res;
+  }
 
-    bool is_zero() const { return z.empty() || ((int)z.w == 1 && !z[0]); }
-
-    BigInt operator-() const {
-        BigInt res = *this;
-        res.f = -f;
-        return res;
+  friend pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1) {
+    int norm = base / (b1.z.back() + 1);
+    BigInt a = a1.abs() * norm;
+    BigInt b = b1.abs() * norm;
+    BigInt q, r;
+    q.z.resize(a.z.w);
+    for (int i = a.z.w - 1; i >= 0; i--) {
+      r *= base;
+      r += a.z[i];
+      int s1 = b.z.w < r.z.w ? r.z[b.z.w] : 0;
+      int s2 = b.z.w - 1 < r.z.w ? r.z[b.z.w - 1] : 0;
+      int d = ((ll)s1 * base + s2) / b.z.back();
+      r -= b * d;
+      while (r < 0) {
+        r += b, --d;
+      }
+      q.z[i] = d;
     }
+    q.f = a1.f * b1.f;
+    r.f = a1.f;
+    q.trim();
+    r.trim();
+    return make_pair(q, r / norm);
+  }
 
-    BigInt abs() const {
-        BigInt res = *this;
-        res.f *= res.f;
-        return res;
+  friend BigInt sqrt(const BigInt& a1) {
+    BigInt a = a1;
+    while (a.z.empty() || (int)a.z.w % 2 == 1) {
+      a.z.push_back(0);
     }
-
-    ll long_value() const {
-        ll res = 0;
-        for (int i = z.w - 1; i >= 0; i--) {
-            res = res * base + z[i];
-        }
-        return res * f;
+    int n = a.z.w;
+    int firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
+    int norm = base / (firstDigit + 1);
+    a *= norm;
+    a *= norm;
+    while (a.z.empty() || (int)a.z.w % 2 == 1) {
+      a.z.push_back(0);
     }
-
-    friend BigInt gcd(const BigInt& a, const BigInt& b) { return b.is_zero() ? a : gcd(b, a % b); }
-    friend BigInt lcm(const BigInt& a, const BigInt& b) { return a / gcd(a, b) * b; }
-
-    friend istream& operator>>(istream& is, BigInt& v) {
-        string s;
-        is >> s;
-        v.read(s);
-        return is;
+    BigInt r = (ll)a.z[n - 1] * base + a.z[n - 2];
+    firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
+    int q = firstDigit;
+    BigInt res;
+    for (int j = n / 2 - 1; j >= 0; j--) {
+      for (;; --q) {
+        BigInt r1 = (r - (res * 2 * base + q) * q) * base * base +
+              (j > 0 ? (ll)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
+        if (r1 >= 0) {
+          r = r1;
+          break;
+        }
+      }
+      res *= base;
+      res += q;
+      if (j > 0) {
+        int d1 = res.z.w + 2 < r.z.w ? r.z[res.z.w + 2] : 0;
+        int d2 = res.z.w + 1 < r.z.w ? r.z[res.z.w + 1] : 0;
+        int d3 = res.z.w < r.z.w ? r.z[res.z.w] : 0;
+        q = ((ll)d1 * base * base + (ll)d2 * base + d3) / (firstDigit * 2);
+      }
     }
+    res.trim();
+    return res / norm;
+  }
 
-    friend ostream& operator<<(ostream& os, const BigInt& v) {
-        if (v.f == -1) {
-            os << '-';
-        }
-        os << (v.z.empty() ? 0 : v.z.back());
-        for (int i = v.z.w - 2; i >= 0; --i) {
-            os << setw(base_digits) << setfill('0') << v.z[i];
-        }
-        return os;
-    }
+  BigInt operator/(const BigInt& v) const { return divmod(*this, v).first; }
+  BigInt operator%(const BigInt& v) const { return divmod(*this, v).second; }
 
-    BigInt operator*(const BigInt& v) const {
-        vi a6 = convert_base(this->z, base_digits, 6);
-        vi b6 = convert_base(v.z, base_digits, 6);
-        vll a(a6.begin(), a6.end());
-        vll b(b6.begin(), b6.end());
-        while (a.w < b.w) {
-            a.push_back(0);
-        }
-        while (b.w < a.w) {
-            b.push_back(0);
-        }
-        while (a.w & (a.w - 1)) {
-            a.push_back(0);
-            b.push_back(0);
-        }
-        vll c = karatsuba(a, b);
-        BigInt res;
-        res.f = f * v.f;
-        for (int i = 0, carry = 0; i < (int)c.w; i++) {
-            ll cur = c[i] + carry;
-            res.z.push_back(cur % 1000000);
-            carry = cur / 1000000;
-        }
-        res.z = convert_base(res.z, 6, base_digits);
-        res.trim();
-        return res;
+  void operator/=(int v) {
+    if (v < 0) {
+      f = -f, v = -v;
     }
+    for (int i = z.w - 1, rem = 0; i >= 0; --i) {
+      ll cur = z[i] + (ll)rem * base;
+      z[i] = cur / v;
+      rem = cur % v;
+    }
+    trim();
+  }
+
+  BigInt operator/(int v) const {
+    BigInt res = *this;
+    res /= v;
+    return res;
+  }
+
+  int operator%(int v) const {
+    if (v < 0) {
+      v = -v;
+    }
+    int m = 0;
+    for (int i = z.w - 1; i >= 0; --i) {
+      m = ((ll)m * base + z[i]) % v;
+    }
+    return m * f;
+  }
+
+  void operator+=(const BigInt& v) { *this = *this + v; }
+  void operator-=(const BigInt& v) { *this = *this - v; }
+  void operator*=(const BigInt& v) { *this = *this * v; }
+  void operator/=(const BigInt& v) { *this = *this / v; }
+
+  bool operator<(const BigInt& v) const {
+    if (f != v.f) {
+      return f < v.f;
+    }
+    if (z.w != v.z.w) {
+      return z.w * f < v.z.w * v.f;
+    }
+    for (int i = z.w - 1; i >= 0; i--) {
+      if (z[i] != v.z[i]) {
+        return z[i] * f < v.z[i] * f;
+      }
+    }
+    return false;
+  }
+
+  bool operator>(const BigInt& v) const { return v < *this; }
+  bool operator<=(const BigInt& v) const { return !(v < *this); }
+  bool operator>=(const BigInt& v) const { return !(*this < v); }
+  bool operator==(const BigInt& v) const { return !(*this < v) && !(v < *this); }
+  bool operator!=(const BigInt& v) const { return *this < v || v < *this; }
+
+  bool is_zero() const { return z.empty() || ((int)z.w == 1 && !z[0]); }
+
+  BigInt operator-() const {
+    BigInt res = *this;
+    res.f = -f;
+    return res;
+  }
+
+  BigInt abs() const {
+    BigInt res = *this;
+    res.f *= res.f;
+    return res;
+  }
+
+  ll long_value() const {
+    ll res = 0;
+    for (int i = z.w - 1; i >= 0; i--) {
+      res = res * base + z[i];
+    }
+    return res * f;
+  }
+
+  friend BigInt gcd(const BigInt& a, const BigInt& b) { return b.is_zero() ? a : gcd(b, a % b); }
+  friend BigInt lcm(const BigInt& a, const BigInt& b) { return a / gcd(a, b) * b; }
+
+  friend istream& operator>>(istream& is, BigInt& v) {
+    string s;
+    is >> s;
+    v.read(s);
+    return is;
+  }
+
+  friend ostream& operator<<(ostream& os, const BigInt& v) {
+    if (v.f == -1) {
+      os << '-';
+    }
+    os << (v.z.empty() ? 0 : v.z.back());
+    for (int i = v.z.w - 2; i >= 0; --i) {
+      os << setw(base_digits) << setfill('0') << v.z[i];
+    }
+    return os;
+  }
+
+  BigInt operator*(const BigInt& v) const {
+    vi a6 = convert_base(this->z, base_digits, 6);
+    vi b6 = convert_base(v.z, base_digits, 6);
+    vll a(a6.begin(), a6.end());
+    vll b(b6.begin(), b6.end());
+    while (a.w < b.w) {
+      a.push_back(0);
+    }
+    while (b.w < a.w) {
+      b.push_back(0);
+    }
+    while (a.w & (a.w - 1)) {
+      a.push_back(0);
+      b.push_back(0);
+    }
+    vll c = karatsuba(a, b);
+    BigInt res;
+    res.f = f * v.f;
+    for (int i = 0, carry = 0; i < (int)c.w; i++) {
+      ll cur = c[i] + carry;
+      res.z.push_back(cur % 1000000);
+      carry = cur / 1000000;
+    }
+    res.z = convert_base(res.z, 6, base_digits);
+    res.trim();
+    return res;
+  }
 
 #undef w
 };
@@ -1038,11 +1038,11 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        PrintStream out = System.out;
+  public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    PrintStream out = System.out;
 
-    }
+  }
 }
 ```
 
@@ -1050,39 +1050,39 @@ public class Main {
 
 ```java
 public class Main {
-    public static void main(String[] args) {
-        InputStream inputStream = System.in;
-        OutputStream outputStream = System.out;
-        InputReader in = new InputReader(inputStream);
-        PrintWriter out = new PrintWriter(outputStream);
+  public static void main(String[] args) {
+    InputStream inputStream = System.in;
+    OutputStream outputStream = System.out;
+    InputReader in = new InputReader(inputStream);
+    PrintWriter out = new PrintWriter(outputStream);
 
-        out.close();
+    out.close();
+  }
+
+  static class InputReader {
+    public BufferedReader reader;
+    public StringTokenizer tokenizer;
+
+    public InputReader(InputStream stream) {
+      reader = new BufferedReader(new InputStreamReader(stream), 32768);
+      tokenizer = null;
     }
 
-    static class InputReader {
-        public BufferedReader reader;
-        public StringTokenizer tokenizer;
-
-        public InputReader(InputStream stream) {
-            reader = new BufferedReader(new InputStreamReader(stream), 32768);
-            tokenizer = null;
+    public String next() {
+      while (tokenizer == null || !tokenizer.hasMoreTokens()) {
+        try {
+          tokenizer = new StringTokenizer(reader.readLine());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
-
-        public String next() {
-            while (tokenizer == null || !tokenizer.hasMoreTokens()) {
-                try {
-                    tokenizer = new StringTokenizer(reader.readLine());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            return tokenizer.nextToken();
-        }
-
-        public int nextInt() {
-            return Integer.parseInt(next());
-        }
+      }
+      return tokenizer.nextToken();
     }
+
+    public int nextInt() {
+      return Integer.parseInt(next());
+    }
+  }
 }
 ```
 
@@ -1132,17 +1132,17 @@ long longValue()
 String toString()
 
 public static BigInteger getsqrt(BigInteger n) {
-    if (n.compareTo(BigInteger.ZERO) <= 0) return n;
-    BigInteger x, xx, txx;
-    xx = x = BigInteger.ZERO;
-    for (int t = n.bitLength() / 2; t >= 0; t--) {
-        txx = xx.add(x.shiftLeft(t + 1)).add(BigInteger.ONE.shiftLeft(t + t));
-        if (txx.compareTo(n) <= 0) {
-            x = x.add(BigInteger.ONE.shiftLeft(t));
-            xx = txx;
-        }
+  if (n.compareTo(BigInteger.ZERO) <= 0) return n;
+  BigInteger x, xx, txx;
+  xx = x = BigInteger.ZERO;
+  for (int t = n.bitLength() / 2; t >= 0; t--) {
+    txx = xx.add(x.shiftLeft(t + 1)).add(BigInteger.ONE.shiftLeft(t + t));
+    if (txx.compareTo(n) <= 0) {
+      x = x.add(BigInteger.ONE.shiftLeft(t));
+      xx = txx;
     }
-    return x;
+  }
+  return x;
 }
 ```
 
