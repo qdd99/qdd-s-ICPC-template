@@ -194,6 +194,28 @@ void get_z(const string& s, vector<int>& z) {
 }
 ```
 
+### Lyndon 分解
+
+```cpp
+vector<string> duval(const string& s) {
+  int n = s.size(), i = 0;
+  vector<string> d;
+  while (i < n) {
+    int j = i + 1, k = i;
+    while (j < n && s[k] <= s[j]) {
+      if (s[k] < s[j]) k = i;
+      else k++;
+      j++;
+    }
+    while (i <= k) {
+      d.push_back(s.substr(i, j - k));
+      i += j - k;
+    }
+  }
+  return d;
+}
+```
+
 ### 最小表示法
 
 ```cpp
