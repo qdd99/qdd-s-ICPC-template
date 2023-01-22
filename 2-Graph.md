@@ -33,7 +33,7 @@ struct Edge {
   Edge(int to = 0, int val = 0) : to(to), val(val) {}
 };
 
-vector<Edge> G[N];
+vector<Edge> g[N];
 ll dis[N];
 
 void dijkstra(int s) {
@@ -47,7 +47,7 @@ void dijkstra(int s) {
     q.pop();
     int u = p.second;
     if (dis[u] < p.first) continue;
-    for (Edge& e : G[u]) {
+    for (Edge& e : g[u]) {
       int v = e.to;
       if (umin(dis[v], dis[u] + e.val)) {
         q.emplace(dis[v], v);
@@ -70,7 +70,7 @@ void spfa(int s) {
   while (!q.empty()) {
     int u = q.front();
     q.pop();
-    for (Edge& e : G[u]) {
+    for (Edge& e : g[u]) {
       int v = e.to;
       if (dis[v] > dis[u] + e.val) {
         dis[v] = dis[u] + e.val;
@@ -92,7 +92,7 @@ void spfa(int s) {
 for (int k = 0; k < n; k++) {
   for (int i = 0; i < k; i++) {
     for (int j = 0; j < i; j++) {
-      ans = min(ans, G[i][k] + G[k][j] + dis[i][j]);
+      ans = min(ans, g[i][k] + g[k][j] + dis[i][j]);
     }
   }
   for (int i = 0; i < n; i++) {
@@ -107,7 +107,7 @@ for (int k = 0; k < n; k++) {
 
 ```cpp
 int n, deg[N], dis[N];
-vector<int> G[N];
+vector<int> g[N];
 
 bool topo(vector<int>& ans) {
   queue<int> q;
@@ -121,7 +121,7 @@ bool topo(vector<int>& ans) {
     int u = q.front();
     q.pop();
     ans.push_back(u);
-    for (int v : G[u]) {
+    for (int v : g[u]) {
       deg[v]--;
       dis[v] = max(dis[v], dis[u] + 1);
       if (deg[v] == 0) q.push(v);
@@ -167,7 +167,7 @@ void dfs(int u, int pa) {
   for (int i = 1; i < 22; i++) {
     up[u][i] = up[up[u][i - 1]][i - 1];
   }
-  for (int v : G[u]) {
+  for (int v : g[u]) {
     if (v != pa) dfs(v, u);
   }
 }
@@ -204,15 +204,15 @@ struct Dinic {
 
   int n, s, t;
   vector<Edge> es;
-  vector<vector<int> > G;
+  vector<vector<int>> g;
   vector<int> dis, cur;
 
-  Dinic(int n, int s, int t) : n(n), s(s), t(t), G(n + 1), dis(n + 1), cur(n + 1) {}
+  Dinic(int n, int s, int t) : n(n), s(s), t(t), g(n + 1), dis(n + 1), cur(n + 1) {}
 
   void add_edge(int u, int v, int cap) {
-    G[u].push_back(es.size());
+    g[u].push_back(es.size());
     es.emplace_back(v, cap);
-    G[v].push_back(es.size());
+    g[v].push_back(es.size());
     es.emplace_back(u, 0);
   }
 
@@ -224,7 +224,7 @@ struct Dinic {
     while (!q.empty()) {
       int u = q.front();
       q.pop();
-      for (int i : G[u]) {
+      for (int i : g[u]) {
         Edge& e = es[i];
         if (!dis[e.to] && e.cap > 0) {
           dis[e.to] = dis[u] + 1;
@@ -238,12 +238,12 @@ struct Dinic {
   int dfs(int u, int cap) {
     if (u == t || cap == 0) return cap;
     int tmp = cap, f;
-    for (int& i = cur[u]; i < (int)G[u].size(); i++) {
-      Edge& e = es[G[u][i]];
+    for (int& i = cur[u]; i < (int)g[u].size(); i++) {
+      Edge& e = es[g[u][i]];
       if (dis[e.to] == dis[u] + 1) {
         f = dfs(e.to, min(cap, e.cap));
         e.cap -= f;
-        es[G[u][i] ^ 1].cap += f;
+        es[g[u][i] ^ 1].cap += f;
         cap -= f;
         if (cap == 0) break;
       }
@@ -277,16 +277,16 @@ struct MCMF {
   int n, s, t;
   ll flow, cost;
   vector<Edge> es;
-  vector<vector<int> > G;
+  vector<vector<int>> g;
   vector<ll> d, a;  // dis, add, prev
   vector<int> p, in;
 
-  MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), G(n + 1), p(n + 1), a(n + 1) {}
+  MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), g(n + 1), p(n + 1), a(n + 1) {}
 
   void add_edge(int u, int v, ll cap, ll cost) {
-    G[u].push_back(es.size());
+    g[u].push_back(es.size());
     es.emplace_back(u, v, cap, cost);
-    G[v].push_back(es.size());
+    g[v].push_back(es.size());
     es.emplace_back(v, u, 0, -cost);
   }
 
@@ -302,7 +302,7 @@ struct MCMF {
       int u = q.front();
       q.pop();
       in[u] = 0;
-      for (int& i : G[u]) {
+      for (int& i : g[u]) {
         Edge& e = es[i];
         if (e.cap && d[e.to] > d[u] + e.cost) {
           d[e.to] = d[u] + e.cost;
@@ -338,16 +338,16 @@ struct MCMF {
 ```cpp
 namespace stoer_wagner {
   bool vis[N], in[N];
-  int G[N][N], w[N];
+  int g[N][N], w[N];
 
   void init() {
-    memset(G, 0, sizeof(G));
+    memset(g, 0, sizeof(g));
     memset(in, 0, sizeof(in));
   }
 
   void add_edge(int u, int v, int w) {
-    G[u][v] += w;
-    G[v][u] += w;
+    g[u][v] += w;
+    g[v][u] += w;
   }
 
   int search(int& s, int& t) {
@@ -367,7 +367,7 @@ namespace stoer_wagner {
       vis[tt] = true;
       for (int j = 0; j < n; j++) {
         if (!in[j] && !vis[j]) {
-          w[j] += G[tt][j];
+          w[j] += g[tt][j];
         }
       }
     }
@@ -383,8 +383,8 @@ namespace stoer_wagner {
       in[t] = true;
       for (int j = 0; j < n; j++) {
         if (!in[j]) {
-          G[s][j] += G[t][j];
-          G[j][s] += G[j][t];
+          g[s][j] += g[t][j];
+          g[j][s] += g[j][t];
         }
       }
     }
@@ -397,14 +397,14 @@ namespace stoer_wagner {
 
 ```cpp
 // 点权
-vector<int> G[N];
+vector<int> g[N];
 int pa[N], sz[N], dep[N], dfn[N], maxc[N], top[N], clk;
 
 void dfs1(int u) {
   sz[u] = 1;
   maxc[u] = -1;
   int maxs = 0;
-  for (int& v : G[u]) {
+  for (int& v : g[u]) {
     if (v != pa[u]) {
       pa[v] = u;
       dep[v] = dep[u] + 1;
@@ -419,7 +419,7 @@ void dfs2(int u, int tp) {
   top[u] = tp;
   dfn[u] = ++clk;
   if (maxc[u] != -1) dfs2(maxc[u], tp);
-  for (int& v : G[u]) {
+  for (int& v : g[u]) {
     if (v != pa[u] && v != maxc[u]) {
       dfs2(v, v);
     }
@@ -463,7 +463,7 @@ void init() { clk = 0; memset(dfn, 0, sizeof(dfn)); }
 void tarjan(int u, int pa) {
   low[u] = dfn[u] = ++clk;
   int cc = (pa != 0);
-  for (int v : G[u]) {
+  for (int v : g[u]) {
     if (v == pa) continue;
     if (!dfn[v]) {
       tarjan(v, u);
@@ -485,7 +485,7 @@ void init() { clk = 0; memset(dfn, 0, sizeof(dfn)); }
 void tarjan(int u, int pa) {
   low[u] = dfn[u] = ++clk;
   int f = 0;
-  for (int v : G[u]) {
+  for (int v : g[u]) {
     if (v == pa && ++f == 1) continue;
     if (!dfn[v]) {
       tarjan(v, u);
@@ -510,7 +510,7 @@ void tarjan(int u) {
   dfn[u] = low[u] = ++clk;
   st[p++] = u;
   in[u] = true;
-  for (int v : G[u]) {
+  for (int v : g[u]) {
     if (!dfn[v]) {
       tarjan(v);
       low[u] = min(low[u], low[v]);
@@ -557,9 +557,9 @@ void two_sat() {
 + 有向无环图
 
 ```cpp
-// rt是G中入度为0的点（可能需要建超级源点）
+// rt是g中入度为0的点（可能需要建超级源点）
 int n, deg[N], dep[N], up[N][22];
-vector<int> G[N], rG[N], dt[N];
+vector<int> g[N], rg[N], dt[N];
 
 bool topo(vector<int>& ans, int rt) {
   queue<int> q;
@@ -568,7 +568,7 @@ bool topo(vector<int>& ans, int rt) {
     int u = q.front();
     q.pop();
     ans.push_back(u);
-    for (int v : G[u]) {
+    for (int v : g[u]) {
       deg[v]--;
       if (deg[v] == 0) q.push(v);
     }
@@ -598,7 +598,7 @@ void go(int rt) {
   dep[rt] = 1;
   for (int i = 1; i < a.size(); i++) {
     int u = a[i], pa = -1;
-    for (int v : rG[u]) {
+    for (int v : rg[u]) {
       pa = (pa == -1) ? v : lca(pa, v);
     }
     dt[pa].push_back(u);
@@ -614,7 +614,7 @@ void go(int rt) {
 + 一般有向图
 
 ```cpp
-vector<int> G[N], rG[N];
+vector<int> g[N], rg[N];
 vector<int> dt[N];
 
 namespace tl {
@@ -634,7 +634,7 @@ namespace tl {
   void dfs(int u) {
     dfn[u] = ++clk;
     rdfn[clk] = u;
-    for (int& v: G[u]) {
+    for (int& v : g[u]) {
       if (!dfn[v]) {
         pa[v] = u;
         dfs(v);
@@ -653,7 +653,7 @@ namespace tl {
     dfs(rt);
     for (int i = clk; i > 1; i--) {
       int x = rdfn[i], mn = clk + 1;
-      for (int& u: rG[x]) {
+      for (int& u : rg[x]) {
         if (!dfn[u]) continue; // 可能不能到达所有点
         fix(u);
         mn = min(mn, dfn[sdom[best[u]]]);
