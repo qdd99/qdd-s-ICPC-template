@@ -159,6 +159,7 @@ ll kruskal() {
 ### LCA
 
 ```cpp
+// dfs(1, 0) or dfs(0, n), don't use dfs(0, -1)
 int dep[N], up[N][22]; // 22 = ((int)log2(N) + 1)
 
 void dfs(int u, int pa) {
