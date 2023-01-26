@@ -81,6 +81,63 @@ ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第
 }
 ```
 
+### 字典序最小2sat
+
+```cpp
+const int N = 1e5 + 10;
+struct TwoSatBF {  // 暴力求解字典序最小的解
+  int n;
+  vector<int> G[N << 1];
+  bool slt[N << 1];
+  // 偶数点：false 奇数点：true 这样x^1就是反面
+  void init(int _n) {
+    n = _n;
+    for (int i = 0; i < (n << 1); ++i) {
+      G[i].clear();
+      slt[i] = false;
+    }
+  }
+  void addLimit(int x, int y) {
+    // 选了x就要选y，具体看情况使用
+    G[x].push_back(y);
+    G[y ^ 1].push_back(x ^ 1);
+  }
+  stack<int> st;
+  void clearst() {
+    while (st.size()) st.pop();
+  }
+  bool dfs(int u) {
+    if (slt[u ^ 1]) {
+      return false;
+    } else if (slt[u]) {
+      return true;
+    }
+    slt[u] = true;
+    st.push(u);
+    for (auto v : G[u]) {
+      if (!dfs(v)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  bool solve() {
+    for (int u = 0; u < (n << 1); u += 2) {
+      if (!slt[u] && !slt[u ^ 1]) {
+        clearst();
+        if (!dfs(u)) {
+          clearst();
+          if (!dfs(u ^ 1)) {
+            return fales;
+          }
+        }
+      }
+    }
+    return true;
+  }
+};
+```
+
 ### 二分图最大权匹配KM
 
 ```cpp
