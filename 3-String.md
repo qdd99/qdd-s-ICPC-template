@@ -121,6 +121,42 @@ struct Hash2D {
 };
 ```
 
++ 动态哈希
+
+```cpp
+const ll MAGIC = 479;
+const ll IMAGIC = 628392490;
+const ll P = 1e9 + 9;
+const int N = 1e5 + 5;
+
+ll pw[N], inv[N];
+
+void init() {
+  pw[0] = inv[0] = 1;
+  for (int i = 1; i < N; i++) {
+    pw[i] = (pw[i - 1] * MAGIC) % P;
+    inv[i] = (inv[i - 1] * IMAGIC) % P;
+  }
+}
+
+// 1-indexed, [l, r]
+struct fenwick {
+  int n;
+  vector<ll> t;
+  fenwick(int n) : n(n), t(n + 1) {}
+  void add(int p, ll x) {
+    for (; p <= n; p += p & -p) (t[p] += x) %= P;
+  }
+  ll get(int p) {
+    ll a = 0;
+    for (; p > 0; p -= p & -p) (a += t[p]) %= P;
+    return a;
+  }
+  void set(int p, ll x) { add(p, (x - query(p, p) + P) * pw[p] % P); }
+  ll query(int l, int r) { return (get(r) - get(l - 1) + P) * inv[l] % P; }
+};
+```
+
 ### Manacher
 
 ```cpp
