@@ -134,7 +134,7 @@ struct fenwick {
     for (; p > 0; p -= p & -p) a += t[p];
     return a;
   }
-  void update(int p, ll x) { add(p, x - query(p, p)); }
+  void set(int p, ll x) { add(p, x - query(p, p)); }
   ll query(int l, int r) { return get(r) - get(l - 1); }
 
   int kth(ll k) {
@@ -685,7 +685,7 @@ void CDQ(int l, int r) {
   }
   for (i = l; i <= r; i++) {
     p[i] = q[i];
-    bit.update(p[i].z, 0);
+    bit.set(p[i].z, 0);
   }
 }
 
