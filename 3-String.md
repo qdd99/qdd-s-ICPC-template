@@ -4,11 +4,10 @@
 
 ```cpp
 // open hack不要用哈希
-using ull = unsigned long long;
-
+// 适合哈希的素数：1572869, 3145739, 6291469, 12582917, 25165843, 50331653
 const int x = 135, p = 1e9 + 9;
 
-ull xp[N];
+ll xp[N];
 
 void init_xp() {
   xp[0] = 1;
@@ -18,12 +17,12 @@ void init_xp() {
 }
 
 struct Hash {
-  vector<ull> h;
+  vector<ll> h;
 
   Hash() : h(1) {}
 
   void add(const string &s) {
-    ull res = h.back();
+    ll res = h.back();
     for (char c : s) {
       res = (res * x + c) % p;
       h.push_back(res);
@@ -31,7 +30,7 @@ struct Hash {
   }
 
   // 0-indexed, [l, r]
-  ull get(int l, int r) {
+  ll get(int l, int r) {
     r++;
     return (h[r] - h[l] * xp[r - l] % p + p) % p;
   }
