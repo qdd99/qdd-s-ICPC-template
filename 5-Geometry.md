@@ -85,18 +85,6 @@ bool p_on_ray(const V& p, const V& a, const V& b) {
   return eq(det(p - a, b - a), 0) && ge(dot(p - a, b - a), 0);
 }
 
-// 点到直线距离
-ld dist_to_line(const V& p, const V& a, const V& b) {
-  return abs(cross(a, b, p) / dist(a, b));
-}
-
-// 点到线段距离
-ld dist_to_seg(const V& p, const V& a, const V& b) {
-  if (lt(dot(b - a, p - a), 0)) return dist(p, a);
-  if (lt(dot(a - b, p - b), 0)) return dist(p, b);
-  return dist_to_line(p, a, b);
-}
-
 // 求直线交点
 V intersect(const V& a, const V& b, const V& c, const V& d) {
   ld s1 = cross(c, d, a), s2 = cross(c, d, b);
@@ -111,6 +99,13 @@ V proj(const V& p, const V& a, const V& b) {
 // 点关于直线的对称点
 V reflect(const V& p, const V& a, const V& b) {
   return proj(p, a, b) * 2 - p;
+}
+
+// 点到线段的最近点
+V closest_point_on_seg(const V& p, const V& a, const V& b) {
+  if (lt(dot(b - a, p - a), 0)) return a;
+  if (lt(dot(a - b, p - b), 0)) return b;
+  return proj(p, a, b);
 }
 
 // 三角形重心
@@ -258,6 +253,9 @@ struct C {
   ld r;
   C(const V& o, ld r) : o(o), r(r) {}
 };
+
+// 扇形面积，半径 r 圆心角 d
+ld area_sector(ld r, ld d) { return r * r * d / 2; }
 
 // 过一点求圆的切线，返回切点
 vector<V> tangent_point(const C& c, const V& p) {
