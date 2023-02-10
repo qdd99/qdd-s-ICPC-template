@@ -259,8 +259,9 @@ ll range_sum(int x, int y, int xx, int yy) {
 
 ```cpp
 // 下标从1开始
-template <class S>
 struct segtree {
+  using S = int;
+
   int _n, size;
   vector<S> d;
 
@@ -364,11 +365,13 @@ S e() { return 0; }
 + 区间加，区间和
 
 ```cpp
-template <class S, class F>
 struct lazy_segtree {
 #define args int p, int l, int r
 #define lc p * 2, l, (l + r) >> 1
 #define rc p * 2 + 1, ((l + r) >> 1) + 1, r
+
+  using S = int;
+  using F = int;
 
   int _n, size, log;
   vector<S> d;
