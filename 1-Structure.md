@@ -261,12 +261,12 @@ ll range_sum(int x, int y, int xx, int yy) {
 // 下标从1开始
 template <class S>
 struct segtree {
-  int size;
+  int _n, size;
   vector<S> d;
 
   void pull(int p) { d[p] = op(d[p * 2], d[p * 2 + 1]); }
 
-  segtree(int n) {
+  segtree(int n) : _n(n) {
     size = 1;
     while (size < n) size <<= 1;
     d.assign(2 * size, e());
@@ -296,6 +296,53 @@ struct segtree {
 
   S op(S a, S b) { return max(a, b); }
   S e() { return -INF; }
+
+  // f(e()) = false
+  // find the smallest r such that f(sum([l...r])) = true
+  template <class F>
+  int find_right(int l, F f) {
+    l += size - 1;
+    S s = e();
+    do {
+      while (l % 2 == 0) l >>= 1;
+      if (f(op(s, d[l]))) {
+        while (l < size) {
+          l *= 2;
+          if (!f(op(s, d[l]))) {
+            s = op(s, d[l]);
+            l++;
+          }
+        }
+        return l - size + 1;
+      }
+      s = op(s, d[l]);
+      l++;
+    } while ((l & -l) != l);
+    return _n + 1;
+  }
+
+  // find the largest l such that f(sum([l...r])) = true
+  template <class F>
+  int find_left(int r, F f) {
+    r += size;
+    S s = e();
+    do {
+      r--;
+      while (r > 1 && (r % 2)) r >>= 1;
+      if (f(op(d[r], s))) {
+        while (r < size) {
+          r = 2 * r + 1;
+          if (!f(op(d[r], s))) {
+            s = op(d[r], s);
+            r--;
+          }
+        }
+        return r - size + 1;
+      }
+      s = op(d[r], s);
+    } while ((r & -r) != r);
+    return 0;
+  }
 };
 ```
 
