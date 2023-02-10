@@ -259,6 +259,7 @@ ll range_sum(int x, int y, int xx, int yy) {
 
 ```cpp
 // 下标从1开始
+// 必要时使用 const S& 卡常数
 struct segtree {
   using S = int;
 
