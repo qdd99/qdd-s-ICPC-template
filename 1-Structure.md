@@ -364,7 +364,6 @@ S e() { return 0; }
 + 区间加，区间和
 
 ```cpp
-// 待验证
 template <class S, class F>
 struct lazy_segtree {
 #define args int p, int l, int r
