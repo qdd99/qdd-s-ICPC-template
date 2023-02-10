@@ -364,13 +364,14 @@ S e() { return 0; }
 + 区间加，区间和
 
 ```cpp
+// 待验证
 template <class S, class F>
 struct lazy_segtree {
 #define args int p, int l, int r
 #define lc p * 2, l, (l + r) >> 1
 #define rc p * 2 + 1, ((l + r) >> 1) + 1, r
 
-  int size;
+  int _n, size, log;
   vector<S> d;
   vector<F> lz;
 
@@ -413,9 +414,9 @@ struct lazy_segtree {
 #undef lc
 #undef rc
 
-  lazy_segtree(int n) {
-    size = 1;
-    while (size < n) size <<= 1;
+  lazy_segtree(int n) : _n(n) {
+    size = 1, log = 0;
+    while (size < n) size <<= 1, log++;
     d.assign(2 * size, e());
     lz.assign(size, id());
   }
@@ -433,6 +434,63 @@ struct lazy_segtree {
   S mapping(S a, F f, int l, int r) { return a + f * (r - l + 1); }
   F composition(F f, F g) { return f + g; }  // f：外层函数 g：内层函数
   F id() { return 0; }  // 如果是区间赋值，选取一个数据范围外的值
+
+  // for binary search
+  void push(int p) {
+    int x = __lg(p), y = size >> x, z = p - (1 << x);
+    push(p, y * z + 1, y * (z + 1));
+  }
+
+  // f(e()) = false
+  // find the smallest r such that f(sum([l...r])) = true
+  template <class G>
+  int find_right(int l, G f) {
+    l += size - 1;
+    for (int i = log; i >= 1; i--) push(l >> i);
+    S s = e();
+    do {
+      while (l % 2 == 0) l >>= 1;
+      if (f(op(s, d[l]))) {
+        while (l < size) {
+          push(l);
+          l *= 2;
+          if (!f(op(s, d[l]))) {
+            s = op(s, d[l]);
+            l++;
+          }
+        }
+        return l - size + 1;
+      }
+      s = op(s, d[l]);
+      l++;
+    } while ((l & -l) != l);
+    return _n + 1;
+  }
+
+  // find the largest l such that f(sum([l...r])) = true
+  template <class G>
+  int find_left(int r, G f) {
+    r += size;
+    for (int i = log; i >= 1; i--) push((r - 1) >> i);
+    S s = e();
+    do {
+      r--;
+      while (r > 1 && (r % 2)) r >>= 1;
+      if (f(op(d[r], s))) {
+        while (r < size) {
+          push(r);
+          r = 2 * r + 1;
+          if (!f(op(d[r], s))) {
+            s = op(d[r], s);
+            r--;
+          }
+        }
+        return r - size + 1;
+      }
+      s = op(d[r], s);
+    } while ((r & -r) != r);
+    return 0;
+  }
 };
 ```
 
