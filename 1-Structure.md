@@ -274,8 +274,9 @@ struct segtree {
     d.assign(2 * size, e());
   }
 
-  segtree(const vector<S>& v) : segtree(v.size()) {
-    copy(v.begin(), v.end(), d.begin() + size);
+  template <class I>
+  segtree(I first, I last) : segtree(last - first) {
+    copy(first, last, d.begin() + size);
     for (int i = size - 1; i >= 1; i--) pull(i);
   }
 
@@ -424,8 +425,9 @@ struct lazy_segtree {
     lz.assign(size, id());
   }
 
-  lazy_segtree(const vector<S>& v) : lazy_segtree(v.size()) {
-    copy(v.begin(), v.end(), d.begin() + size);
+  template <class I>
+  lazy_segtree(I first, I last) : lazy_segtree(last - first) {
+    copy(first, last, d.begin() + size);
     for (int i = size - 1; i >= 1; i--) pull(i);
   }
 
