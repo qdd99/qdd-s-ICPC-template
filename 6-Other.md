@@ -128,6 +128,26 @@ int lis(const vector<T>& a) {
   while (dp[ans] != mx) ++ans;
   return ans;
 }
+
+// 输出方案
+template <class T>
+vector<int> lis(const vector<T>& S) {
+  if (S.empty()) return {};
+  vector<int> prev(S.size());
+  using P = pair<T, int>;
+  vector<P> res;
+  for (int i = 0; i < int(S.size()); i++) {
+    // use lower_bound P{S[i], 0} for increasing
+    auto it = upper_bound(res.begin(), res.end(), P{S[i], INT_MAX});
+    if (it == res.end()) res.emplace_back(), it = res.end() - 1;
+    *it = {S[i], i};
+    prev[i] = it == res.begin() ? 0 : (it - 1)->second;
+  }
+  int L = res.size(), cur = res.back().second;
+  vector<int> ans(L);
+  while (L--) ans[L] = cur, cur = prev[cur];
+  return ans;
+}
 ```
 
 ### 格雷码

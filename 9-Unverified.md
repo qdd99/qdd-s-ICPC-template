@@ -279,62 +279,6 @@ ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第
 }
 ```
 
-### LIS输出方案
-
-```cpp
-// CF104015J
-#include <algorithm>
-#include <climits>
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-typedef long long ll;
-typedef pair<int, int> par;
-
-vector<par> a;
-vector<int> p;
-
-signed main() {
-  ios_base::sync_with_stdio(0);
-  cin.tie(0);
-
-  int n;
-  cin >> n;
-  string s;
-  cin >> s;
-  a.resize(n + 1, make_pair(INT_MAX, -1));
-  a[0] = {INT_MIN, -1};
-  p.resize(n, -1);
-  for (int i = 0; i < n; i++) {
-    int v = upper_bound(a.begin(), a.end(), make_pair(s[i] - 'a', INT_MAX)) - a.begin();
-    a[v] = {s[i] - 'a', i};
-    p[i] = a[v - 1].second;
-  }
-  string ans(n, ' ');
-  int y = lower_bound(a.begin(), a.end(), make_pair(INT_MAX, -1)) - a.begin() - 1;
-  cout << n - y << '\n';
-  int yy = a[y].second;
-  while (yy != -1) {
-    // cerr << yy << endl;
-    ans[yy] = s[yy];
-    yy = p[yy];
-  }
-  char pr = 'a';
-  for (int i = 0; i < n; i++) {
-    if (ans[i] == ' ') {
-      ans[i] = pr;
-    } else {
-      pr = ans[i];
-    }
-  }
-  cout << ans;
-
-  return 0;
-}
-```
-
 ### 字典序最小2sat
 
 ```cpp
