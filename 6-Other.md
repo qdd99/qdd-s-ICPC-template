@@ -150,6 +150,35 @@ vector<int> lis(const vector<T>& S) {
 }
 ```
 
+### 分治 dp
+
+```cpp
+vector<ll> dp(n), new_dp(n);
+
+// compute new_dp[l], ... new_dp[r] (inclusive)
+function<void(int, int, int, int)> compute = [&](int l, int r, int optl, int optr) {
+  if (l > r) return;
+  int mid = (l + r) >> 1;
+  pair<ll, int> best = {LLONG_MAX, -1};
+  for (int j = optl; j <= min(mid, optr); j++) {
+    best = min(best, {(j ? dp[j - 1] : 0) + C(j, mid), j});
+  }
+  new_dp[mid] = best.first;
+  int opt = best.second;
+  compute(l, mid - 1, optl, opt);
+  compute(mid + 1, r, opt, optr);
+};
+
+for (int i = 0; i < n; i++) {
+  dp[i] = C(0, i);
+}
+for (int i = 1; i <= k; i++) {
+  compute(0, n - 1, 0, n - 1);
+  swap(dp, new_dp);
+}
+// return dp[n - 1];
+```
+
 ### 格雷码
 
 ```cpp
