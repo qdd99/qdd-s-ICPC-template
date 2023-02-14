@@ -619,11 +619,31 @@ using rank_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_
 template<class Key, class T>
 using rank_map = tree<Key, T, less<Key>, rb_tree_tag, tree_order_statistics_node_update>;
 
+void example() {
+  rank_set<int> t, t2;
+  t.insert(8);
+  auto it = t.insert(10).first;
+  assert(it == t.lower_bound(9));
+  assert(t.order_of_key(10) == 1);
+  assert(t.order_of_key(11) == 2);
+  assert(*t.find_by_order(0) == 8);
+  t.join(t2);  // assuming T < T2 or T > T2, merge t2 into t
+}
+
 // 优先队列
 #include <ext/pb_ds/priority_queue.hpp>
 using namespace __gnu_pbds;
 template<class T, class Cmp = less<T> >
 using pair_heap = __gnu_pbds::priority_queue<T, Cmp>;
+
+void example() {
+  pair_heap<int> q1, q2;
+  q1.push(5);
+  q1.push(10);
+  q2.push(1);
+  q2.push(7);
+  q1.join(q2);
+}
 ```
 
 ### Splay
