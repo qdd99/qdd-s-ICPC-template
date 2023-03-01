@@ -1,92 +1,47 @@
-## 字符串
+## Strings
 
-### 哈希
+### Hash
 
 ```cpp
-// open hack不要用哈希
-// 适合哈希的素数：1572869, 3145739, 6291469, 12582917, 25165843, 50331653
-const int x = 135, p = 1e9 + 9;
-
-ll xp[N];
-
-void init_xp() {
-  xp[0] = 1;
-  for (int i = 1; i < N; i++) {
-    xp[i] = xp[i - 1] * x % p;
-  }
-}
+// open hack
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 struct Hash {
-  vector<ll> h;
+  static const i64 md = (1LL << 61) - 1;
+  static i64 step;
+  static vector<i64> pw;
 
-  Hash() : h(1) {}
+  static i64 mul(i64 a, i64 b) { return (i64)(__int128(a) * b % md); }
 
-  void add(const string &s) {
-    ll res = h.back();
-    for (char c : s) {
-      res = (res * x + c) % p;
-      h.push_back(res);
-    }
+  static void init(int N) {
+    pw.resize(N + 1);
+    pw[0] = 1;
+    for (int i = 1; i <= N; i++) pw[i] = mul(pw[i - 1], step);
   }
 
-  // 0-indexed, [l, r]
-  ll get(int l, int r) {
-    r++;
-    return (h[r] - h[l] * xp[r - l] % p + p) % p;
+  vector<i64> h;
+
+  template <class T>
+  Hash(const T& s) {
+    int n = s.size();
+    h.resize(n + 1);
+    for (int i = 0; i < n; i++) h[i + 1] = (mul(h[i], step) + s[i]) % md;
   }
+
+  i64 operator()(int l, int r) { return (h[r + 1] - mul(h[l], pw[r - l + 1]) + md) % md; }
 };
+
+i64 Hash::step = uniform_int_distribution<i64>(256, md - 1)(rng);
+vector<i64> Hash::pw;
+int _ = (Hash::init(1e6), 0);
 ```
 
-+ 双哈希
++ 2D Hash
 
 ```cpp
-const int x = 135, p1 = 1e9 + 7, p2 = 1e9 + 9;
-const ull mask32 = ~(0u);
+const i64 basex = 239, basey = 241, p = 998244353;
 
-ull xp1[N], xp2[N];
-
-void init_xp() {
-  xp1[0] = xp2[0] = 1;
-  for (int i = 1; i < N; i++) {
-    xp1[i] = xp1[i - 1] * x % p1;
-    xp2[i] = xp2[i - 1] * x % p2;
-  }
-}
-
-struct Hash {
-  vector<ull> h;
-
-  Hash() : h(1) {}
-
-  void add(const string& s) {
-    ull res1 = h.back() >> 32;
-    ull res2 = h.back() & mask32;
-    for (char c : s) {
-      res1 = (res1 * x + c) % p1;
-      res2 = (res2 * x + c) % p2;
-      h.push_back((res1 << 32) | res2);
-    }
-  }
-
-  // 0-indexed, [l, r]
-  ull get(int l, int r) {
-    r++;
-    int len = r - l;
-    ull l1 = h[l] >> 32, r1 = h[r] >> 32;
-    ull l2 = h[l] & mask32, r2 = h[r] & mask32;
-    ull res1 = (r1 - l1 * xp1[len] % p1 + p1) % p1;
-    ull res2 = (r2 - l2 * xp2[len] % p2 + p2) % p2;
-    return (res1 << 32) | res2;
-  }
-};
-```
-
-+ 二维哈希
-
-```cpp
-const ll basex = 239, basey = 241, p = 998244353;
-
-ll pwx[N], pwy[N];
+i64 pwx[N], pwy[N];
 
 void init_xp() {
   pwx[0] = pwy[0] = 1;
@@ -97,11 +52,11 @@ void init_xp() {
 }
 
 struct Hash2D {
-  vector<vector<ll> > h;
+  vector<vector<i64>> h;
 
-  Hash2D(const vector<vector<int> >& a, int n, int m) : h(n + 1, vector<ll>(m + 1)) {
+  Hash2D(const vector<vector<int>>& a, int n, int m) : h(n + 1, vector<i64>(m + 1)) {
     for (int i = 0; i < n; i++) {
-      ll s = 0;
+      i64 s = 0;
       for (int j = 0; j < m; j++) {
         s = (s * basey + a[i][j] + 1) % p;
         h[i + 1][j + 1] = (h[i][j + 1] * basex + s) % p;
@@ -109,10 +64,10 @@ struct Hash2D {
     }
   }
 
-  ll get(int x, int y, int xx, int yy) {
+  i64 get(int x, int y, int xx, int yy) {
     ++xx; ++yy;
     int dx = xx - x, dy = yy - y;
-    ll res = h[xx][yy]
+    i64 res = h[xx][yy]
       - h[x][yy] * pwx[dx]
       - h[xx][y] * pwy[dy]
       + h[x][y] * pwx[dx] % p * pwy[dy];
@@ -121,40 +76,70 @@ struct Hash2D {
 };
 ```
 
-+ 动态哈希
++ SplitMix
 
 ```cpp
-const ll MAGIC = 479;
-const ll IMAGIC = 628392490;
-const ll P = 1e9 + 9;
-const int N = 1e5 + 5;
+// tourist
+mt19937_64 rng((unsigned int)chrono::steady_clock::now().time_since_epoch().count());
 
-ll pw[N], inv[N];
+struct hash61 {
+  static const uint64_t md = (1LL << 61) - 1;
+  static uint64_t step;
+  static vector<uint64_t> pw;
 
-void init() {
-  pw[0] = inv[0] = 1;
-  for (int i = 1; i < N; i++) {
-    pw[i] = (pw[i - 1] * MAGIC) % P;
-    inv[i] = (inv[i - 1] * IMAGIC) % P;
-  }
-}
-
-// 1-indexed, [l, r]
-struct fenwick {
-  int n;
-  vector<ll> t;
-  fenwick(int n) : n(n), t(n + 1) {}
-  void add(int p, ll x) {
-    for (; p <= n; p += p & -p) (t[p] += x) %= P;
-  }
-  ll get(int p) {
-    ll a = 0;
-    for (; p > 0; p -= p & -p) (a += t[p]) %= P;
+  uint64_t addmod(uint64_t a, uint64_t b) const {
+    a += b;
+    if (a >= md) a -= md;
     return a;
   }
-  void set(int p, ll x) { add(p, (x - query(p, p) + P) * pw[p] % P); }
-  ll query(int l, int r) { return (get(r) - get(l - 1) + P) * inv[l] % P; }
+
+  uint64_t submod(uint64_t a, uint64_t b) const {
+    a += md - b;
+    if (a >= md) a -= md;
+    return a;
+  }
+
+  uint64_t mulmod(uint64_t a, uint64_t b) const {
+    uint64_t l1 = (uint32_t)a, h1 = a >> 32, l2 = (uint32_t)b, h2 = b >> 32;
+    uint64_t l = l1 * l2, m = l1 * h2 + l2 * h1, h = h1 * h2;
+    uint64_t ret = (l & md) + (l >> 61) + (h << 3) + (m >> 29) + (m << 35 >> 3) + 1;
+    ret = (ret & md) + (ret >> 61);
+    ret = (ret & md) + (ret >> 61);
+    return ret - 1;
+  }
+
+  void ensure_pw(int sz) {
+    int cur = (int)pw.size();
+    if (cur < sz) {
+      pw.resize(sz);
+      for (int i = cur; i < sz; i++) {
+        pw[i] = mulmod(pw[i - 1], step);
+      }
+    }
+  }
+
+  vector<uint64_t> pref;
+  int n;
+
+  template <typename T>
+  hash61(const T& s) {
+    n = (int)s.size();
+    ensure_pw(n + 1);
+    pref.resize(n + 1);
+    pref[0] = 1;
+    for (int i = 0; i < n; i++) {
+      pref[i + 1] = addmod(mulmod(pref[i], step), s[i]);
+    }
+  }
+
+  inline uint64_t operator()(const int from, const int to) const {
+    assert(0 <= from && from <= to && to <= n - 1);
+    return submod(pref[to + 1], mulmod(pref[from], pw[to - from + 1]));
+  }
 };
+
+uint64_t hash61::step = (md >> 2) + rng() % (md >> 1);
+vector<uint64_t> hash61::pw = vector<uint64_t>(1, 1);
 ```
 
 ### Manacher
@@ -191,33 +176,43 @@ struct Manacher {
 ### KMP
 
 ```cpp
-// 前缀函数（每一个前缀的最长公共前后缀）
-void get_pi(const string& s, vector<int>& a) {
-  int n = s.size(), j = 0;
-  a.resize(n);
-  for (int i = 1; i < n; i++) {
+// prefix function (the longest common prefix and suffix for each prefix)
+// the smallest period of [0...i] is i + 1 - a[i]
+vector<int> get_pi(const string& s) {
+  int n = s.size();
+  vector<int> a(n);
+  for (int i = 1, j = 0; i < n; i++) {
     while (j && s[j] != s[i]) j = a[j - 1];
     if (s[j] == s[i]) j++;
     a[i] = j;
   }
+  return a;
 }
 
-void kmp(const string& s, vector<int>& a, const string& t) {
-  int j = 0;
-  for (int i = 0; i < t.size(); i++) {
-    while (j && s[j] != t[i]) j = a[j - 1];
-    if (s[j] == t[i]) j++;
-    if (j == s.size()) {
-      // ...
-      j = a[j - 1]; // 允许重叠匹配 j = 0 不允许
+struct KMP {
+  string s;
+  vector<int> a;
+
+  KMP(const string& s) : s(s), a(get_pi(s)) {}
+
+  vector<int> find_in(const string& t) {
+    vector<int> res;
+    for (int i = 0, j = 0; i < t.size(); i++) {
+      while (j && s[j] != t[i]) j = a[j - 1];
+      if (s[j] == t[i]) j++;
+      if (j == s.size()) {
+        res.push_back(i - j + 1);
+        j = a[j - 1]; // Allowing overlapping matches j = 0 not allowed
+      }
     }
+    return res;
   }
-}
+};
 
-// Z函数（每一个后缀和该字符串的最长公共前缀）
-void get_z(const string& s, vector<int>& z) {
+// Z function, z[i] = LCP(s, s[i:])
+vector<int> get_z(const string& s) {
   int n = s.size(), l = 0, r = 0;
-  z.resize(n);
+  vector<int> z(n);
   for (int i = 1; i < n; i++) {
     if (i <= r) z[i] = min(r - i + 1, z[i - l]);
     while (i + z[i] < n && s[z[i]] == s[i + z[i]]) z[i]++;
@@ -226,10 +221,11 @@ void get_z(const string& s, vector<int>& z) {
       r = i + z[i] - 1;
     }
   }
+  return z;
 }
 ```
 
-### Lyndon 分解
+### Lyndon Decomposition
 
 ```cpp
 vector<string> duval(const string& s) {
@@ -251,7 +247,7 @@ vector<string> duval(const string& s) {
 }
 ```
 
-### 最小表示法
+### Lexicographically Minimal String Rotation
 
 ```cpp
 int get(const string& s) {
@@ -291,7 +287,7 @@ struct Trie {
   }
 };
 
-// 正常Trie
+// Normal Trie
 struct Trie {
   int t[N][26], sz, cnt[N];
 
@@ -313,7 +309,7 @@ struct Trie {
 };
 ```
 
-### AC 自动机
+### Aho-Corasick Automaton
 
 ```cpp
 struct ACA {
@@ -360,25 +356,25 @@ struct ACA {
 };
 ```
 
-### 回文自动机
+### Palindromic Tree
 
 ```cpp
 // WindJ0Y
 struct Palindromic_Tree {
   static constexpr int N = 300005;
 
-  int next[N][26]; // next指针，next指针和字典树类似，指向的串为当前串两端加上同一个字符构成
-  int fail[N]; // fail指针，失配后跳转到fail指针指向的节点
-  int cnt[N]; // 表示节点i表示的本质不同的串的个数 after count()
-  int num[N]; // 表示以节点i表示的最长回文串的最右端点为回文串结尾的回文串个数。
-  int len[N]; // len[i]表示节点i表示的回文串的长度
+  int next[N][26]; // next pointer, similar to trie, points to the string formed by adding the same character at the beginning and end of the current string
+  int fail[N]; // fail pointer, jumps to the node pointed to by fail pointer after mismatch
+  int cnt[N]; // represents the number of different essential strings represented by node i after count()
+  int num[N]; // represents the number of palindrome strings with the last character of the palindrome string represented by node i as the end of the palindrome string.
+  int len[N]; // len[i] represents the length of the palindrome string represented by node i
   int lcnt[N];
-  int S[N]; // 存放添加的字符
-  int last; // 指向上一个字符所在的节点，方便下一次add
-  int n; // 字符数组指针
-  int p; // 节点指针
+  int S[N]; // Store the added characters
+  int last; // Points to the node where the last character is located for easy addition next time
+  int n; // Character array pointer
+  int p; // Node pointer
 
-  int newnode(int l, int vc) { // 新建节点
+  int newnode(int l, int vc) { // Create a new node
     for (int i = 0; i < 26; ++i) next[p][i] = 0;
     cnt[p] = 0;
     num[p] = 0;
@@ -387,27 +383,27 @@ struct Palindromic_Tree {
     return p++;
   }
 
-  void init() { // 初始化
+  void init() { // Initialize
     p = 0;
     newnode(0, 0);
     newnode(-1, 0);
     last = 0;
     n = 0;
-    S[n] = -1; // 开头放一个字符集中没有的字符，减少特判
+    S[n] = -1; // Put a character not in the character set at the beginning to reduce special cases
     fail[0] = 1;
   }
 
-  int get_fail(int x) { // 和KMP一样，失配后找一个尽量最长的
+  int get_fail(int x) { // Similar to KMP, find the longest one after mismatch
     while (S[n - len[x] - 1] != S[n]) x = fail[x];
     return x;
   }
 
   void add(int c) {
     S[++n] = c;
-    int cur = get_fail(last); // 通过上一个回文串找这个回文串的匹配位置
-    if (!next[cur][c]) { // 如果这个回文串没有出现过，说明出现了一个新的本质不同的回文串
-      int now = newnode(len[cur] + 2, lcnt[cur] | (1 << c)); // 新建节点
-      fail[now] = next[get_fail(fail[cur])][c]; // 和AC自动机一样建立fail指针，以便失配后跳转
+    int cur = get_fail(last); // Find the matching position of this palindrome string through the last palindrome string
+    if (!next[cur][c]) { // If this palindrome string has not appeared, it means a new essential different palindrome string has appeared
+      int now = newnode(len[cur] + 2, lcnt[cur] | (1 << c)); // Create a new node
+      fail[now] = next[get_fail(fail[cur])][c]; // Establish a fail pointer as in AC automation, so as to jump after mismatch
       next[cur][c] = now;
       num[now] = num[fail[now]] + 1;
     }
@@ -417,16 +413,16 @@ struct Palindromic_Tree {
 
   void count() {
     for (int i = p - 1; i >= 0; --i) cnt[fail[i]] += cnt[i];
-    // 父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串
+    // Parent node accumulates child node's cnt, because if fail[v]=u, then u must be v's child palindrome string
   }
 } pt;
 ```
 
-### 后缀自动机
+### Suffix Automaton
 
 ```cpp
-// 下标从 1 开始
-// rsort 中的数组 a 是拓扑序 [1, sz)
+// 1-indexed
+// the array a in rsort is the topological order [1, sz)
 struct SAM {
   static constexpr int M = N << 1;
   int t[M][26], len[M], fa[M], sz = 2, last = 1;
@@ -466,10 +462,10 @@ struct SAM {
 };
 ```
 
-+ 广义后缀自动机（在线版）
++ Multiple Strings, Online Construction
 
 ```cpp
-// 插入新串前 置 last 为 1
+// set last to 1 before inserting a new string
 struct SAM {
   static constexpr int M = N << 1;
   int t[M][26], len[M], fa[M], sz = 2, last = 1;
@@ -505,38 +501,50 @@ struct SAM {
 };
 ```
 
-### 后缀数组
+### Suffix Array
 
 ```cpp
-// 下标从1开始
-// sa[i]: 排名为i的后缀位置
-// rk[i]: 第i个后缀的排名
-// ht[i]: LCP(sa[i], sa[i - 1])
-struct SA {
-  int n, m;
-  vector<int> a, d, sa, rk, ht;
-
-  void rsort() {
-    vector<int> c(m + 1);
-    for (int i = 1; i <= n; i++) c[rk[d[i]]]++;
-    for (int i = 1; i <= m; i++) c[i] += c[i - 1];
-    for (int i = n; i; i--) sa[c[rk[d[i]]]--] = d[i];
-  }
-
-  SA(const string& s) : n(s.size()), m(128), a(n + 1), d(n + 1), sa(n + 1), rk(n + 1), ht(n + 1) {
-    for (int i = 1; i <= n; i++) { rk[i] = a[i] = s[i - 1]; d[i] = i; }
-    rsort();
-    for (int j = 1, i, k; k < n; m = k, j <<= 1) {
-      for (i = n - j + 1, k = 0; i <= n; i++) d[++k] = i;
-      for (i = 1; i <= n; i++) if (sa[i] > j) d[++k] = sa[i] - j;
-      rsort(); swap(rk, d); rk[sa[1]] = k = 1;
-      for (i = 2; i <= n; i++) {
-        rk[sa[i]] = (d[sa[i]] == d[sa[i - 1]] && d[sa[i] + j] == d[sa[i - 1] + j]) ? k : ++k;
-      }
+// 0-indexed
+// sa[i]: position of the suffix with rank i
+// rk[i]: rank of the i-th suffix
+// lc[i]: LCP(sa[i], sa[i + 1])
+struct SuffixArray {
+  int n;
+  vector<int> sa, rk, lc;
+  SuffixArray(const string& s) {
+    n = s.length();
+    sa.resize(n);
+    lc.resize(n - 1);
+    rk.resize(n);
+    iota(sa.begin(), sa.end(), 0);
+    sort(sa.begin(), sa.end(), [&](int a, int b) { return s[a] < s[b]; });
+    rk[sa[0]] = 0;
+    for (int i = 1; i < n; ++i) rk[sa[i]] = rk[sa[i - 1]] + (s[sa[i]] != s[sa[i - 1]]);
+    int k = 1;
+    vector<int> tmp, cnt(n);
+    tmp.reserve(n);
+    while (rk[sa[n - 1]] < n - 1) {
+      tmp.clear();
+      for (int i = 0; i < k; ++i) tmp.push_back(n - k + i);
+      for (auto i : sa)
+        if (i >= k) tmp.push_back(i - k);
+      fill(cnt.begin(), cnt.end(), 0);
+      for (int i = 0; i < n; ++i) ++cnt[rk[i]];
+      for (int i = 1; i < n; ++i) cnt[i] += cnt[i - 1];
+      for (int i = n - 1; i >= 0; --i) sa[--cnt[rk[tmp[i]]]] = tmp[i];
+      swap(rk, tmp);
+      rk[sa[0]] = 0;
+      for (int i = 1; i < n; ++i)
+        rk[sa[i]] = rk[sa[i - 1]] + (tmp[sa[i - 1]] < tmp[sa[i]] || sa[i - 1] + k == n || tmp[sa[i - 1] + k] < tmp[sa[i] + k]);
+      k *= 2;
     }
-    int j, k = 0;
-    for (int i = 1; i <= n; ht[rk[i++]] = k) {
-      for (k ? k-- : k, j = sa[rk[i] - 1]; a[i + k] == a[j + k]; ++k);
+    for (int i = 0, j = 0; i < n; ++i) {
+      if (rk[i] == 0) {
+        j = 0;
+      } else {
+        for (j -= j > 0; i + j < n && sa[rk[i] - 1] + j < n && s[i + j] == s[sa[rk[i] - 1] + j];) ++j;
+        lc[rk[i] - 1] = j;
+      }
     }
   }
 };

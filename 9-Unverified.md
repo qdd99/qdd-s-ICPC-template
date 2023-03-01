@@ -1,13 +1,12 @@
-## 待验证
+## Unverified
 
-**版权归原作者所有 部分代码有风格调整 不保证内容的正确性**
+**Copyright belongs to the original author. Some code has style adjustments. Not guaranteed to be correct.**
 
-### 吉利线段树
+### Segment Tree Beats
 
 ```cpp
 // Nyaan
 struct AngelBeats {
-  using i64 = long long;
   static constexpr i64 INF = numeric_limits<i64>::max() / 2.1;
 
   struct alignas(32) Node {
@@ -200,42 +199,42 @@ struct AngelBeats {
 };
 ```
 
-### 约瑟夫问题
+### Josephus Problem
 
 ```cpp
-// n个人，1至m报数，问最后留下来的人的编号
-// 公式：f(n,m)=(f(n−1,m)+m)%n，f(0,m)=0;
+// n people, count from 1 to m, asking for the number of the last person remaining
+// Formula: f(n,m)=(f(n−1,m)+m)%n, f(0,m)=0;
 // O(n)
-ll calc(int n, ll m) {
-    ll p = 0;
+i64 calc(int n, i64 m) {
+    i64 p = 0;
     for (int i = 2; i <= n; i++) {
         p = (p + m) % i;
     }
     return p + 1;
 }
 
-// n个人，1至m报数，问第k个出局的人的编号
-// 公式：f(n,k)=(f(n−1,k−1)+m−1)%n+1
+// n people, count from 1 to m, asking for the number of the k-th person eliminated
+// Formula: f(n,k)=(f(n−1,k−1)+m−1)%n+1
 // f(n−k+1,1)=m%(n−k+1)
 // if (f==0) f=n−k+1
 // O(k)
-ll cal1(ll n, ll m, ll k) {  // (k == n) equal(calc)
-    ll p = m % (n - k + 1);
+i64 cal1(i64 n, i64 m, i64 k) {  // (k == n) equal(calc)
+    i64 p = m % (n - k + 1);
     if (p == 0) p = n - k + 1;
-    for (ll i = 2; i <= k; i++) {
+    for (i64 i = 2; i <= k; i++) {
         p = (p + m - 1) % (n - k + i) + 1;
     }
     return p;
 }
 
-// n个人，1至m报数，问第k个出局的人的编号
+// n people, count from 1 to m, asking for the number of the k-th person eliminated
 // O(m*log(m))
-ll cal2(ll n, ll m, ll k) {
+i64 cal2(i64 n, i64 m, i64 k) {
     if (m == 1)
         return k;
     else {
-        ll a = n - k + 1, b = 1;
-        ll c = m % a, x = 0;
+        i64 a = n - k + 1, b = 1;
+        i64 c = m % a, x = 0;
         if (c == 0) c = a;
         while (b + x <= k) {
             a += x, b += x, c += m * x;
@@ -250,11 +249,11 @@ ll cal2(ll n, ll m, ll k) {
     }
 }
 
-// n个人，1至m报数，问编号为k的人是第几个出局的
+// n people, count from 1 to m, asking for the number of the person with index k eliminated
 // O(n)
-ll n, k;  //可做n<=4e7,询问个数<=100,下标范围[0,n-1]
-ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第几个死亡
-    ll tmp = 0;
+i64 n, k;  // n <= 4e7, number of queries <= 100, index range [0,n-1]
+i64 dieInXturn(int n, int k, int x) {  // n people, count k, the X-th person dies with index X
+    i64 tmp = 0;
     while (n) {
         x = (x + n) % n;
         if (k > n) x += (k - x - 1 + n - 1) / n * n;
@@ -264,7 +263,7 @@ ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第
         } else {
             if (k > n) {
                 tmp += x / k;
-                ll ttmp = x;
+                i64 ttmp = x;
                 x = x - (x / n + 1) * (x / k) + (x + n) / n * n - k;
                 n -= ttmp / k;
             } else {
@@ -279,64 +278,7 @@ ll dieInXturn(int n, int k, int x) {  // n个人，报数k，下标为X的人第
 }
 ```
 
-### 字典序最小2sat
-
-```cpp
-const int N = 1e5 + 10;
-struct TwoSatBF {  // 暴力求解字典序最小的解
-  int n;
-  vector<int> G[N << 1];
-  bool slt[N << 1];
-  // 偶数点：false 奇数点：true 这样x^1就是反面
-  void init(int _n) {
-    n = _n;
-    for (int i = 0; i < (n << 1); ++i) {
-      G[i].clear();
-      slt[i] = false;
-    }
-  }
-  void addLimit(int x, int y) {
-    // 选了x就要选y，具体看情况使用
-    G[x].push_back(y);
-    G[y ^ 1].push_back(x ^ 1);
-  }
-  stack<int> st;
-  void clearst() {
-    while (st.size()) st.pop();
-  }
-  bool dfs(int u) {
-    if (slt[u ^ 1]) {
-      return false;
-    } else if (slt[u]) {
-      return true;
-    }
-    slt[u] = true;
-    st.push(u);
-    for (auto v : G[u]) {
-      if (!dfs(v)) {
-        return false;
-      }
-    }
-    return true;
-  }
-  bool solve() {
-    for (int u = 0; u < (n << 1); u += 2) {
-      if (!slt[u] && !slt[u ^ 1]) {
-        clearst();
-        if (!dfs(u)) {
-          clearst();
-          if (!dfs(u ^ 1)) {
-            return fales;
-          }
-        }
-      }
-    }
-    return true;
-  }
-};
-```
-
-### 二分图最大权匹配KM
+### Weighted Bipartite Matching (KM Algorithm)
 
 ```cpp
 // ECNU
@@ -344,7 +286,7 @@ namespace R {
     int n;
     int w[N][N], kx[N], ky[N], py[N], vy[N], slk[N], pre[N];
 
-    ll go() {
+    i64 go() {
         for (int i = 1; i <= n; i++)
             for (int j = 1; j <= n; j++)
                 kx[i] = max(kx[i], w[i][j]);
@@ -371,96 +313,393 @@ namespace R {
             }
             for (; k; k = pre[k]) py[k] = py[pre[k]];
         }
-        ll ans = 0;
+        i64 ans = 0;
         for (int i = 1; i <= n; i++) ans += kx[i] + ky[i];
         return ans;
     }
 }
 ```
 
-### HLPP
+### Flow
 
 ```cpp
-struct HLPP {
-    struct Edge {
-        int v, rev;
-        ll cap;
-    };
-    int n, sp, tp, lim, ht, lcnt;
-    ll exf[N];
-    vector<Edge> G[N];
-    vector<int> hq[N], gap[N], h, sum;
-    void init(int nn, int s, int t) {
-        sp = s, tp = t, n = nn, lim = n + 1, ht = lcnt = 0;
-        for (int i = 1; i <= n; ++i) G[i].clear(), exf[i] = 0;
+namespace atcoder {
+namespace internal {
+
+template <class E>
+struct csr {
+  std::vector<int> start;
+  std::vector<E> elist;
+  explicit csr(int n, const std::vector<std::pair<int, E>>& edges) : start(n + 1), elist(edges.size()) {
+    for (auto e : edges) {
+      start[e.first + 1]++;
     }
-    void add_edge(int u, int v, ll cap) {
-        G[u].push_back({v, int(G[v].size()), cap});
-        G[v].push_back({u, int(G[u].size()) - 1, 0});
+    for (int i = 1; i <= n; i++) {
+      start[i] += start[i - 1];
     }
-    void update(int u, int nh) {
-        ++lcnt;
-        if (h[u] != lim) --sum[h[u]];
-        h[u] = nh;
-        if (nh == lim) return;
-        ++sum[ht = nh];
-        gap[nh].push_back(u);
-        if (exf[u] > 0) hq[nh].push_back(u);
+    auto counter = start;
+    for (auto e : edges) {
+      elist[counter[e.first]++] = e.second;
     }
-    void relabel() {
-        queue<int> q;
-        for (int i = 0; i <= lim; ++i) hq[i].clear(), gap[i].clear();
-        h.assign(lim, lim), sum.assign(lim, 0), q.push(tp);
-        lcnt = ht = h[tp] = 0;
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-            for (Edge& e : G[u])
-                if (h[e.v] == lim && G[e.v][e.rev].cap) update(e.v, h[u] + 1), q.push(e.v);
-            ht = h[u];
-        }
-    }
-    void push(int u, Edge& e) {
-        if (!exf[e.v]) hq[h[e.v]].push_back(e.v);
-        ll df = min(exf[u], e.cap);
-        e.cap -= df, G[e.v][e.rev].cap += df;
-        exf[u] -= df, exf[e.v] += df;
-    }
-    void discharge(int u) {
-        int nh = lim;
-        if (h[u] == lim) return;
-        for (Edge& e : G[u]) {
-            if (!e.cap) continue;
-            if (h[u] == h[e.v] + 1) {
-                push(u, e);
-                if (exf[u] <= 0) return;
-            } else if (nh > h[e.v] + 1)
-                nh = h[e.v] + 1;
-        }
-        if (sum[h[u]] > 1)
-            update(u, nh);
-        else {
-            for (; ht >= h[u]; gap[ht--].clear())
-                for (int& i : gap[ht]) update(i, lim);
-        }
-    }
-    ll hlpp() {
-        exf[sp] = INF, exf[tp] = -INF, relabel();
-        for (Edge& e : G[sp]) push(sp, e);
-        for (; ~ht; --ht) {
-            while (!hq[ht].empty()) {
-                int u = hq[ht].back();
-                hq[ht].pop_back();
-                discharge(u);
-                if (lcnt > (n << 2)) relabel();
-            }
-        }
-        return exf[tp] + INF;
-    }
+  }
 };
+
+template <class T>
+struct simple_queue {
+  std::vector<T> payload;
+  int pos = 0;
+  void reserve(int n) { payload.reserve(n); }
+  int size() const { return int(payload.size()) - pos; }
+  bool empty() const { return pos == int(payload.size()); }
+  void push(const T& t) { payload.push_back(t); }
+  T& front() { return payload[pos]; }
+  void clear() {
+    payload.clear();
+    pos = 0;
+  }
+  void pop() { pos++; }
+};
+
+}  // namespace internal
+}  // namespace atcoder
+
+namespace atcoder {
+
+template <class Cap>
+struct mf_graph {
+public:
+  mf_graph() : _n(0) {}
+  explicit mf_graph(int n) : _n(n), g(n) {}
+
+  int add_edge(int from, int to, Cap cap) {
+    assert(0 <= from && from < _n);
+    assert(0 <= to && to < _n);
+    assert(0 <= cap);
+    int m = int(pos.size());
+    pos.push_back({from, int(g[from].size())});
+    int from_id = int(g[from].size());
+    int to_id = int(g[to].size());
+    if (from == to) to_id++;
+    g[from].push_back(_edge{to, to_id, cap});
+    g[to].push_back(_edge{from, from_id, 0});
+    return m;
+  }
+
+  struct edge {
+    int from, to;
+    Cap cap, flow;
+  };
+
+  edge get_edge(int i) {
+    int m = int(pos.size());
+    assert(0 <= i && i < m);
+    auto _e = g[pos[i].first][pos[i].second];
+    auto _re = g[_e.to][_e.rev];
+    return edge{pos[i].first, _e.to, _e.cap + _re.cap, _re.cap};
+  }
+  std::vector<edge> edges() {
+    int m = int(pos.size());
+    std::vector<edge> result;
+    for (int i = 0; i < m; i++) {
+      result.push_back(get_edge(i));
+    }
+    return result;
+  }
+  void change_edge(int i, Cap new_cap, Cap new_flow) {
+    int m = int(pos.size());
+    assert(0 <= i && i < m);
+    assert(0 <= new_flow && new_flow <= new_cap);
+    auto& _e = g[pos[i].first][pos[i].second];
+    auto& _re = g[_e.to][_e.rev];
+    _e.cap = new_cap - new_flow;
+    _re.cap = new_flow;
+  }
+
+  Cap flow(int s, int t) { return flow(s, t, std::numeric_limits<Cap>::max()); }
+  Cap flow(int s, int t, Cap flow_limit) {
+    assert(0 <= s && s < _n);
+    assert(0 <= t && t < _n);
+    assert(s != t);
+
+    std::vector<int> level(_n), iter(_n);
+    internal::simple_queue<int> que;
+
+    auto bfs = [&]() {
+      std::fill(level.begin(), level.end(), -1);
+      level[s] = 0;
+      que.clear();
+      que.push(s);
+      while (!que.empty()) {
+        int v = que.front();
+        que.pop();
+        for (auto e : g[v]) {
+          if (e.cap == 0 || level[e.to] >= 0) continue;
+          level[e.to] = level[v] + 1;
+          if (e.to == t) return;
+          que.push(e.to);
+        }
+      }
+    };
+    auto dfs = [&](auto self, int v, Cap up) {
+      if (v == s) return up;
+      Cap res = 0;
+      int level_v = level[v];
+      for (int& i = iter[v]; i < int(g[v].size()); i++) {
+        _edge& e = g[v][i];
+        if (level_v <= level[e.to] || g[e.to][e.rev].cap == 0) continue;
+        Cap d = self(self, e.to, std::min(up - res, g[e.to][e.rev].cap));
+        if (d <= 0) continue;
+        g[v][i].cap += d;
+        g[e.to][e.rev].cap -= d;
+        res += d;
+        if (res == up) return res;
+      }
+      level[v] = _n;
+      return res;
+    };
+
+    Cap flow = 0;
+    while (flow < flow_limit) {
+      bfs();
+      if (level[t] == -1) break;
+      std::fill(iter.begin(), iter.end(), 0);
+      Cap f = dfs(dfs, t, flow_limit - flow);
+      if (!f) break;
+      flow += f;
+    }
+    return flow;
+  }
+
+  std::vector<bool> min_cut(int s) {
+    std::vector<bool> visited(_n);
+    internal::simple_queue<int> que;
+    que.push(s);
+    while (!que.empty()) {
+      int p = que.front();
+      que.pop();
+      visited[p] = true;
+      for (auto e : g[p]) {
+        if (e.cap && !visited[e.to]) {
+          visited[e.to] = true;
+          que.push(e.to);
+        }
+      }
+    }
+    return visited;
+  }
+
+private:
+  int _n;
+  struct _edge {
+    int to, rev;
+    Cap cap;
+  };
+  std::vector<std::pair<int, int>> pos;
+  std::vector<std::vector<_edge>> g;
+};
+
+}  // namespace atcoder
+
+namespace atcoder {
+
+template <class Cap, class Cost>
+struct mcf_graph {
+public:
+  mcf_graph() {}
+  explicit mcf_graph(int n) : _n(n) {}
+
+  int add_edge(int from, int to, Cap cap, Cost cost) {
+    assert(0 <= from && from < _n);
+    assert(0 <= to && to < _n);
+    assert(0 <= cap);
+    assert(0 <= cost);
+    int m = int(_edges.size());
+    _edges.push_back({from, to, cap, 0, cost});
+    return m;
+  }
+
+  struct edge {
+    int from, to;
+    Cap cap, flow;
+    Cost cost;
+  };
+
+  edge get_edge(int i) {
+    int m = int(_edges.size());
+    assert(0 <= i && i < m);
+    return _edges[i];
+  }
+  std::vector<edge> edges() { return _edges; }
+
+  std::pair<Cap, Cost> flow(int s, int t) { return flow(s, t, std::numeric_limits<Cap>::max()); }
+  std::pair<Cap, Cost> flow(int s, int t, Cap flow_limit) { return slope(s, t, flow_limit).back(); }
+  std::vector<std::pair<Cap, Cost>> slope(int s, int t) { return slope(s, t, std::numeric_limits<Cap>::max()); }
+  std::vector<std::pair<Cap, Cost>> slope(int s, int t, Cap flow_limit) {
+    assert(0 <= s && s < _n);
+    assert(0 <= t && t < _n);
+    assert(s != t);
+
+    int m = int(_edges.size());
+    std::vector<int> edge_idx(m);
+
+    auto g = [&]() {
+      std::vector<int> degree(_n), redge_idx(m);
+      std::vector<std::pair<int, _edge>> elist;
+      elist.reserve(2 * m);
+      for (int i = 0; i < m; i++) {
+        auto e = _edges[i];
+        edge_idx[i] = degree[e.from]++;
+        redge_idx[i] = degree[e.to]++;
+        elist.push_back({e.from, {e.to, -1, e.cap - e.flow, e.cost}});
+        elist.push_back({e.to, {e.from, -1, e.flow, -e.cost}});
+      }
+      auto _g = internal::csr<_edge>(_n, elist);
+      for (int i = 0; i < m; i++) {
+        auto e = _edges[i];
+        edge_idx[i] += _g.start[e.from];
+        redge_idx[i] += _g.start[e.to];
+        _g.elist[edge_idx[i]].rev = redge_idx[i];
+        _g.elist[redge_idx[i]].rev = edge_idx[i];
+      }
+      return _g;
+    }();
+
+    auto result = slope(g, s, t, flow_limit);
+
+    for (int i = 0; i < m; i++) {
+      auto e = g.elist[edge_idx[i]];
+      _edges[i].flow = _edges[i].cap - e.cap;
+    }
+
+    return result;
+  }
+
+private:
+  int _n;
+  std::vector<edge> _edges;
+
+  // inside edge
+  struct _edge {
+    int to, rev;
+    Cap cap;
+    Cost cost;
+  };
+
+  std::vector<std::pair<Cap, Cost>> slope(internal::csr<_edge>& g, int s, int t, Cap flow_limit) {
+    // variants (C = maxcost):
+    // -(n-1)C <= dual[s] <= dual[i] <= dual[t] = 0
+    // reduced cost (= e.cost + dual[e.from] - dual[e.to]) >= 0 for all edge
+
+    // dual_dist[i] = (dual[i], dist[i])
+    std::vector<std::pair<Cost, Cost>> dual_dist(_n);
+    std::vector<int> prev_e(_n);
+    std::vector<bool> vis(_n);
+    struct Q {
+      Cost key;
+      int to;
+      bool operator<(Q r) const { return key > r.key; }
+    };
+    std::vector<int> que_min;
+    std::vector<Q> que;
+    auto dual_ref = [&]() {
+      for (int i = 0; i < _n; i++) {
+        dual_dist[i].second = std::numeric_limits<Cost>::max();
+      }
+      std::fill(vis.begin(), vis.end(), false);
+      que_min.clear();
+      que.clear();
+
+      // que[0..heap_r) was heapified
+      size_t heap_r = 0;
+
+      dual_dist[s].second = 0;
+      que_min.push_back(s);
+      while (!que_min.empty() || !que.empty()) {
+        int v;
+        if (!que_min.empty()) {
+          v = que_min.back();
+          que_min.pop_back();
+        } else {
+          while (heap_r < que.size()) {
+            heap_r++;
+            std::push_heap(que.begin(), que.begin() + heap_r);
+          }
+          v = que.front().to;
+          std::pop_heap(que.begin(), que.end());
+          que.pop_back();
+          heap_r--;
+        }
+        if (vis[v]) continue;
+        vis[v] = true;
+        if (v == t) break;
+        // dist[v] = shortest(s, v) + dual[s] - dual[v]
+        // dist[v] >= 0 (all reduced cost are positive)
+        // dist[v] <= (n-1)C
+        Cost dual_v = dual_dist[v].first, dist_v = dual_dist[v].second;
+        for (int i = g.start[v]; i < g.start[v + 1]; i++) {
+          auto e = g.elist[i];
+          if (!e.cap) continue;
+          // |-dual[e.to] + dual[v]| <= (n-1)C
+          // cost <= C - -(n-1)C + 0 = nC
+          Cost cost = e.cost - dual_dist[e.to].first + dual_v;
+          if (dual_dist[e.to].second - dist_v > cost) {
+            Cost dist_to = dist_v + cost;
+            dual_dist[e.to].second = dist_to;
+            prev_e[e.to] = e.rev;
+            if (dist_to == dist_v) {
+              que_min.push_back(e.to);
+            } else {
+              que.push_back(Q{dist_to, e.to});
+            }
+          }
+        }
+      }
+      if (!vis[t]) {
+        return false;
+      }
+
+      for (int v = 0; v < _n; v++) {
+        if (!vis[v]) continue;
+        // dual[v] = dual[v] - dist[t] + dist[v]
+        //         = dual[v] - (shortest(s, t) + dual[s] - dual[t]) +
+        //         (shortest(s, v) + dual[s] - dual[v]) = - shortest(s,
+        //         t) + dual[t] + shortest(s, v) = shortest(s, v) -
+        //         shortest(s, t) >= 0 - (n-1)C
+        dual_dist[v].first -= dual_dist[t].second - dual_dist[v].second;
+      }
+      return true;
+    };
+    Cap flow = 0;
+    Cost cost = 0, prev_cost_per_flow = -1;
+    std::vector<std::pair<Cap, Cost>> result = {{Cap(0), Cost(0)}};
+    while (flow < flow_limit) {
+      if (!dual_ref()) break;
+      Cap c = flow_limit - flow;
+      for (int v = t; v != s; v = g.elist[prev_e[v]].to) {
+        c = std::min(c, g.elist[g.elist[prev_e[v]].rev].cap);
+      }
+      for (int v = t; v != s; v = g.elist[prev_e[v]].to) {
+        auto& e = g.elist[prev_e[v]];
+        e.cap += c;
+        g.elist[e.rev].cap -= c;
+      }
+      Cost d = -dual_dist[s].first;
+      flow += c;
+      cost += c * d;
+      if (prev_cost_per_flow == d) {
+        result.pop_back();
+      }
+      result.push_back({flow, cost});
+      prev_cost_per_flow = d;
+    }
+    return result;
+  }
+};
+
+}  // namespace atcoder
 ```
 
-### 上下界网络流
+### Flow with Lower Bounds
 
 ```cpp
 const int INF = 0x3f3f3f3f;
@@ -545,13 +784,13 @@ struct graph {
         return 0;
     }
 
-    ll dinic(int s, int t) {
-        ll ans = 0;
+    i64 dinic(int s, int t) {
+        i64 ans = 0;
         this->t = t;
         while (bfs(s)) {
             int flow;
             for (int i = 1; i <= n; i++) cur[i] = first[i];
-            while (flow = dfs(s, INF)) ans += (ll)flow;
+            while (flow = dfs(s, INF)) ans += (i64)flow;
         }
         return ans;
     }
@@ -628,6 +867,124 @@ void solve() {
         g.add_edge(u, v, low, up);
     }
 }
+```
+
+### Matching on General Graph
+
+```cpp
+// jiangly
+struct Blossom {
+  int n;
+  vector<vector<int>> g;
+
+  Blossom(int n) : n(n), g(n) {}
+
+  void add_edge(int u, int v) {
+    g[u].push_back(v);
+    g[v].push_back(u);
+  }
+
+  vector<int> solve() {
+    vector<int> match(n, -1), vis(n), link(n), f(n), dep(n);
+
+    // disjoint set union
+    auto find = [&](int u) {
+      while (f[u] != u) u = f[u] = f[f[u]];
+      return u;
+    };
+
+    auto lca = [&](int u, int v) {
+      u = find(u);
+      v = find(v);
+      while (u != v) {
+        if (dep[u] < dep[v]) swap(u, v);
+        u = find(link[match[u]]);
+      }
+      return u;
+    };
+
+    queue<int> que;
+    auto blossom = [&](int u, int v, int p) {
+      while (find(u) != p) {
+        link[u] = v;
+        v = match[u];
+        if (vis[v] == 0) {
+          vis[v] = 1;
+          que.push(v);
+        }
+        f[u] = f[v] = p;
+        u = link[v];
+      }
+    };
+
+    // find an augmenting path starting from u and augment (if exist)
+    auto augment = [&](int u) {
+      while (!que.empty()) que.pop();
+
+      iota(f.begin(), f.end(), 0);
+
+      // vis = 0 corresponds to inner vertices, vis = 1 corresponds to outer vertices
+      fill(vis.begin(), vis.end(), -1);
+
+      que.push(u);
+      vis[u] = 1;
+      dep[u] = 0;
+
+      while (!que.empty()) {
+        int u = que.front();
+        que.pop();
+        for (auto v : g[u]) {
+          if (vis[v] == -1) {
+            vis[v] = 0;
+            link[v] = u;
+            dep[v] = dep[u] + 1;
+
+            // found an augmenting path
+            if (match[v] == -1) {
+              for (int x = v, y = u, temp; y != -1; x = temp, y = x == -1 ? -1 : link[x]) {
+                temp = match[y];
+                match[x] = y;
+                match[y] = x;
+              }
+              return;
+            }
+
+            vis[match[v]] = 1;
+            dep[match[v]] = dep[u] + 2;
+            que.push(match[v]);
+
+          } else if (vis[v] == 1 && find(v) != find(u)) {
+            // found a blossom
+            int p = lca(u, v);
+            blossom(u, v, p);
+            blossom(v, u, p);
+          }
+        }
+      }
+    };
+
+    // find a maximal matching greedily (decrease constant)
+    auto greedy = [&]() {
+      for (int u = 0; u < n; ++u) {
+        if (match[u] != -1) continue;
+        for (auto v : g[u]) {
+          if (match[v] == -1) {
+            match[u] = v;
+            match[v] = u;
+            break;
+          }
+        }
+      }
+    };
+
+    greedy();
+
+    for (int u = 0; u < n; ++u)
+      if (match[u] == -1) augment(u);
+
+    return match;
+  }
+};
 ```
 
 ### Link-Cut Tree
@@ -742,7 +1099,7 @@ int main() {
 }
 ```
 
-### 任意模数 NTT
+### NTT for NTT-unfriendly Modulus
 
 ```cpp
 // memset0
@@ -756,8 +1113,8 @@ void ntt(int *a, int g, int p) {
         int wn = qk(g, (p - 1) / (len << 1), p);
         for (int i = 0; i < n; i += (len << 1)) {
             int w = 1;
-            for (int j = 0; j < len; j++, w = (ll)w * wn % p) {
-                int x = a[i + j], y = (ll)w * a[i + j + len] % p;
+            for (int j = 0; j < len; j++, w = (i64)w * wn % p) {
+                int x = a[i + j], y = (i64)w * a[i + j + len] % p;
                 a[i + j] = (x + y) % p, a[i + j + len] = (x - y + p) % p;
             }
         }
@@ -765,9 +1122,9 @@ void ntt(int *a, int g, int p) {
 }
 
 int merge(int a1, int a2, int A2) {
-    ll M1 = (ll)p1 * p2;
-    ll A1 = ((ll)inv(p2, p1) * a1 % p1 * p2 + (ll)inv(p1, p2) * a2 % p2 * p1) % M1;
-    ll K = ((A2 - A1) % M2 + M2) % M2 * inv(M1 % M2, M2) % M2;
+    i64 M1 = (i64)p1 * p2;
+    i64 A1 = ((i64)inv(p2, p1) * a1 % p1 * p2 + (i64)inv(p1, p2) * a2 % p2 * p1) % M1;
+    i64 K = ((A2 - A1) % M2 + M2) % M2 * inv(M1 % M2, M2) % M2;
     int ans = (A1 + M1 % p * K) % p;
     return ans;
 }
@@ -785,18 +1142,18 @@ void go() {
         for (int i = 0; i < n; i++) f[k][i] = a[i] % P[k];
         for (int i = 0; i < n; i++) g[i] = b[i] % P[k];
         ntt(f[k], G, P[k]), ntt(g, G, P[k]);
-        for (int i = 0; i < n; i++) f[k][i] = (ll)f[k][i] * g[i] % P[k];
+        for (int i = 0; i < n; i++) f[k][i] = (i64)f[k][i] * g[i] % P[k];
         ntt(f[k], inv(G, P[k]), P[k]);
-        for (int i = 0; i < n; i++) f[k][i] = (ll)f[k][i] * inv(n, P[k]) % P[k];
+        for (int i = 0; i < n; i++) f[k][i] = (i64)f[k][i] * inv(n, P[k]) % P[k];
     }
     for (int i = 0; i <= n1 + n2; i++) ans[i] = merge(f[0][i], f[1][i], f[2][i]);
 }
 ```
 
-### 计算几何
+### Geometry
 
 ```cpp
-// 经纬度球面最短距离
+// Great-circle distance on the sphere
 // Voleking
 ld Dist(ld la1, ld lo1, ld la2, ld lo2, ld R) {
     la1 *= PI / 180, lo1 *= PI / 180, la2 *= PI / 180, lo2 *= PI / 180;
@@ -809,24 +1166,24 @@ ld Dist(ld la1, ld lo1, ld la2, ld lo2, ld R) {
 int cmp(ld k1, ld k2) {
     return sgn(k1 - k2);
 }
-V proj(V k1, V k2, V q) { // q 到直线 k1,k2 的投影 
+V proj(V k1, V k2, V q) { // Projection of point q onto line k1,k2
     V k = k2 - k1;
     return k1 + k * (dot(q - k1, k) / k.abs2());
 }
 V reflect(V k1, V k2, V q) {
     return proj(k1, k2, q) * 2 - q;
 }
-int clockwise(V k1, V k2, V k3) { // k1 k2 k3 逆时针 1 顺时针 -1 否则 0  
+int clockwise(V k1, V k2, V k3) { // k1 k2 k3 counterclockwise 1 clockwise -1 otherwise 0  
     return sgn(det(k2 - k1, k3 - k1));
 }
-int checkLL(V k1, V k2, V k3, V k4) { // 求直线 (L) 线段 (S) k1,k2 和 k3,k4 的交点 
+int checkLL(V k1, V k2, V k3, V k4) { // Check the intersection point of line (L) and segment (S) k1,k2 and k3,k4
     return cmp(det(k3 - k1, k4 - k1), det(k3 - k2, k4 - k2)) != 0;
 }
 V getLL(V k1, V k2, V k3, V k4) {
     ld w1 = det(k1 - k3, k4 - k3), w2 = det(k4 - k3, k2 - k3);
     return (k1 * w2 + k2 * w1) / (w1 + w2);
 }
-vector<line> getHL(vector<line>& L) { // 求半平面交, 半平面是逆时针方向, 输出按照逆时针
+vector<line> getHL(vector<line>& L) { // Get the half-plane intersection, the half-plane is counterclockwise, and the output is counterclockwise
     sort(L.begin(), L.end());
     deque<line> q;
     for (int i = 0; i < (int) L.size(); i++) {
@@ -841,7 +1198,7 @@ vector<line> getHL(vector<line>& L) { // 求半平面交, 半平面是逆时针�
     for (int i = 0; i < q.size(); i++) ans.push_back(q[i]);
     return ans;
 }
-int checkposCC(circle k1, circle k2) { // 返回两个圆的公切线数量
+int checkposCC(circle k1, circle k2) { // Return the number of common tangent lines of two circles
     if (cmp(k1.r, k2.r) == -1) swap(k1, k2);
     ld dis = k1.o.dis(k2.o);
     int w1 = cmp(dis, k1.r + k2.r), w2 = cmp(dis, k1.r - k2.r);
@@ -851,7 +1208,7 @@ int checkposCC(circle k1, circle k2) { // 返回两个圆的公切线数量
     else if (w2 == 0) return 1;
     else return 0;
 }
-vector<V> getCL(circle k1, V k2, V k3) { // 沿着 k2->k3 方向给出, 相切给出两个 
+vector<V> getCL(circle k1, V k2, V k3) { // Given k2->k3 direction, give out p, the two tangent points
     V k = proj(k2, k3, k1.o);
     ld d = k1.r * k1.r - (k - k1.o).abs2();
     if (sgn(d) == -1) return {};
@@ -914,7 +1271,7 @@ ld convexDiameter(vector<V> A) {
     }
     return ans;
 }
-vector<V> convexcut(vector<V> A, V k1, V k2) { // 保留 k1,k2,p 逆时针的所有点
+vector<V> convexcut(vector<V> A, V k1, V k2) { // Keep points k1,k2,p counterclockwise
     int n = A.size();
     A.push_back(A[0]);
     vector<V> ans;
@@ -927,33 +1284,10 @@ vector<V> convexcut(vector<V> A, V k1, V k2) { // 保留 k1,k2,p 逆时针的所
 }
 ```
 
-### 本模板未涉及的专题
+### References
 
-+ ECNU
-
-**数据结构**
-
-均摊复杂度线段树 K-DTree 树状数组套主席树 左偏树 Treap-序列 可回滚并查集 舞蹈链 笛卡尔树 莫队
-
-**数学**
-
-min_25 杜教筛 伯努利数和等幂求和 单纯形 数论分块
-
-**图论**
-
-zkw费用流 树上点分治 二分图匹配 虚树 欧拉路径 一般图匹配 点双连通分量/广义圆方树
-圆方树 最小树形图 三元环、四元环
-
-**计算几何**
-
-圆与多边形交 圆的离散化、面积并 圆的反演 三维计算几何 旋转 线、面 凸包
-
-+ kuangbin
-
-**数学**
-
-整数拆分 求A^B的约数之和对MOD取模 斐波那契数列取模循环节
-
-**图论**
-
-次小生成树 生成树计数 曼哈顿最小生成树
+[Nyaan's Library](https://nyaannyaan.github.io/library/)
+[F0RE1GNERS](https://github.com/F0RE1GNERS/template)
+[YouKn0wWho](https://github.com/ShahjalalShohag/code-library)
+[OI Wiki](https://oi-wiki.org/)
+[cp-algorithms](https://cp-algorithms.com/)

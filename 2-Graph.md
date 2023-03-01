@@ -1,94 +1,94 @@
-## 图论
+## Graph Theory
 
-### 链式前向星
-
-```cpp
-int ecnt, mp[N];
-
-struct Edge {
-  int to, nxt;
-  Edge(int to = 0, int nxt = 0) : to(to), nxt(nxt) {}
-} es[M];
-
-void mp_init() {
-  memset(mp, -1, (n + 2) * sizeof(int));
-  ecnt = 0;
-}
-
-void mp_link(int u, int v) {
-  es[ecnt] = Edge(v, mp[u]);
-  mp[u] = ecnt++;
-}
-
-for (int i = mp[u]; i != -1; i = es[i].nxt)
-```
-
-### 最短路
+### Shortest Path
 
 + Dijkstra
 
 ```cpp
-struct Edge {
-  int to, val;
-  Edge(int to = 0, int val = 0) : to(to), val(val) {}
-};
+struct Dijkstra {
+  struct Edge {
+    int to, val;
+    Edge(int to = 0, int val = 0) : to(to), val(val) {}
+  };
 
-vector<Edge> g[N];
-ll dis[N];
+  int n;
+  vector<vector<Edge>> g;
 
-void dijkstra(int s) {
-  using pii = pair<ll, int>;
-  memset(dis, 0x3f, sizeof(dis));
-  priority_queue<pii, vector<pii>, greater<pii> > q;
-  dis[s] = 0;
-  q.emplace(0, s);
-  while (!q.empty()) {
-    pii p = q.top();
-    q.pop();
-    int u = p.second;
-    if (dis[u] < p.first) continue;
-    for (Edge& e : g[u]) {
-      int v = e.to;
-      if (umin(dis[v], dis[u] + e.val)) {
-        q.emplace(dis[v], v);
-      }
-    }
-  }
-}
-```
+  Dijkstra(int n) : n(n), g(n) {}
 
-+ SPFA
+  void add_edge(int u, int v, int val) { g[u].emplace_back(v, val); }
 
-```cpp
-void spfa(int s) {
-  queue<int> q;
-  q.push(s);
-  memset(dis, 0x3f, sizeof(dis));
-  memset(in, 0, sizeof(in));
-  in[s] = 1;
-  dis[s] = 0;
-  while (!q.empty()) {
-    int u = q.front();
-    q.pop();
-    for (Edge& e : g[u]) {
-      int v = e.to;
-      if (dis[v] > dis[u] + e.val) {
-        dis[v] = dis[u] + e.val;
-        if (!in[v]) {
-          in[v] = 1;
-          q.push(v);
+  vector<i64> solve(int s) {
+    using pii = pair<i64, int>;
+    vector<i64> dis(n, 1LL << 60);
+    priority_queue<pii, vector<pii>, greater<pii>> q;
+    dis[s] = 0;
+    q.emplace(0, s);
+    while (!q.empty()) {
+      pii p = q.top();
+      q.pop();
+      int u = p.second;
+      if (dis[u] < p.first) continue;
+      for (Edge& e : g[u]) {
+        int v = e.to;
+        if (dis[v] > dis[u] + e.val) {
+          dis[v] = dis[u] + e.val;
+          q.emplace(dis[v], v);
         }
       }
     }
-    in[u] = 0;
+    return dis;
   }
-}
+};
 ```
 
-+ Floyd 最小环
++ Bellman-Ford
 
 ```cpp
-// 注意 INF 不能超过 1/3 LLONG_MAX
+struct SPFA {
+  struct Edge {
+    int to, val;
+    Edge(int to = 0, int val = 0) : to(to), val(val) {}
+  };
+
+  int n;
+  vector<vector<Edge>> g;
+
+  SPFA(int n) : n(n), g(n) {}
+
+  void add_edge(int u, int v, int val) { g[u].emplace_back(v, val); }
+
+  vector<i64> solve(int s) {
+    queue<int> q;
+    vector<i64> dis(n, 1LL << 60);
+    vector<bool> in(n, 0);
+    q.push(s);
+    dis[s] = 0;
+    in[s] = 1;
+    while (!q.empty()) {
+      int u = q.front();
+      q.pop();
+      in[u] = 0;
+      for (Edge& e : g[u]) {
+        int v = e.to;
+        if (dis[v] > dis[u] + e.val) {
+          dis[v] = dis[u] + e.val;
+          if (!in[v]) {
+            in[v] = 1;
+            q.push(v);
+          }
+        }
+      }
+    }
+    return dis;
+  }
+};
+```
+
++ Floyd–Warshall, with Shortest Cycle
+
+```cpp
+// Note: INF should not exceed 1/3 LLONG_MAX
 for (int k = 0; k < n; k++) {
   for (int i = 0; i < k; i++) {
     for (int j = 0; j < i; j++) {
@@ -103,9 +103,10 @@ for (int k = 0; k < n; k++) {
 }
 ```
 
-### 拓扑排序
+### Topological Sorting
 
 ```cpp
+// Use max/min heap for lexicographically largest/smallest
 int n, deg[N], dis[N];
 vector<int> g[N];
 
@@ -131,68 +132,75 @@ bool topo(vector<int>& ans) {
 }
 ```
 
-### 最小生成树
+### Minimum Spanning Tree
 
 ```cpp
-// 前置：并查集
+// Prerequisite: Disjoint Set Union
 struct Edge {
-  int from, to, val;
-  Edge(int from = 0, int to = 0, int val = 0) : from(from), to(to), val(val) {}
+  int u, v, w;
+  Edge(int u = 0, int v = 0, int w = 0) : u(u), v(v), w(w) {}
 };
 
-vector<Edge> es;
-
-ll kruskal() {
-  sort(es.begin(), es.end(), [](Edge& x, Edge& y) { return x.val < y.val; });
-  iota(pa, pa + n + 1, 0);
-  ll ans = 0;
+i64 kruskal(vector<Edge>& es, int n) {
+  sort(es.begin(), es.end(), [](Edge& x, Edge& y) { return x.w < y.w; });
+  dsu d(n + 1);
+  i64 ans = 0;
   for (Edge& e : es) {
-    if (find(e.from) != find(e.to)) {
-      merge(e.from, e.to);
-      ans += e.val;
+    if (d.merge(e.u, e.v)) {
+      ans += e.w;
     }
   }
   return ans;
 }
 ```
 
-### LCA
+### Lowest Common Ancestor
 
 ```cpp
-// dfs(1, 0) or dfs(0, n), don't use dfs(0, -1)
-int dep[N], up[N][22]; // 22 = ((int)log2(N) + 1)
+struct LCA {
+  int n, log;
+  vector<vector<int>> g;
+  vector<int> dep;
+  vector<vector<int>> up;
+  LCA(int n)
+      : n(n), log(__lg(n) + 1), g(n), dep(n), up(n, vector<int>(log, -1)) {}
 
-void dfs(int u, int pa) {
-  dep[u] = dep[pa] + 1;
-  up[u][0] = pa;
-  for (int i = 1; i < 22; i++) {
-    up[u][i] = up[up[u][i - 1]][i - 1];
+  void add_edge(int u, int v) {
+    g[u].push_back(v);
+    g[v].push_back(u);
   }
-  for (int v : g[u]) {
-    if (v != pa) dfs(v, u);
-  }
-}
 
-int lca(int u, int v) {
-  if (dep[u] > dep[v]) swap(u, v);
-  int t = dep[v] - dep[u];
-  for (int i = 0; i < 22; i++) {
-    if ((t >> i) & 1) v = up[v][i];
-  }
-  if (u == v) return u;
-  for (int i = 21; i >= 0; i--) {
-    if (up[u][i] != up[v][i]) {
-      u = up[u][i];
-      v = up[v][i];
+  void dfs(int u, int p) {
+    up[u][0] = p;
+    for (int i = 1; i < log; i++) {
+      up[u][i] = (up[u][i - 1] == -1 ? -1 : up[up[u][i - 1]][i - 1]);
+    }
+    for (int v : g[u]) {
+      if (v == p) continue;
+      dep[v] = dep[u] + 1;
+      dfs(v, u);
     }
   }
-  return up[u][0];
-}
+
+  void build(int root = 0) { dfs(root, -1); }
+
+  int lca(int u, int v) {
+    if (dep[u] < dep[v]) swap(u, v);
+    for (int i = log - 1; i >= 0; i--) {
+      if (dep[u] - (1 << i) >= dep[v]) u = up[u][i];
+    }
+    if (u == v) return u;
+    for (int i = log - 1; i >= 0; i--) {
+      if (up[u][i] != up[v][i]) u = up[u][i], v = up[v][i];
+    }
+    return up[u][0];
+  }
+};
 ```
 
-### 网络流
+### Network Flow
 
-+ 最大流
++ Max Flow
 
 ```cpp
 const int INF = 0x7fffffff;
@@ -208,7 +216,7 @@ struct Dinic {
   vector<vector<int>> g;
   vector<int> dis, cur;
 
-  Dinic(int n, int s, int t) : n(n), s(s), t(t), g(n + 1), dis(n + 1), cur(n + 1) {}
+  Dinic(int n, int s, int t) : n(n), s(s), t(t), g(n), dis(n), cur(n) {}
 
   void add_edge(int u, int v, int cap) {
     g[u].push_back(es.size());
@@ -218,7 +226,7 @@ struct Dinic {
   }
 
   bool bfs() {
-    dis.assign(n + 1, 0);
+    dis.assign(n, 0);
     queue<int> q;
     q.push(s);
     dis[s] = 1;
@@ -238,11 +246,11 @@ struct Dinic {
 
   int dfs(int u, int cap) {
     if (u == t || cap == 0) return cap;
-    int tmp = cap, f;
+    int tmp = cap;
     for (int& i = cur[u]; i < (int)g[u].size(); i++) {
       Edge& e = es[g[u][i]];
       if (dis[e.to] == dis[u] + 1) {
-        f = dfs(e.to, min(cap, e.cap));
+        int f = dfs(e.to, min(cap, e.cap));
         e.cap -= f;
         es[g[u][i] ^ 1].cap += f;
         cap -= f;
@@ -252,10 +260,10 @@ struct Dinic {
     return tmp - cap;
   }
 
-  ll solve() {
-    ll flow = 0;
+  i64 solve() {
+    i64 flow = 0;
     while (bfs()) {
-      cur.assign(n + 1, 0);
+      cur.assign(n, 0);
       flow += dfs(s, INF);
     }
     return flow;
@@ -263,28 +271,28 @@ struct Dinic {
 };
 ```
 
-+ 最小费用流
++ Minimum Cost Flow
 
 ```cpp
-const ll INF = 1e15;
+const i64 INF = 1e15;
 
 struct MCMF {
   struct Edge {
     int from, to;
-    ll cap, cost;
-    Edge(int from, int to, ll cap, ll cost) : from(from), to(to), cap(cap), cost(cost) {}
+    i64 cap, cost;
+    Edge(int from, int to, i64 cap, i64 cost) : from(from), to(to), cap(cap), cost(cost) {}
   };
 
   int n, s, t;
-  ll flow, cost;
+  i64 flow, cost;
   vector<Edge> es;
   vector<vector<int>> g;
-  vector<ll> d, a;  // dis, add, prev
+  vector<i64> d, a;  // dis, add, prev
   vector<int> p, in;
 
-  MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), g(n + 1), p(n + 1), a(n + 1) {}
+  MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), g(n), p(n), a(n) {}
 
-  void add_edge(int u, int v, ll cap, ll cost) {
+  void add_edge(int u, int v, i64 cap, i64 cost) {
     g[u].push_back(es.size());
     es.emplace_back(u, v, cap, cost);
     g[v].push_back(es.size());
@@ -292,8 +300,8 @@ struct MCMF {
   }
 
   bool spfa() {
-    d.assign(n + 1, INF);
-    in.assign(n + 1, 0);
+    d.assign(n, INF);
+    in.assign(n, 0);
     d[s] = 0;
     in[s] = 1;
     a[s] = INF;
@@ -334,7 +342,7 @@ struct MCMF {
 };
 ```
 
-### 无向图最小割
+### Minimum Cut of Undirected Graph
 
 ```cpp
 namespace stoer_wagner {
@@ -394,67 +402,152 @@ namespace stoer_wagner {
 }
 ```
 
-### 树链剖分
+### Heavy-Light Decomposition
 
 ```cpp
-// 点权
-vector<int> g[N];
-int pa[N], sz[N], dep[N], dfn[N], maxc[N], top[N], clk;
+// jiangly
+struct HLD {
+  int n;
+  vector<int> siz, top, dep, parent, in, out, seq;
+  vector<vector<int>> adj;
+  int cur;
 
-void dfs1(int u) {
-  sz[u] = 1;
-  maxc[u] = -1;
-  int maxs = 0;
-  for (int& v : g[u]) {
-    if (v != pa[u]) {
-      pa[v] = u;
+  explicit HLD(int n) : n(n), siz(n), top(n), dep(n), parent(n), in(n), out(n), seq(n), adj(n), cur(0) {}
+
+  void addEdge(int u, int v) {
+    adj[u].push_back(v);
+    adj[v].push_back(u);
+  }
+
+  void work(int root = 0) {
+    top[root] = root;
+    dep[root] = 0;
+    parent[root] = -1;
+    dfs1(root);
+    dfs2(root);
+  }
+
+  void dfs1(int u) {
+    if (parent[u] != -1) {
+      adj[u].erase(find(adj[u].begin(), adj[u].end(), parent[u]));
+    }
+    siz[u] = 1;
+    for (auto& v : adj[u]) {
+      parent[v] = u;
       dep[v] = dep[u] + 1;
       dfs1(v);
-      sz[u] += sz[v];
-      if (umax(maxs, sz[v])) maxc[u] = v;
+      siz[u] += siz[v];
+      if (siz[v] > siz[adj[u][0]]) {
+        swap(v, adj[u][0]);
+      }
     }
   }
-}
 
-void dfs2(int u, int tp) {
-  top[u] = tp;
-  dfn[u] = ++clk;
-  if (maxc[u] != -1) dfs2(maxc[u], tp);
-  for (int& v : g[u]) {
-    if (v != pa[u] && v != maxc[u]) {
-      dfs2(v, v);
+  void dfs2(int u) {
+    in[u] = cur++;
+    seq[in[u]] = u;
+    for (auto v : adj[u]) {
+      top[v] = v == adj[u][0] ? top[u] : v;
+      dfs2(v);
     }
+    out[u] = cur;
   }
-}
 
-void init() {
-  clk = 0;
-  dep[1] = 1;
-  dfs1(1);
-  dfs2(1, 1);
-}
-
-ll go(int u, int v) {
-  int uu = top[u], vv = top[v];
-  ll res = 0;
-  while (uu != vv) {
-    if (dep[uu] < dep[vv]) {
-      swap(u, v);
-      swap(uu, vv);
+  int lca(int u, int v) {
+    while (top[u] != top[v]) {
+      if (dep[top[u]] > dep[top[v]]) {
+        u = parent[top[u]];
+      } else {
+        v = parent[top[v]];
+      }
     }
-    res += segt.query(dfn[uu], dfn[u]);
-    u = pa[uu];
-    uu = top[u];
+    return dep[u] < dep[v] ? u : v;
   }
-  if (dep[u] > dep[v]) swap(u, v);
-  res += segt.query(dfn[u], dfn[v]);
-  return res;
+
+  int dist(int u, int v) { return dep[u] + dep[v] - 2 * dep[lca(u, v)]; }
+
+  int jump(int u, int k) {
+    if (dep[u] < k) {
+      return -1;
+    }
+    int d = dep[u] - k;
+    while (dep[top[u]] > d) {
+      u = parent[top[u]];
+    }
+    return seq[in[u] - dep[u] + d];
+  }
+
+  bool isAncester(int u, int v) { return in[u] <= in[v] && in[v] < out[u]; }
+
+  int rootedParent(int u, int v) {
+    swap(u, v);
+    if (u == v) {
+      return u;
+    }
+    if (!isAncester(u, v)) {
+      return parent[u];
+    }
+    auto it = upper_bound(adj[u].begin(), adj[u].end(), v, [&](int x, int y) { return in[x] < in[y]; }) - 1;
+    return *it;
+  }
+
+  int rootedSize(int u, int v) {
+    if (u == v) {
+      return n;
+    }
+    if (!isAncester(v, u)) {
+      return siz[v];
+    }
+    return n - siz[rootedParent(u, v)];
+  }
+
+  int rootedLca(int a, int b, int c) { return lca(a, b) ^ lca(b, c) ^ lca(c, a); }
+
+  // [u, v] if inclusive is true, otherwise [u, v)
+  vector<pair<int, int>> path(int u, int v, bool inclusive) {
+    assert(isAncester(v, u));
+    vector<pair<int, int>> res;
+    while (top[u] != top[v]) {
+      res.emplace_back(u, top[u]);
+      u = parent[top[u]];
+    }
+    if (inclusive) {
+      res.emplace_back(u, v);
+    } else if (u != v) {
+      res.emplace_back(u, seq[in[v] + 1]);
+    }
+    return res;
+  }
+};
+```
+
+### Tree Hash
+
+```cpp
+const uint64_t mask = chrono::steady_clock::now().time_since_epoch().count();
+
+uint64_t f(uint64_t x) {
+  x ^= mask;
+  x ^= x << 13;
+  x ^= x >> 7;
+  x ^= x << 17;
+  x ^= mask;
+  return x;
+}
+
+uint64_t dfs(int u, int p) {
+  uint64_t h = 1;
+  for (int v : g[u]) {
+    if (v == p) continue;
+    h += f(dfs(v, u));
+  }
+  return h;
 }
 ```
 
 ### Tarjan
 
-+ 割点
++ Cut Points
 
 ```cpp
 int dfn[N], low[N], clk;
@@ -476,7 +569,7 @@ void tarjan(int u, int pa) {
 }
 ```
 
-+ 桥
++ Bridges
 
 ```cpp
 int dfn[N], low[N], clk;
@@ -497,122 +590,155 @@ void tarjan(int u, int pa) {
 }
 ```
 
-+ 强连通分量缩点
++ Strongly Connected Components (SCC)
 
 ```cpp
-int dfn[N], low[N], clk, tot, color[N];
-vector<int> scc[N];
+struct SCC {
+  int n, tot;
+  vector<vector<int>> g;
+  vector<int> color;
 
-void init() { tot = clk = 0; memset(dfn, 0, sizeof dfn); }
+  SCC(int n) : n(n), g(n) {}
 
-void tarjan(int u) {
-  static int st[N], p;
-  static bool in[N];
-  dfn[u] = low[u] = ++clk;
-  st[p++] = u;
-  in[u] = true;
-  for (int v : g[u]) {
-    if (!dfn[v]) {
-      tarjan(v);
-      low[u] = min(low[u], low[v]);
-    } else if (in[v]) {
-      low[u] = min(low[u], dfn[v]);
+  void add_edge(int u, int v) { g[u].push_back(v); }
+
+  void work() {
+    tot = 0;
+    color.assign(n, -1);
+    vector<int> dfn(n), low(n), st;
+    int clk = 0;
+    function<void(int)> dfs = [&](int u) {
+      dfn[u] = low[u] = ++clk;
+      st.push_back(u);
+      for (int v : g[u]) {
+        if (!dfn[v]) {
+          dfs(v);
+          low[u] = min(low[u], low[v]);
+        } else if (color[v] == -1) {
+          low[u] = min(low[u], dfn[v]);
+        }
+      }
+      if (dfn[u] == low[u]) {
+        for (;;) {
+          int x = st.back();
+          st.pop_back();
+          color[x] = tot;
+          if (x == u) break;
+        }
+        tot++;
+      }
+    };
+    for (int i = 0; i < n; i++) {
+      if (!dfn[i]) dfs(i);
+    }
+    for (int& x : color) {
+      x = tot - 1 - x;
     }
   }
-  if (dfn[u] == low[u]) {
-    ++tot;
-    for (;;) {
-      int x = st[--p];
-      in[x] = false;
-      color[x] = tot;
-      scc[tot].push_back(x);
-      if (x == u) break;
+
+  vector<vector<int>> scc() {
+    vector<vector<int>> res(tot);
+    for (int i = 0; i < n; i++) {
+      res[color[i]].push_back(i);
     }
+    return res;
   }
-}
+
+  vector<vector<int>> dag() {
+    vector<vector<int>> res(tot);
+    for (int i = 0; i < n; i++) {
+      for (int j : g[i]) {
+        if (color[i] != color[j]) {
+          res[color[i]].push_back(color[j]);
+        }
+      }
+    }
+    for (auto& v : res) {
+      sort(v.begin(), v.end());
+      v.erase(unique(v.begin(), v.end()), v.end());
+    }
+    return res;
+  }
+};
 ```
 
 + 2-SAT
 
 ```cpp
-// N 开两倍
-void two_sat() {
-  for (int i = 1; i <= n * 2; i++) {
-    if (!dfn[i]) tarjan(i);
+struct two_sat {
+  int n;
+  SCC scc;
+
+  two_sat(int n) : n(n), scc(n * 2) {}
+
+  void add_clause(int u, bool f, int v, bool g) {
+    u = u * 2 + f;
+    v = v * 2 + g;
+    scc.add_edge(u ^ 1, v);
+    scc.add_edge(v ^ 1, u);
   }
-  for (int i = 1; i <= n; i++) {
-    if (color[i] == color[i + n]) {
-      // impossible
+
+  bool solve() {
+    scc.work();
+    for (int i = 0; i < n; i++) {
+      if (scc.color[i * 2] == scc.color[i * 2 + 1]) {
+        return false;
+      }
     }
+    return true;
   }
-  for (int i = 1; i <= n; i++) {
-    if (color[i] < color[i + n]) {
-      // select
+
+  vector<bool> answer() {
+    vector<bool> res(n);
+    for (int i = 0; i < n; i++) {
+      res[i] = scc.color[i * 2 + 1] > scc.color[i * 2];
     }
+    return res;
   }
-}
+};
 ```
 
-### 支配树
-
-+ 有向无环图
+### Eulerian Path
 
 ```cpp
-// rt是g中入度为0的点（可能需要建超级源点）
-int n, deg[N], dep[N], up[N][22];
-vector<int> g[N], rg[N], dt[N];
+struct EulerPath {
+  int n;
+  vector<vector<int>> g;
+  vector<pair<int, int>> es;
 
-bool topo(vector<int>& ans, int rt) {
-  queue<int> q;
-  q.push(rt);
-  while (!q.empty()) {
-    int u = q.front();
-    q.pop();
-    ans.push_back(u);
-    for (int v : g[u]) {
-      deg[v]--;
-      if (deg[v] == 0) q.push(v);
-    }
-  }
-  return ans.size() == n;
-}
+  EulerPath(int n) : n(n), g(n) {}
 
-int lca(int u, int v) {
-  if (dep[u] > dep[v]) swap(u, v);
-  int t = dep[v] - dep[u];
-  for (int i = 0; i < 22; i++) {
-    if ((t >> i) & 1) v = up[v][i];
+  void add_edge(int u, int v, bool directed = false) {
+    g[u].push_back(es.size());
+    if (!directed) g[v].push_back(es.size());
+    es.emplace_back(u, v);
   }
-  if (u == v) return u;
-  for (int i = 21; i >= 0; i--) {
-    if (up[u][i] != up[v][i]) {
-      u = up[u][i];
-      v = up[v][i];
-    }
-  }
-  return up[u][0];
-}
 
-void go(int rt) {
-  vector<int> a;
-  topo(a, rt);
-  dep[rt] = 1;
-  for (int i = 1; i < a.size(); i++) {
-    int u = a[i], pa = -1;
-    for (int v : rg[u]) {
-      pa = (pa == -1) ? v : lca(pa, v);
+  vector<int> solve(int s) {
+    vector<int> path, ptr(n), st;
+    vector<bool> used(es.size());
+    st.push_back(s);
+    while (!st.empty()) {
+      int u = st.back();
+      int& i = ptr[u];
+      while (i < g[u].size() && used[g[u][i]]) i++;
+      if (i == g[u].size()) {
+        path.push_back(u);
+        st.pop_back();
+      } else {
+        int e = g[u][i];
+        used[e] = 1;
+        int v = es[e].first ^ es[e].second ^ u;
+        st.push_back(v);
+      }
     }
-    dt[pa].push_back(u);
-    dep[u] = dep[pa] + 1;
-    up[u][0] = pa;
-    for (int i = 1; i < 22; i++) {
-      up[u][i] = up[up[u][i - 1]][i - 1];
-    }
+    reverse(path.begin(), path.end());
+    return path;
   }
-}
+};
 ```
 
-+ 一般有向图
+### Dominator Tree
 
 ```cpp
 vector<int> g[N], rg[N];
@@ -655,7 +781,7 @@ namespace tl {
     for (int i = clk; i > 1; i--) {
       int x = rdfn[i], mn = clk + 1;
       for (int& u : rg[x]) {
-        if (!dfn[u]) continue; // 可能不能到达所有点
+        if (!dfn[u]) continue; // may not reach all vertices
         fix(u);
         mn = min(mn, dfn[sdom[best[u]]]);
       }

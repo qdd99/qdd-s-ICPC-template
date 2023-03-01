@@ -1,9 +1,24 @@
-## 杂项
+## Miscellaneous
 
-### 二分答案
+### Sliding Window
 
 ```cpp
-// 二分闭区间[l, r]
+// [start, end)
+// [l, r)
+void sliding_window(int start, int end,
+                    function<void(int)> add,
+                    function<void(int)> del,
+                    function<bool()> f,
+                    function<void(int, int)> callback) {
+  for (int l = start, r = start; r != end; callback(l, r))
+    for (add(r++); l != r && f(); del(l++));
+}
+```
+
+### Binary Search
+
+```cpp
+// [l, r]
 template <class T, class F>
 T min_left(T l, T r, F f) {
   while (l < r) {
@@ -23,36 +38,40 @@ T max_right(T l, T r, F f) {
 }
 ```
 
-### 三分
+### Ternary Search
 
 ```cpp
-// 实数范围
-double l, r, mid1, mid2;
-for (int i = 0; i < 75; i++) {
-  mid1 = (l * 5 + r * 4) / 9;
-  mid2 = (l * 4 + r * 5) / 9;
-  if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
-  else l = mid1;
+// for real numbers
+template <class F, class C = less<>>
+double ternary_search(double l, double r, F f, C cmp = C()) {
+  for (int i = 0; i < 75; i++) {
+    double x1 = (l * 5 + r * 4) / 9;
+    double x2 = (l * 4 + r * 5) / 9;
+    cmp(f(x1), f(x2)) ? r = x2 : l = x1;
+  }
+  return l;
 }
 
-// 整数范围
-int l, r, mid1, mid2;
-while (l < r - 2) {
-  mid1 = (l + r) / 2;
-  mid2 = mid1 + 1;
-  if (f(mid1) > f(mid2)) r = mid2; // 单峰函数取'>'号，单谷函数取'<'号
-  else l = mid1;
-}
-int maxval = f(l), ans = l;
-for (int i = l + 1; i <= r; i++) {
-  if (umax(maxval, f(i))) ans = i;
+// for integers
+template <class T, class F, class C = less<>>
+T ternary_search(T l, T r, F f, C cmp = C()) {
+  while (l < r - 2) {
+    T x = l + (r - l) / 2;
+    cmp(f(x), f(x + 1)) ? r = x + 1 : l = x;
+  }
+  auto bestval = f(l);
+  T ans = l;
+  for (T i = l + 1; i <= r; i++) {
+    if (cmp(f(i), bestval)) bestval = f(i), ans = i;
+  }
+  return ans;
 }
 ```
 
-### 日期
+### Date
 
 ```cpp
-// 0 ~ 6 对应 周一 ~ 周日
+// 0 ~ 6 corresponds to Monday ~ Sunday
 int zeller(int y, int m, int d) {
   if (m <= 2) m += 12, y--;
   return (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
@@ -84,14 +103,14 @@ void int_to_date(int jd, int &y, int &m, int &d) {
 }
 ```
 
-### 子集枚举
+### Subset Enumeration
 
 ```cpp
-// 枚举真子集
+// all strict subsets
 for (int t = (x - 1) & x; t; t = (t - 1) & x)
 
-// 枚举大小为 k 的子集
-// 注意 k 不能为 0
+// subsets of size k
+// Note: k cannot be 0
 void subset(int k, int n) {
   int t = (1 << k) - 1;
   while (t < (1 << n)) {
@@ -100,25 +119,29 @@ void subset(int k, int n) {
     t = ((t & ~y) / x >> 1) | y;
   }
 }
+
+// enumerate supersets
+for (int t = (x + 1) | x; t < (1 << n); t = (t + 1) | x)
 ```
 
-### 高维前缀和
+### Sum Over Subsets DP
 
 ```cpp
-// 子集和
+// sum over subsets
 for (int i = 0; i < k; i++)
   for (int s = 0; s < (1 << k); s++)
     if ((s >> i) & 1) dp[s] += dp[s - (1 << i)];
 
-// 超集和
+// sum over supersets
 for (int i = 0; i < k; i++)
   for (int s = 0; s < (1 << k); s++)
     if (!((s >> i) & 1)) dp[s] += dp[s + (1 << i)];
 ```
 
-### 最长不下降子序列
+### Longest Increasing Subsequence
 
 ```cpp
+// dp[i]: the minimum value of the last element of a non-decreasing subsequence with length i+1
 template <class T>
 int lis(const vector<T>& a) {
   vector<T> dp(a.size() + 1, numeric_limits<T>::max());
@@ -129,7 +152,7 @@ int lis(const vector<T>& a) {
   return ans;
 }
 
-// 输出方案
+// output actual solution
 template <class T>
 vector<int> lis(const vector<T>& S) {
   if (S.empty()) return {};
@@ -150,16 +173,16 @@ vector<int> lis(const vector<T>& S) {
 }
 ```
 
-### 分治 dp
+### Divide and Conquer DP
 
 ```cpp
-vector<ll> dp(n), new_dp(n);
+vector<i64> dp(n), new_dp(n);
 
 // compute new_dp[l], ... new_dp[r] (inclusive)
 function<void(int, int, int, int)> compute = [&](int l, int r, int optl, int optr) {
   if (l > r) return;
   int mid = (l + r) >> 1;
-  pair<ll, int> best = {LLONG_MAX, -1};
+  pair<i64, int> best = {LLONG_MAX, -1};
   for (int j = optl; j <= min(mid, optr); j++) {
     best = min(best, {(j ? dp[j - 1] : 0) + C(j, mid), j});
   }
@@ -179,7 +202,7 @@ for (int i = 1; i <= k; i++) {
 // return dp[n - 1];
 ```
 
-### 格雷码
+### Gray Code
 
 ```cpp
 int g(int n) { return n ^ (n >> 1); }
@@ -191,74 +214,45 @@ int rev_g(int g) {
 }
 ```
 
-### 数位 dp
+### Digit DP
 
 ```cpp
-// Kick Start 2022 数位和整除数位积的数的个数
-const int N = 110;
-ll dp[15][N][N], a[15];
-int mod;
+struct DigitDP {
+  int n;
+  vector<int> a, b;
+  vector<i64> dp;
 
-ll dfs(int pos, int sum, int tot, bool limit) {
-  if (sum > mod) return 0;
-  if (pos == -1) return (sum == mod) && (tot == 0);
-  if (!limit && dp[pos][sum][tot] != -1) return dp[pos][sum][tot];
-  ll ret = 0;
-  int ed = limit ? a[pos] : 9;
-  for (int i = 0; i <= ed; i++) {
-    ret += dfs(pos - 1, sum + i, (sum == 0 && i == 0) ? 1 : (tot * i) % mod, limit && i == a[pos]);
+  DigitDP(i64 x, i64 y) {
+    while (x) {
+      a.push_back(x % 10);
+      x /= 10;
+    }
+    while (y) {
+      b.push_back(y % 10);
+      y /= 10;
+    }
+    n = b.size();
+    while (a.size() < n) a.push_back(0);
+    dp.assign(n, -1);
   }
-  if (!limit) dp[pos][sum][tot] = ret;
-  return ret;
-}
 
-ll cal(ll x) {
-  ll sz = 0;
-  while (x) {
-    a[sz++] = x % 10;
-    x /= 10;
+  i64 dfs(int i, bool tight_lo, bool tight_hi, bool zero) {
+    if (i == -1) return 1;
+    if (!tight_lo && !tight_hi && !zero && dp[i] != -1) return dp[i];
+    i64 res = 0;
+    int lo = tight_lo ? a[i] : 0;
+    int hi = tight_hi ? b[i] : 9;
+    for (int d = lo; d <= hi; d++) {
+      res += dfs(i - 1, tight_lo && d == lo, tight_hi && d == hi, zero && d == 0);
+    }
+    return tight_lo || tight_hi || zero ? res : dp[i] = res;
   }
-  ll ans = 0;
-  for (mod = 1; mod < N; mod++) {
-    memset(dp, -1, sizeof(dp));
-    ans += dfs(sz - 1, 0, 1, true);
-  }
-  return ans;
-}
 
-// 小于等于 x 的 base 进制下回文数个数
-ll dp[20][20][20][2], tmp[20], a[20];
-
-ll dfs(ll base, ll pos, ll len, ll s, bool limit) {
-  if (pos == -1) return s;
-  if (!limit && dp[base][pos][len][s] != -1) return dp[base][pos][len][s];
-  ll ret = 0;
-  ll ed = limit ? a[pos] : base - 1;
-  for (int i = 0; i <= ed; i++) {
-    tmp[pos] = i;
-    if (len == pos)
-      ret += dfs(base, pos - 1, len - (i == 0), s, limit && i == a[pos]);
-    else if (s && pos < (len + 1) / 2)
-      ret += dfs(base, pos - 1, len, tmp[len - pos] == i, limit && i == a[pos]);
-    else
-      ret += dfs(base, pos - 1, len, s, limit && i == a[pos]);
-  }
-  if (!limit) dp[base][pos][len][s] = ret;
-  return ret;
-}
-
-ll solve(ll x, ll base) {
-  memset(dp, -1, sizeof(dp));
-  ll sz = 0;
-  while (x) {
-    a[sz++] = x % base;
-    x /= base;
-  }
-  return dfs(base, sz - 1, sz - 1, 1, true);
-}
+  i64 count() { return dfs(n - 1, true, true, true); }
+};
 ```
 
-### 大范围洗牌算法
+### Random Set
 
 ```cpp
 vector<int> randset(int l, int r, int k) {
@@ -276,14 +270,37 @@ vector<int> randset(int l, int r, int k) {
 }
 ```
 
-### 表达式求值
+### Expression Evaluation
 
 ```py
 print(input()) # Python2
 print(eval(input())) # Python3
 ```
 
-### 对拍
+### Regex
+
+```py
+import re
+
+pattern = r'hello'
+text = 'hello world'
+match = re.search(pattern, text) # or re.match(pattern, text)
+if match:
+    print('Match found:', match.group(), match.start(), match.end())
+else:
+    print('No match')
+
+# identifier
+r'^[a-zA-Z_]\w*$'
+
+# email
+r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+# URL
+r'^(https?|ftp)://[^\s/$.?#].[^\s]*$'
+```
+
+### Stress Test
 
 + *unix
 
@@ -291,9 +308,9 @@ print(eval(input())) # Python3
 #!/bin/bash
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-g++ gen.cpp -o gen -O2 -std=c++11
-g++ my.cpp -o my -O2 -std=c++11
-g++ std.cpp -o std -O2 -std=c++11
+g++ gen.cpp -o gen -O2 -std=c++17
+g++ my.cpp -o my -O2 -std=c++17
+g++ std.cpp -o std -O2 -std=c++17
 
 while true
 do
@@ -322,9 +339,9 @@ done
 ```
 @echo off
 
-g++ gen.cpp -o gen.exe -O2 -std=c++11
-g++ my.cpp -o my.exe -O2 -std=c++11
-g++ std.cpp -o std.exe -O2 -std=c++11
+g++ gen.cpp -o gen.exe -O2 -std=c++17
+g++ my.cpp -o my.exe -O2 -std=c++17
+g++ std.cpp -o std.exe -O2 -std=c++17
 
 :loop
     gen.exe > in.txt
@@ -344,7 +361,7 @@ g++ std.cpp -o std.exe -O2 -std=c++11
 goto loop
 ```
 
-### 防爆vector
+### Safe std::vector
 
 ```cpp
 namespace std {
@@ -360,7 +377,7 @@ public:
 #define vector vector_s
 ```
 
-### hash
+### More Hash
 
 ```cpp
 template<class T1, class T2>
@@ -370,8 +387,8 @@ struct pair_hash {
   }
 };
 
-unordered_set<pair<int, int>, pair_hash<int, int> > st;
-unordered_map<pair<int, int>, int, pair_hash<int, int> > mp;
+unordered_set<pair<int, int>, pair_hash<int, int>> st;
+unordered_map<pair<int, int>, int, pair_hash<int, int>> mp;
 
 struct custom_hash {
   static uint64_t splitmix64(uint64_t x) {
@@ -388,17 +405,17 @@ struct custom_hash {
   }
 };
 
-unordered_map<ll, int, custom_hash> safe_map;
+unordered_map<i64, int, custom_hash> safe_map;
 ```
 
-### updmax/min
+### Max/Min with Assignment
 
 ```cpp
 template <class T, class U> bool umax(T& a, U b) { return a < b ? a = b, 1 : 0; }
 template <class T, class U> bool umin(T& a, U b) { return a > b ? a = b, 1 : 0; }
 ```
 
-### split/join
+### Split and Join
 
 ```cpp
 vector<string> split(const string& s, string sep) {
@@ -421,47 +438,29 @@ string join(const vector<T>& v, string sep) {
 }
 ```
 
-### 离散化
-
-```cpp
-// 重复元素id不同
-template<class T>
-vector<int> dc(const vector<T>& a, int start_id) {
-  int n = a.size();
-  vector<pair<T, int> > t(n);
-  for (int i = 0; i < n; i++) {
-    t[i] = make_pair(a[i], i);
-  }
-  sort(t.begin(), t.end());
-  vector<int> id(n);
-  for (int i = 0; i < n; i++) {
-    id[t[i].second] = start_id + i;
-  }
-  return id;
-}
-
-// 重复元素id相同
-template<class T>
-vector<int> unique_dc(const vector<T>& a, int start_id) {
-  int n = a.size();
-  vector<T> t(a);
-  sort(t.begin(), t.end());
-  t.resize(unique(t.begin(), t.end()) - t.begin());
-  vector<int> id(n);
-  for (int i = 0; i < n; i++) {
-    id[i] = start_id + lower_bound(t.begin(), t.end(), a[i]) - t.begin();
-  }
-  return id;
-}
-```
-
-### 合并同类项
+### Coordinate Compressor
 
 ```cpp
 template <class T>
-vector<pair<T, int> > norm(vector<T>& v) {
+struct CoordinateCompressor {
+  vector<T> v;
+  CoordinateCompressor(const vector<T>& a) : v(a) {
+    sort(v.begin(), v.end());
+    v.erase(unique(v.begin(), v.end()), v.end());
+  }
+  int operator()(const T& x) const {
+    return lower_bound(v.begin(), v.end(), x) - v.begin();
+  }
+};
+```
+
+### Merge Same Items
+
+```cpp
+template <class T>
+vector<pair<T, int>> norm(vector<T>& v) {
   // sort(v.begin(), v.end());
-  vector<pair<T, int> > p;
+  vector<pair<T, int>> p;
   for (int i = 0; i < (int)v.size(); i++) {
     if (i == 0 || v[i] != v[i - 1])
       p.emplace_back(v[i], 1);
@@ -472,14 +471,31 @@ vector<pair<T, int> > norm(vector<T>& v) {
 }
 ```
 
-### 加强版优先队列
+### 2D Transformation
 
 ```cpp
+struct Transformation {
+  int n, m;
+  Transformation(int n, int m) : n(n), m(m) {}
+  pair<int, int> rotate_90(int x, int y) const { return {y, n - x - 1}; }
+  pair<int, int> rotate_180(int x, int y) const { return {n - x - 1, m - y - 1}; }
+  pair<int, int> rotate_270(int x, int y) const { return {m - y - 1, x}; }
+  pair<int, int> flip_horizontal(int x, int y) const { return {x, m - y - 1}; }
+  pair<int, int> flip_vertical(int x, int y) const { return {n - x - 1, y}; }
+  pair<int, int> flip_diagonal(int x, int y) const { return {y, x}; }
+  pair<int, int> flip_antidiagonal(int x, int y) const { return {m - y - 1, n - x - 1}; }
+};
+```
+
+### Priority Queue with Erase
+
+```cpp
+template <class T, class C = less<T>>
 struct heap {
-  priority_queue<int> q1, q2;
-  void push(int x) { q1.push(x); }
-  void erase(int x) { q2.push(x); }
-  int top() {
+  priority_queue<T, vector<T>, C> q1, q2;
+  void push(const T& x) { q1.push(x); }
+  void erase(const T& x) { q2.push(x); }
+  T top() {
     while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
     return q1.top();
   }
@@ -487,29 +503,47 @@ struct heap {
     while (q2.size() && q1.top() == q2.top()) q1.pop(), q2.pop();
     q1.pop();
   }
-  int size() { return q1.size() - q2.size(); }
+  int size() const { return q1.size() - q2.size(); }
 };
 ```
 
-### 分数
+### Fractions
 
 ```cpp
+template <class T>
 struct Frac {
-  ll x, y;
+  T x, y;
 
-  Frac(ll p = 0, ll q = 1) {
-    ll d = __gcd(p, q);
-    x = p / d, y = q / d;
-    if (y < 0) x = -x, y = -y;
+  Frac(const T& p = 0, const T& q = 1) {
+    T d = gcd(p, q);
+    x = p / d;
+    y = q / d;
+    if (y < 0) {
+      x = -x;
+      y = -y;
+    }
   }
 
-  Frac operator + (const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
-  Frac operator - (const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
-  Frac operator * (const Frac& b) { return Frac(x * b.x, y * b.y); }
-  Frac operator / (const Frac& b) { return Frac(x * b.y, y * b.x); }
+  Frac operator+(const Frac& b) { return Frac(x * b.y + y * b.x, y * b.y); }
+  Frac operator-(const Frac& b) { return Frac(x * b.y - y * b.x, y * b.y); }
+  Frac operator*(const Frac& b) { return Frac(x * b.x, y * b.y); }
+  Frac operator/(const Frac& b) { return Frac(x * b.y, y * b.x); }
+
+  bool operator==(const Frac& b) { return x * b.y == y * b.x; }
+  bool operator!=(const Frac& b) { return !(*this == b); }
+  bool operator<(const Frac& b) { return x * b.y < y * b.x; }
+  bool operator>(const Frac& b) { return x * b.y > y * b.x; }
+  bool operator<=(const Frac& b) { return !(*this > b); }
+  bool operator>=(const Frac& b) { return !(*this < b); }
+
+  Frac& operator+=(const Frac& b) { *this = *this + b; return *this; }
+  Frac& operator-=(const Frac& b) { *this = *this - b; return *this; }
+  Frac& operator*=(const Frac& b) { *this = *this * b; return *this; }
+  Frac& operator/=(const Frac& b) { *this = *this / b; return *this; }
 };
 
-ostream& operator << (ostream& os, const Frac& f) {
+template <class T>
+ostream& operator<<(ostream& os, const Frac<T>& f) {
   if (f.y == 1) return os << f.x;
   else return os << f.x << '/' << f.y;
 }
@@ -517,7 +551,7 @@ ostream& operator << (ostream& os, const Frac& f) {
 
 ### ModInt
 
-+ 工业级 ModInt
++ Industrial ModInt
 
 ```cpp
 // tourist
@@ -586,8 +620,12 @@ class Modular {
   }
   template <typename U = T>
   typename enable_if<is_same<typename Modular<U>::Type, long long>::value, Modular>::type& operator*=(const Modular& rhs) {
+#ifdef __SIZEOF_INT128__
+    value = normalize(static_cast<__int128>(value) * static_cast<__int128>(rhs.value));
+#else
     long long q = static_cast<long long>(static_cast<long double>(value) * rhs.value / mod());
     value = normalize(value * rhs.value - q * mod());
+#endif
     return *this;
   }
   template <typename U = T>
@@ -677,8 +715,36 @@ U& operator>>(U& stream, Modular<T>& number) {
   return stream;
 }
 
+/* using ModType = int;
+
+struct VarMod { static ModType value; };
+ModType VarMod::value;
+ModType& md = VarMod::value;
+using Mint = Modular<VarMod>; */
+
 constexpr int md = (int) 1e9 + 7;
 using Mint = Modular<std::integral_constant<decay<decltype(md)>::type, md>>;
+
+/* const int N = 2e5 + 10;
+Mint fac[N], ifac[N];
+
+void init_inv() {
+  fac[0] = 1;
+  for (int i = 1; i < N; i++) {
+    fac[i] = fac[i - 1] * i;
+  }
+  ifac[N - 1] = 1 / fac[N - 1];
+  for (int i = N - 2; i >= 0; i--) {
+    ifac[i] = ifac[i + 1] * (i + 1);
+  }
+}
+
+Mint C(int n, int m) {
+  if (n < m || m < 0) return 0;
+  return fac[n] * ifac[m] * ifac[n - m];
+}
+
+Mint H(int n, int m) { return C(n + m - 1, m); } */
 ```
 
 ### BigInt
@@ -692,7 +758,7 @@ class BigInt {
   static constexpr int base_digits = 9;
 
   using vi = vector<int>;
-  using vll = vector<ll>;
+  using vll = vector<long long>;
 
   vi z;
   int f;
@@ -733,7 +799,7 @@ class BigInt {
       p[i] = p[i - 1] * 10;
     }
     vi res;
-    ll cur = 0;
+    long long cur = 0;
     int cur_digits = 0;
     for (int i = 0; i < (int)a.w; i++) {
       cur += a[i] * p[cur_digits];
@@ -796,7 +862,7 @@ class BigInt {
 
 public:
   BigInt() : f(1) {}
-  BigInt(ll v) { *this = v; }
+  BigInt(long long v) { *this = v; }
   BigInt(const string& s) { read(s); }
 
   void operator=(const BigInt& v) {
@@ -804,7 +870,7 @@ public:
     z = v.z;
   }
 
-  void operator=(ll v) {
+  void operator=(long long v) {
     f = 1;
     if (v < 0) {
       f = -1, v = -v;
@@ -863,7 +929,7 @@ public:
       if (i == (int)z.w) {
         z.push_back(0);
       }
-      ll cur = (ll)z[i] * v + carry;
+      long long cur = (long long)z[i] * v + carry;
       carry = cur / base;
       z[i] = cur % base;
       // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur), "c"(base));
@@ -888,7 +954,7 @@ public:
       r += a.z[i];
       int s1 = b.z.w < r.z.w ? r.z[b.z.w] : 0;
       int s2 = b.z.w - 1 < r.z.w ? r.z[b.z.w - 1] : 0;
-      int d = ((ll)s1 * base + s2) / b.z.back();
+      int d = ((long long)s1 * base + s2) / b.z.back();
       r -= b * d;
       while (r < 0) {
         r += b, --d;
@@ -908,21 +974,21 @@ public:
       a.z.push_back(0);
     }
     int n = a.z.w;
-    int firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
+    int firstDigit = sqrt((long long)a.z[n - 1] * base + a.z[n - 2]);
     int norm = base / (firstDigit + 1);
     a *= norm;
     a *= norm;
     while (a.z.empty() || (int)a.z.w % 2 == 1) {
       a.z.push_back(0);
     }
-    BigInt r = (ll)a.z[n - 1] * base + a.z[n - 2];
-    firstDigit = sqrt((ll)a.z[n - 1] * base + a.z[n - 2]);
+    BigInt r = (long long)a.z[n - 1] * base + a.z[n - 2];
+    firstDigit = sqrt((long long)a.z[n - 1] * base + a.z[n - 2]);
     int q = firstDigit;
     BigInt res;
     for (int j = n / 2 - 1; j >= 0; j--) {
       for (;; --q) {
         BigInt r1 = (r - (res * 2 * base + q) * q) * base * base +
-              (j > 0 ? (ll)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
+              (j > 0 ? (long long)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
         if (r1 >= 0) {
           r = r1;
           break;
@@ -934,7 +1000,7 @@ public:
         int d1 = res.z.w + 2 < r.z.w ? r.z[res.z.w + 2] : 0;
         int d2 = res.z.w + 1 < r.z.w ? r.z[res.z.w + 1] : 0;
         int d3 = res.z.w < r.z.w ? r.z[res.z.w] : 0;
-        q = ((ll)d1 * base * base + (ll)d2 * base + d3) / (firstDigit * 2);
+        q = ((long long)d1 * base * base + (long long)d2 * base + d3) / (firstDigit * 2);
       }
     }
     res.trim();
@@ -949,7 +1015,7 @@ public:
       f = -f, v = -v;
     }
     for (int i = z.w - 1, rem = 0; i >= 0; --i) {
-      ll cur = z[i] + (ll)rem * base;
+      long long cur = z[i] + (long long)rem * base;
       z[i] = cur / v;
       rem = cur % v;
     }
@@ -968,7 +1034,7 @@ public:
     }
     int m = 0;
     for (int i = z.w - 1; i >= 0; --i) {
-      m = ((ll)m * base + z[i]) % v;
+      m = ((long long)m * base + z[i]) % v;
     }
     return m * f;
   }
@@ -1013,8 +1079,8 @@ public:
     return res;
   }
 
-  ll long_value() const {
-    ll res = 0;
+  long long long_value() const {
+    long long res = 0;
     for (int i = z.w - 1; i >= 0; i--) {
       res = res * base + z[i];
     }
@@ -1061,7 +1127,7 @@ public:
     BigInt res;
     res.f = f * v.f;
     for (int i = 0, carry = 0; i < (int)c.w; i++) {
-      ll cur = c[i] + carry;
+      long long cur = c[i] + carry;
       res.z.push_back(cur % 1000000);
       carry = cur / 1000000;
     }
@@ -1073,6 +1139,7 @@ public:
 #undef w
 };
 ```
+
 
 ### Java
 
@@ -1091,7 +1158,7 @@ public class Main {
 }
 ```
 
-+ 皮特老师读入挂
++ Petr's ultimate fast input
 
 ```java
 public class Main {
@@ -1131,7 +1198,7 @@ public class Main {
 }
 ```
 
-+ 大整数
++ BigInteger
 
 ```java
 import java.math.BigInteger;
@@ -1191,7 +1258,7 @@ public static BigInteger getsqrt(BigInteger n) {
 }
 ```
 
-+ 浮点数格式
++ DecimalFormat
 
 ```java
 import java.text.DecimalFormat;
