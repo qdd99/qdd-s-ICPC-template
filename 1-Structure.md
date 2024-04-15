@@ -670,7 +670,7 @@ void example() {
   assert(t.order_of_key(10) == 1);
   assert(t.order_of_key(11) == 2);
   assert(*t.find_by_order(0) == 8);
-  t.join(t2);  // assuming T < T2 or T > T2, merge t2 into t
+  t.join(t2);  // assuming t < t2 or t > t2, merge t2 into t
 }
 
 // Priority Queue
