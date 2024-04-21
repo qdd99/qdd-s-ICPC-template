@@ -22,18 +22,26 @@ struct dsu {
 + Dynamic Allocation DSU
 
 ```cpp
-unordered_map<int, int> pa;
-
-void _set(int x) { if (!pa.count(x)) pa[x] = -1; }
-int find(int x) { return (pa[x] < 0) ? x : pa[x] = find(pa[x]); }
-
-void merge(int x, int y) {
-  x = find(x), y = find(y);
-  if (x == y) return;
-  if (pa[x] < pa[y]) swap(x, y);
-  pa[y] += pa[x];
-  pa[x] = y;
-}
+struct dsu {
+  unordered_map<int, int> p;
+  int data(int x) {
+    auto it = p.find(x);
+    return it == p.end() ? p[x] = -1 : it->second;
+  }
+  int find(int x) {
+    int n = data(x);
+    return n < 0 ? x : p[x] = find(n);
+  }
+  bool merge(int x, int y) {
+    x = find(x), y = find(y);
+    if (x == y) return 0;
+    auto itx = p.find(x), ity = p.find(y);
+    if (itx->second > ity->second) swap(itx, ity), swap(x, y);
+    itx->second += ity->second;
+    ity->second = x;
+    return 1;
+  }
+};
 ```
 
 + Rollback DSU
@@ -48,8 +56,8 @@ struct dsu {
     if (x == y) return 0;
     if (sz[x] > sz[y]) swap(x, y);
     undo.push_back(x);
-    p[x] = y;
     sz[y] += sz[x];
+    p[x] = y;
     return 1;
   }
   void rollback() {
