@@ -343,7 +343,7 @@ struct segtree {
     for (p >>= 1; p > 0; p >>= 1) pull(p);
   }
 
-  S get(int p) { return d[p + size]; }
+  S operator[](int i) { return d[i + size]; }
   S query(int l, int r) { return ask(l, r, 1, 0, size - 1); }
 
   // f(e()) = false
@@ -481,6 +481,7 @@ struct lazy_segtree {
 
   void update(int l, int r, F f) { modify(l, r, f, 1, 0, size - 1); }
   S query(int l, int r) { return ask(l, r, 1, 0, size - 1); }
+  S operator[](int i) { return query(i, i); }
 
   // For binary search
   void push(int p) {
