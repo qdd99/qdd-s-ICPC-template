@@ -123,7 +123,7 @@ struct sieve {
     spf.resize(n + 1);
     phi.resize(n + 1);
     mu.resize(n + 1);
-    spf[1] = phi[1] = mu[1] = 1;
+    vis[0] = vis[1] = spf[1] = phi[1] = mu[1] = 1;
     for (int i = 2; i <= n; i++) {
       if (!vis[i]) {
         prime.push_back(i);
@@ -146,6 +146,33 @@ struct sieve {
         }
       }
     }
+  }
+
+  vector<pair<int, int>> factorize(int x) {
+    vector<pair<int, int>> v;
+    while (x > 1) {
+      int p = spf[x];
+      int cnt = 0;
+      while (x % p == 0) x /= p, cnt++;
+      v.emplace_back(p, cnt);
+    }
+    return v;
+  }
+
+  vector<int> divisors(int x) {
+    vector<int> v = {1};
+    for (auto [p, cnt] : factorize(x)) {
+      int m = v.size();
+      for (int i = 0; i < m; i++) {
+        int y = 1;
+        for (int j = 0; j < cnt; j++) {
+          y *= p;
+          v.push_back(v[i] * y);
+        }
+      }
+    }
+    sort(v.begin(), v.end());
+    return v;
   }
 };
 ```
@@ -176,11 +203,11 @@ void get_prime(i64 a, i64 b) {
 }
 ```
 
-### Find Factors
+### Find Divisors
 
 ```cpp
 // O(sqrt(n))
-vector<int> getf(int x) {
+vector<int> divisors(int x) {
   vector<int> v;
   for (int i = 1; i * i <= x; i++) {
     if (x % i == 0) {
@@ -197,7 +224,7 @@ vector<int> getf(int x) {
 
 ```cpp
 // O(sqrt(n))
-vector<pair<int, int>> getf(int x) {
+vector<pair<int, int>> factorize(int x) {
   vector<pair<int, int>> v;
   for (int i = 2; i * i <= x; i++) {
     if (x % i == 0) {
@@ -207,19 +234,6 @@ vector<pair<int, int>> getf(int x) {
     }
   }
   if (x != 1) v.emplace_back(x, 1);
-  return v;
-}
-
-// Prerequisite: Sieves
-// O(logn)
-vector<pair<int, int>> getf(int x) {
-  vector<pair<int, int>> v;
-  while (x > 1) {
-    int p = spf[x];
-    int cnt = 0;
-    while (x % p == 0) x /= p, cnt++;
-    v.emplace_back(p, cnt);
-  }
   return v;
 }
 ```
@@ -273,7 +287,7 @@ i64 pollard_rho(i64 n, i64 c) {
   }
 }
 
-vector<pair<i64, int>> getf(i64 x) {
+vector<pair<i64, int>> factorize(i64 x) {
   if (x <= 1) return {};
   map<i64, int> mp;
   function<void(i64)> f = [&](i64 n) {
@@ -294,7 +308,7 @@ vector<pair<i64, int>> getf(i64 x) {
 // Prerequisite: Prime Factorization
 int phi(int x) {
   int ret = x;
-  for (auto& [f, _] : getf(x)) ret = ret / f * (f - 1);
+  for (auto& [f, _] : factorize(x)) ret = ret / f * (f - 1);
   return ret;
 }
 ```
@@ -604,7 +618,7 @@ i64 excrt(vector<i64>& m, vector<i64>& r) {
 ```cpp
 // Prerequisite: Prime Factorization
 i64 primitive_root(i64 p) {
-  vector<pair<i64, int>> facs = getf(p - 1);
+  vector<pair<i64, int>> facs = factorize(p - 1);
   for (i64 i = 2; i < p; i++) {
     bool flag = true;
     for (auto& [x, _] : facs) {
