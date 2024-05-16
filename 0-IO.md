@@ -80,7 +80,7 @@ class Scanner {
       p1 = buf; p2 = buf + fread(buf, 1, BUF_SIZE, stdin);
       // assert(p1 != p2);
     }
-    return *p1++;
+    return p1 == p2 ? EOF : *p1++;
   }
 
 public:
