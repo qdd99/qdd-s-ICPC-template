@@ -198,68 +198,39 @@ int rev_g(int g) {
 ### Digit DP
 
 ```cpp
-// Kick Start 2022: the number of integers s.t. prod(digits) % sum(digits) == 0
-const int N = 110;
-i64 dp[15][N][N], a[15];
-int mod;
+struct DigitDP {
+  int n;
+  vector<int> a, b;
+  vector<i64> dp;
 
-i64 dfs(int pos, int sum, int tot, bool limit) {
-  if (sum > mod) return 0;
-  if (pos == -1) return (sum == mod) && (tot == 0);
-  if (!limit && dp[pos][sum][tot] != -1) return dp[pos][sum][tot];
-  i64 ret = 0;
-  int ed = limit ? a[pos] : 9;
-  for (int i = 0; i <= ed; i++) {
-    ret += dfs(pos - 1, sum + i, (sum == 0 && i == 0) ? 1 : (tot * i) % mod, limit && i == a[pos]);
+  DigitDP(i64 x, i64 y) {
+    while (x) {
+      a.push_back(x % 10);
+      x /= 10;
+    }
+    while (y) {
+      b.push_back(y % 10);
+      y /= 10;
+    }
+    n = b.size();
+    while (a.size() < n) a.push_back(0);
+    dp.assign(n, -1);
   }
-  if (!limit) dp[pos][sum][tot] = ret;
-  return ret;
-}
 
-i64 cal(i64 x) {
-  i64 sz = 0;
-  while (x) {
-    a[sz++] = x % 10;
-    x /= 10;
+  i64 dfs(int i, bool tight_lo, bool tight_hi, bool zero) {
+    if (i == -1) return 1;
+    if (!tight_lo && !tight_hi && !zero && dp[i] != -1) return dp[i];
+    i64 res = 0;
+    int lo = tight_lo ? a[i] : 0;
+    int hi = tight_hi ? b[i] : 9;
+    for (int d = lo; d <= hi; d++) {
+      res += dfs(i - 1, tight_lo && d == lo, tight_hi && d == hi, zero && d == 0);
+    }
+    return tight_lo || tight_hi || zero ? res : dp[i] = res;
   }
-  i64 ans = 0;
-  for (mod = 1; mod < N; mod++) {
-    memset(dp, -1, sizeof(dp));
-    ans += dfs(sz - 1, 0, 1, true);
-  }
-  return ans;
-}
 
-// the number of "palindromes" <= x, with any base
-i64 dp[20][20][20][2], tmp[20], a[20];
-
-i64 dfs(i64 base, i64 pos, i64 len, i64 s, bool limit) {
-  if (pos == -1) return s;
-  if (!limit && dp[base][pos][len][s] != -1) return dp[base][pos][len][s];
-  i64 ret = 0;
-  i64 ed = limit ? a[pos] : base - 1;
-  for (int i = 0; i <= ed; i++) {
-    tmp[pos] = i;
-    if (len == pos)
-      ret += dfs(base, pos - 1, len - (i == 0), s, limit && i == a[pos]);
-    else if (s && pos < (len + 1) / 2)
-      ret += dfs(base, pos - 1, len, tmp[len - pos] == i, limit && i == a[pos]);
-    else
-      ret += dfs(base, pos - 1, len, s, limit && i == a[pos]);
-  }
-  if (!limit) dp[base][pos][len][s] = ret;
-  return ret;
-}
-
-i64 solve(i64 x, i64 base) {
-  memset(dp, -1, sizeof(dp));
-  i64 sz = 0;
-  while (x) {
-    a[sz++] = x % base;
-    x /= base;
-  }
-  return dfs(base, sz - 1, sz - 1, 1, true);
-}
+  i64 count() { return dfs(n - 1, true, true, true); }
+};
 ```
 
 ### Random Set
