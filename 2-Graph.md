@@ -419,59 +419,120 @@ namespace stoer_wagner {
 ### Heavy-Light Decomposition
 
 ```cpp
-// weights on vertices
-vector<int> g[N];
-int pa[N], sz[N], dep[N], dfn[N], maxc[N], top[N], clk;
+// jiangly
+struct HLD {
+  int n;
+  vector<int> siz, top, dep, parent, in, out, seq;
+  vector<vector<int>> adj;
+  int cur;
 
-void dfs1(int u) {
-  sz[u] = 1;
-  maxc[u] = -1;
-  int maxs = 0;
-  for (int& v : g[u]) {
-    if (v != pa[u]) {
-      pa[v] = u;
+  explicit HLD(int n) : n(n), siz(n), top(n), dep(n), parent(n), in(n), out(n), seq(n), adj(n), cur(0) {}
+
+  void addEdge(int u, int v) {
+    adj[u].push_back(v);
+    adj[v].push_back(u);
+  }
+
+  void work(int root = 0) {
+    top[root] = root;
+    dep[root] = 0;
+    parent[root] = -1;
+    dfs1(root);
+    dfs2(root);
+  }
+
+  void dfs1(int u) {
+    if (parent[u] != -1) {
+      adj[u].erase(find(adj[u].begin(), adj[u].end(), parent[u]));
+    }
+    siz[u] = 1;
+    for (auto& v : adj[u]) {
+      parent[v] = u;
       dep[v] = dep[u] + 1;
       dfs1(v);
-      sz[u] += sz[v];
-      if (umax(maxs, sz[v])) maxc[u] = v;
+      siz[u] += siz[v];
+      if (siz[v] > siz[adj[u][0]]) {
+        swap(v, adj[u][0]);
+      }
     }
   }
-}
 
-void dfs2(int u, int tp) {
-  top[u] = tp;
-  dfn[u] = ++clk;
-  if (maxc[u] != -1) dfs2(maxc[u], tp);
-  for (int& v : g[u]) {
-    if (v != pa[u] && v != maxc[u]) {
-      dfs2(v, v);
+  void dfs2(int u) {
+    in[u] = cur++;
+    seq[in[u]] = u;
+    for (auto v : adj[u]) {
+      top[v] = v == adj[u][0] ? top[u] : v;
+      dfs2(v);
     }
+    out[u] = cur;
   }
-}
 
-void init() {
-  clk = 0;
-  dep[1] = 1;
-  dfs1(1);
-  dfs2(1, 1);
-}
-
-i64 go(int u, int v) {
-  int uu = top[u], vv = top[v];
-  i64 res = 0;
-  while (uu != vv) {
-    if (dep[uu] < dep[vv]) {
-      swap(u, v);
-      swap(uu, vv);
+  int lca(int u, int v) {
+    while (top[u] != top[v]) {
+      if (dep[top[u]] > dep[top[v]]) {
+        u = parent[top[u]];
+      } else {
+        v = parent[top[v]];
+      }
     }
-    res += segt.query(dfn[uu], dfn[u]);
-    u = pa[uu];
-    uu = top[u];
+    return dep[u] < dep[v] ? u : v;
   }
-  if (dep[u] > dep[v]) swap(u, v);
-  res += segt.query(dfn[u], dfn[v]);
-  return res;
-}
+
+  int dist(int u, int v) { return dep[u] + dep[v] - 2 * dep[lca(u, v)]; }
+
+  int jump(int u, int k) {
+    if (dep[u] < k) {
+      return -1;
+    }
+    int d = dep[u] - k;
+    while (dep[top[u]] > d) {
+      u = parent[top[u]];
+    }
+    return seq[in[u] - dep[u] + d];
+  }
+
+  bool isAncester(int u, int v) { return in[u] <= in[v] && in[v] < out[u]; }
+
+  int rootedParent(int u, int v) {
+    swap(u, v);
+    if (u == v) {
+      return u;
+    }
+    if (!isAncester(u, v)) {
+      return parent[u];
+    }
+    auto it = upper_bound(adj[u].begin(), adj[u].end(), v, [&](int x, int y) { return in[x] < in[y]; }) - 1;
+    return *it;
+  }
+
+  int rootedSize(int u, int v) {
+    if (u == v) {
+      return n;
+    }
+    if (!isAncester(v, u)) {
+      return siz[v];
+    }
+    return n - siz[rootedParent(u, v)];
+  }
+
+  int rootedLca(int a, int b, int c) { return lca(a, b) ^ lca(b, c) ^ lca(c, a); }
+
+  // [u, v] if inclusive is true, otherwise [u, v)
+  vector<pair<int, int>> path(int u, int v, bool inclusive) {
+    assert(isAncester(v, u));
+    vector<pair<int, int>> res;
+    while (top[u] != top[v]) {
+      res.emplace_back(u, top[u]);
+      u = parent[top[u]];
+    }
+    if (inclusive) {
+      res.emplace_back(u, v);
+    } else if (u != v) {
+      res.emplace_back(u, seq[in[v] + 1]);
+    }
+    return res;
+  }
+};
 ```
 
 ### Tarjan
