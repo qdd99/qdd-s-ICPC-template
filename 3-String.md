@@ -79,36 +79,39 @@ struct Hash2D {
 + Dynamic Hash
 
 ```cpp
-const i64 MAGIC = 479;
-const i64 IMAGIC = 628392490;
-const i64 P = 1e9 + 9;
-const int N = 1e5 + 5;
+// open hack
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-i64 pw[N], inv[N];
+const int N = 1e5 + 5;
+const i64 md = (1LL << 61) - 1;
+i64 step, inv_step, pw[N], inv[N];
 
 void init() {
+  step = uniform_int_distribution<i64>(256, md - 1)(rng);
+  inv_step = 1;
+  for (i64 a = step, b = md - 2; b; b >>= 1, a = __int128(a) * a % md)
+    if (b & 1) inv_step = __int128(inv_step) * a % md;
   pw[0] = inv[0] = 1;
   for (int i = 1; i < N; i++) {
-    pw[i] = (pw[i - 1] * MAGIC) % P;
-    inv[i] = (inv[i - 1] * IMAGIC) % P;
+    pw[i] = __int128(pw[i - 1]) * step % md;
+    inv[i] = __int128(inv[i - 1]) * inv_step % md;
   }
 }
 
-// 1-indexed, [l, r]
-struct fenwick {
+struct HashFk {
   int n;
   vector<i64> t;
-  fenwick(int n) : n(n), t(n + 1) {}
+  HashFk(int n) : n(n), t(n) {}
   void add(int p, i64 x) {
-    for (; p <= n; p += p & -p) (t[p] += x) %= P;
+    for (; p < n; p |= p + 1) (t[p] += x) %= md;
   }
   i64 get(int p) {
     i64 a = 0;
-    for (; p > 0; p -= p & -p) (a += t[p]) %= P;
+    for (; p >= 0; p = (p & (p + 1)) - 1) (a += t[p]) %= md;
     return a;
   }
-  void set(int p, i64 x) { add(p, (x - query(p, p) + P) * pw[p] % P); }
-  i64 query(int l, int r) { return (get(r) - get(l - 1) + P) * inv[l] % P; }
+  void set(int p, i64 x) { add(p, __int128(x - query(p, p) + md) * pw[p] % md); }
+  i64 query(int l, int r) { return __int128(get(r) - get(l - 1) + md) * inv[l] % md; }
 };
 ```
 
