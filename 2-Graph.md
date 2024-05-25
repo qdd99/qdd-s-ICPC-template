@@ -535,6 +535,30 @@ struct HLD {
 };
 ```
 
+### Tree Hash
+
+```cpp
+const uint64_t mask = chrono::steady_clock::now().time_since_epoch().count();
+
+uint64_t f(uint64_t x) {
+  x ^= mask;
+  x ^= x << 13;
+  x ^= x >> 7;
+  x ^= x << 17;
+  x ^= mask;
+  return x;
+}
+
+uint64_t dfs(int u, int p) {
+  uint64_t h = 1;
+  for (int v : g[u]) {
+    if (v == p) continue;
+    h += f(dfs(v, u));
+  }
+  return h;
+}
+```
+
 ### Tarjan
 
 + Cut Points
