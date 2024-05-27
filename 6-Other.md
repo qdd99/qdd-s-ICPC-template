@@ -258,6 +258,29 @@ print(input()) # Python2
 print(eval(input())) # Python3
 ```
 
+### Regex
+
+```py
+import re
+
+pattern = r'hello'
+text = 'hello world'
+match = re.search(pattern, text) # or re.match(pattern, text)
+if match:
+    print('Match found:', match.group(), match.start(), match.end())
+else:
+    print('No match')
+
+# identifier
+r'^[a-zA-Z_]\w*$'
+
+# email
+r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+# URL
+r'^(https?|ftp)://[^\s/$.?#].[^\s]*$'
+```
+
 ### Stress Test
 
 + *unix
@@ -1087,6 +1110,7 @@ public:
 #undef w
 };
 ```
+
 
 ### Java
 
