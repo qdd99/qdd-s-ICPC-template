@@ -561,53 +561,6 @@ F composition(F f, F g) { return F{(g.first * f.first) % P, (g.second * f.first 
 F id() { return F{1, 0}; }
 ```
 
-### Dynamic Segment Tree
-
-```cpp
-struct Node {
-  int lc, rc, val;
-  Node(int lc = 0, int rc = 0, int val = 0) : lc(lc), rc(rc), val(val) {}
-} t[20 * N];
-
-int cnt;
-
-struct SegT {
-#define mid ((pl + pr) >> 1)
-
-  int rt, size;
-
-  SegT(int sz) : rt(0) {
-    size = 1;
-    while (size < sz) size <<= 1;
-  }
-
-  int modify(int p, int pl, int pr, int k, int val) {
-    if (pl > k || pr < k) return p;
-    if (!p) p = ++cnt;
-    if (pl == pr) t[p].val = val;
-    else {
-      t[p].lc = modify(t[p].lc, pl, mid, k, val);
-      t[p].rc = modify(t[p].rc, mid + 1, pr, k, val);
-      t[p].val = max(t[t[p].lc].val, t[t[p].rc].val);
-    }
-    return p;
-  }
-
-  int ask(int p, int pl, int pr, int l, int r) {
-    if (l > pr || r < pl) return -INF;
-    if (l <= pl && r >= pr) return t[p].val;
-    int vl = ask(t[p].lc, pl, mid, l, r);
-    int vr = ask(t[p].rc, mid + 1, pr, l, r);
-    return max(vl, vr);
-  }
-
-  void update(int k, int val) { rt = modify(rt, 0, size - 1, k, val); }
-  int query(int l, int r) { return ask(rt, 0, size - 1, l, r); }
-
-#undef mid
-};
-```
-
 ### Functional Segment Tree
 
 ```cpp
