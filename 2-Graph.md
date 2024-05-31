@@ -662,52 +662,42 @@ void two_sat() {
 
 ### Eulerian Path
 
-+ Undirected Graph
-
 ```cpp
-vector<int> euler_path(int s) {
-  vector<int> path;
-  stack<pair<int, int>> st;
-  st.emplace(s, -1);
-  while (!st.empty()) {
-    auto [u, i] = st.top();
-    if (g[u].empty()) {
-      if (i != -1) path.push_back(i);
-      st.pop();
-    } else {
-      i = *g[u].begin();
-      int v = es[i].first ^ es[i].second ^ u;
-      g[u].erase(i);
-      g[v].erase(i);
-      st.emplace(v, i);
-    }
-  }
-  return path;
-}
-```
+struct EulerPath {
+  int n;
+  vector<vector<int>> g;
+  vector<pair<int, int>> es;
 
-+ Directed Graph
+  EulerPath(int n) : n(n), g(n) {}
 
-```cpp
-vector<int> euler_path(int s) {
-  vector<int> path;
-  stack<pair<int, int>> st;
-  st.emplace(s, -1);
-  while (!st.empty()) {
-    auto [u, i] = st.top();
-    if (g[u].empty()) {
-      if (i != -1) path.push_back(i);
-      st.pop();
-    } else {
-      i = *g[u].begin();
-      int v = es[i].second;
-      g[u].erase(i);
-      st.emplace(v, i);
-    }
+  void add_edge(int u, int v, bool directed = false) {
+    g[u].push_back(es.size());
+    if (!directed) g[v].push_back(es.size());
+    es.emplace_back(u, v);
   }
-  reverse(path.begin(), path.end());
-  return path;
-}
+
+  vector<int> solve(int s) {
+    vector<int> path, ptr(n), st;
+    vector<bool> used(es.size());
+    st.push_back(s);
+    while (!st.empty()) {
+      int u = st.back();
+      int& i = ptr[u];
+      while (i < g[u].size() && used[g[u][i]]) i++;
+      if (i == g[u].size()) {
+        path.push_back(u);
+        st.pop_back();
+      } else {
+        int e = g[u][i];
+        used[e] = 1;
+        int v = es[e].first ^ es[e].second ^ u;
+        st.push_back(v);
+      }
+    }
+    reverse(path.begin(), path.end());
+    return path;
+  }
+};
 ```
 
 ### Dominator Tree
