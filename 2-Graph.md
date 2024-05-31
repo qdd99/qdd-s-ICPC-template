@@ -702,66 +702,6 @@ struct EulerPath {
 
 ### Dominator Tree
 
-+ Directed Acyclic Graph (DAG)
-
-```cpp
-// rt is a point in g with in-degree 0 (may need to create a super source point)
-const int LOG = 22;
-int n, deg[N], dep[N], up[N][LOG];
-vector<int> g[N], rg[N], dt[N];
-
-bool topo(vector<int>& ans, int rt) {
-  queue<int> q;
-  q.push(rt);
-  while (!q.empty()) {
-    int u = q.front();
-    q.pop();
-    ans.push_back(u);
-    for (int v : g[u]) {
-      deg[v]--;
-      if (deg[v] == 0) q.push(v);
-    }
-  }
-  return ans.size() == n;
-}
-
-int lca(int u, int v) {
-  if (dep[u] > dep[v]) swap(u, v);
-  int t = dep[v] - dep[u];
-  for (int i = 0; i < LOG; i++) {
-    if ((t >> i) & 1) v = up[v][i];
-  }
-  if (u == v) return u;
-  for (int i = LOG - 1; i >= 0; i--) {
-    if (up[u][i] != up[v][i]) {
-      u = up[u][i];
-      v = up[v][i];
-    }
-  }
-  return up[u][0];
-}
-
-void go(int rt) {
-  vector<int> a;
-  topo(a, rt);
-  dep[rt] = 1;
-  for (int i = 1; i < a.size(); i++) {
-    int u = a[i], pa = -1;
-    for (int v : rg[u]) {
-      pa = (pa == -1) ? v : lca(pa, v);
-    }
-    dt[pa].push_back(u);
-    dep[u] = dep[pa] + 1;
-    up[u][0] = pa;
-    for (int i = 1; i < LOG; i++) {
-      up[u][i] = up[up[u][i - 1]][i - 1];
-    }
-  }
-}
-```
-
-+ General Directed Graph
-
 ```cpp
 vector<int> g[N], rg[N];
 vector<int> dt[N];
