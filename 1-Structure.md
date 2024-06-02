@@ -69,15 +69,15 @@ struct dsu {
 };
 ```
 
-### Range Maximum Query (RMQ)
+### Sparse Table
 
 + 1D
 
 ```cpp
-struct RMQ {
+struct SparseTable {
   vector<vector<int>> st;
 
-  RMQ(const vector<int>& a) {
+  SparseTable(const vector<int>& a) {
     int n = a.size();
     st.assign(__lg(n) + 1, vector<int>(n));
     for (int i = 0; i < n; i++) {
@@ -100,7 +100,7 @@ struct RMQ {
 + 2D
 
 ```cpp
-struct RMQ {
+struct SparseTable {
   int st[11][11][N][N]; // 11 = ((int)log2(N) + 1)
 
   void init(int n, int m) {
