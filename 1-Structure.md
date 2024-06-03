@@ -188,7 +188,7 @@ struct fenwick {
 };
 ```
 
-+ Range Update, Point Query
++ Range Add, Point Query
 
 ```cpp
 void range_add(int l, int r, i64 x) {
@@ -197,7 +197,7 @@ void range_add(int l, int r, i64 x) {
 }
 ```
 
-+ Range Update, Range Sum
++ Range Add, Range Sum
 
 ```cpp
 fenwick t1, t2;
@@ -242,7 +242,7 @@ struct fenwick_2d {
 };
 ```
 
-+ 2D Range Update, Range Sum
++ 2D Range Add, Range Sum
 
 ```cpp
 fenwick t0, t1, t2, t3;
@@ -300,7 +300,7 @@ struct segt {
 };
 ```
 
-+ Single Point Modification, Range Maximum Query (RMQ)
++ Point Update, Range Max
 
 ```cpp
 // Use const S& when necessary to optimize constants
@@ -395,29 +395,25 @@ struct segtree {
 };
 
 auto op = [](int a, int b) { return max(a, b); };
-auto e = []() { return -INF; };
+auto e = []() { return (int)-2e9; };
 
-segtree<int> seg(n, op, e);
+segtree<int> st(n, op, e);
 ```
 
-+ Range Addition, Range Sum
++ Range Add, Range Sum
 
 ```cpp
-template <class S, class F>
+template <class S, class T>
 struct lazy_segtree {
-#define args int p, int l, int r
-#define lc p * 2, l, (l + r) >> 1
-#define rc p * 2 + 1, ((l + r) >> 1) + 1, r
-
   using OP = S (*)(S, S);
   using E = S (*)();
-  using MAP = S (*)(S, F, int, int);
-  using COM = F (*)(F, F);
-  using ID = F (*)();
+  using MAP = S (*)(S, T);
+  using COM = T (*)(T, T);
+  using ID = T (*)();
 
   int _n, size, log;
   vector<S> d;
-  vector<F> lz;
+  vector<T> lz;
 
   const OP op;
   const E e;
@@ -427,42 +423,38 @@ struct lazy_segtree {
 
   void pull(int p) { d[p] = op(d[p * 2], d[p * 2 + 1]); }
 
-  void apply(F f, args) {
-    d[p] = mapping(d[p], f, l, r);
-    if (p < size) lz[p] = composition(f, lz[p]);
+  void apply(T t, int p) {
+    d[p] = mapping(d[p], t);
+    if (p < size) lz[p] = composition(t, lz[p]);
   }
 
-  void push(args) {
+  void push(int p) {
     if (lz[p] == id()) return;
-    apply(lz[p], lc);
-    apply(lz[p], rc);
+    apply(lz[p], p * 2);
+    apply(lz[p], p * 2 + 1);
     lz[p] = id();
   }
 
-  S ask(int ql, int qr, args) {
+  S ask(int ql, int qr, int p, int l, int r) {
     if (ql > r || qr < l) return e();
     if (ql <= l && qr >= r) return d[p];
-    push(p, l, r);
-    S vl = ask(ql, qr, lc);
-    S vr = ask(ql, qr, rc);
+    push(p);
+    S vl = ask(ql, qr, p * 2, l, (l + r) >> 1);
+    S vr = ask(ql, qr, p * 2 + 1, ((l + r) >> 1) + 1, r);
     return op(vl, vr);
   }
 
-  void modify(int ql, int qr, F f, args) {
+  void modify(int ql, int qr, T t, int p, int l, int r) {
     if (ql > r || qr < l) return;
     if (ql <= l && qr >= r) {
-      apply(f, p, l, r);
+      apply(t, p);
       return;
     }
-    push(p, l, r);
-    modify(ql, qr, f, lc);
-    modify(ql, qr, f, rc);
+    push(p);
+    modify(ql, qr, t, p * 2, l, (l + r) >> 1);
+    modify(ql, qr, t, p * 2 + 1, ((l + r) >> 1) + 1, r);
     pull(p);
   }
-
-#undef args
-#undef lc
-#undef rc
 
   lazy_segtree(int n, OP op, E e, MAP mapping, COM composition, ID id)
       : _n(n), op(op), e(e), mapping(mapping), composition(composition), id(id) {
@@ -479,20 +471,21 @@ struct lazy_segtree {
     for (int i = size - 1; i >= 1; i--) pull(i);
   }
 
-  void update(int l, int r, F f) { modify(l, r, f, 1, 0, size - 1); }
+  void set(int p, S x) {
+    p += size;
+    for (int i = log; i >= 1; i--) push(p >> i);
+    d[p] = x;
+    for (int i = 1; i <= log; i++) pull(p >> i);
+  }
+
+  void update(int l, int r, T t) { modify(l, r, t, 1, 0, size - 1); }
   S query(int l, int r) { return ask(l, r, 1, 0, size - 1); }
   S operator[](int i) { return query(i, i); }
 
-  // For binary search
-  void push(int p) {
-    int x = __lg(p), y = size >> x, z = p - (1 << x);
-    push(p, y * z + 1, y * (z + 1));
-  }
-
   // f(e()) = false
   // find the smallest r such that f(sum([l...r])) = true
-  template <class G>
-  int find_right(int l, G f) {
+  template <class F>
+  int find_right(int l, F f) {
     l += size;
     for (int i = log; i >= 1; i--) push(l >> i);
     S s = e();
@@ -516,8 +509,8 @@ struct lazy_segtree {
   }
 
   // find the largest l such that f(sum([l...r])) = true
-  template <class G>
-  int find_left(int r, G f) {
+  template <class F>
+  int find_left(int r, F f) {
     r += size + 1;
     for (int i = log; i >= 1; i--) push((r - 1) >> i);
     S s = e();
@@ -541,24 +534,39 @@ struct lazy_segtree {
   }
 };
 
-auto op = [](i64 a, i64 b) { return a + b; };
-auto e = []() { return 0LL; };
-auto mapping = [](i64 a, i64 f, int l, int r) { return a + f * (r - l + 1); };
-auto composition = [](i64 f, i64 g) { return f + g; };  // f: outer function, g: inner function
-auto id = []() { return 0LL; };  // For interval assignment, choose a value outside the data range
+struct Info {
+  i64 sum, len;
+};
 
-lazy_segtree<i64, i64> seg(n, op, e, mapping, composition, id);
+auto op = [](Info a, Info b) { return Info{a.sum + b.sum, a.len + b.len}; };
+auto e = []() { return Info{0LL, 0LL}; };
+auto mapping = [](Info a, i64 f) { return Info{a.sum + a.len * f, a.len}; };
+auto composition = [](i64 f, i64 g) { return f + g; };  // f(g())
+auto id = []() { return 0LL; };  // For range assignment, choose a value outside the data range
+
+lazy_segtree<Info, i64> st(n, op, e, mapping, composition, id);
 ```
 
-+ Range Multiplication and Addition, Range Sum Modulo
++ Range Affine, Range Sum
 
 ```cpp
-// S = i64, F = pair<i64, i64>
-S op(S a, S b) { return (a + b) % P; }
-S e() { return 0; }
-S mapping(S a, F f, int l, int r) { return (a * f.first % P + (r - l + 1) * f.second % P) % P; }
-F composition(F f, F g) { return F{(g.first * f.first) % P, (g.second * f.first % P + f.second) % P}; }
-F id() { return F{1, 0}; }
+const i64 P = 1e9 + 7;
+
+struct Info {
+  i64 sum, len;
+};
+
+struct Tag {
+  i64 mul, add;
+
+  bool operator==(const Tag& t) const { return mul == t.mul && add == t.add; }
+};
+
+auto op = [](Info a, Info b) { return Info{(a.sum + b.sum) % P, a.len + b.len}; };
+auto e = []() { return Info{0, 0}; };
+auto mapping = [](Info a, Tag t) { return Info{(a.sum * t.mul + a.len * t.add) % P, a.len}; };
+auto composition = [](Tag f, Tag g) { return Tag{(f.mul * g.mul) % P, (f.mul * g.add + f.add) % P}; };
+auto id = []() { return Tag{1, 0}; };
 ```
 
 ### Functional Segment Tree
