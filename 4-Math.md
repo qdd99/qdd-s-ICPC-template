@@ -414,24 +414,52 @@ void initC() {
 }
 
 // Fast Binomial Coefficient
-// For combination with repetition, N needs to be 2x
-i64 fac[N], ifac[N];
+struct Factorial {
+  static constexpr int md = 1e9 + 7;
+  vector<int> f, g;
 
-void init_inv() {
-  fac[0] = 1;
-  for (int i = 1; i < N; i++) {
-    fac[i] = fac[i - 1] * i % P;
+  Factorial(int N) {
+    N *= 2;
+    f.resize(N + 1);
+    g.resize(N + 1);
+    f[0] = 1;
+    for (int i = 1; i <= N; i++) {
+      f[i] = 1LL * f[i - 1] * i % md;
+    }
+    g[N] = pow(f[N], md - 2);
+    for (int i = N - 1; i >= 0; i--) {
+      g[i] = 1LL * g[i + 1] * (i + 1) % md;
+    }
   }
-  ifac[N - 1] = qk(fac[N - 1], P - 2, P);
-  for (int i = N - 2; i >= 0; i--) {
-    ifac[i] = ifac[i + 1] * (i + 1) % P;
-  }
-}
 
-i64 C(int n, int m) {
-  if (n < m || m < 0) return 0;
-  return fac[n] * ifac[m] % P * ifac[n - m] % P;
-}
+  int pow(int a, int b) {
+    int r = 1;
+    for (; b; b >>= 1, a = 1LL * a * a % md) {
+      if (b & 1) r = 1LL * r * a % md;
+    }
+    return r;
+  }
+
+  int fac(int n) { return f[n]; }
+
+  int ifac(int n) { return g[n]; }
+
+  int inv(int n) { return 1LL * f[n - 1] * g[n] % md; }
+
+  int comb(int n, int m) {
+    if (n < m || m < 0) return 0;
+    return 1LL * f[n] * g[m] % md * g[n - m] % md;
+  }
+
+  int perm(int n, int m) {
+    if (n < m || m < 0) return 0;
+    return 1LL * f[n] * g[n - m] % md;
+  }
+
+  int comb_rep(int n, int m) { return comb(n + m - 1, m); }
+
+  int catalan(int n) { return (comb(2 * n, n) - comb(2 * n, n - 1) + md) % md; }
+};
 
 // Lucas Theorem
 i64 C(i64 n, i64 m) {
@@ -439,9 +467,6 @@ i64 C(i64 n, i64 m) {
   if (n < P && m < P) return fac[n] * ifac[m] % P * ifac[n - m] % P;
   return C(n / P, m / P) * C(n % P, m % P) % P;
 }
-
-// Combination with repetition
-i64 H(int n, int m) { return C(n + m - 1, m); }
 ```
 
 ### Cantor Expansion
