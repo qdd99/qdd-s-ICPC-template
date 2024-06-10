@@ -1,12 +1,5 @@
 ## Math
 
-### GCD & LCM
-
-```cpp
-i64 gcd(i64 a, i64 b) { return b ? gcd(b, a % b) : a; }
-i64 lcm(i64 a, i64 b) { return a / gcd(a, b) * b; }
-```
-
 ### Safe Multiplication & Fast Exponentiation
 
 ```cpp
