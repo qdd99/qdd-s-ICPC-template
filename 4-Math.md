@@ -111,13 +111,9 @@ struct sieve {
   vector<bool> vis;
   vector<int> prime, spf, phi, mu;
 
-  void init(int n) {
-    vis.assign(n + 1, false);
-    spf.resize(n + 1);
-    phi.resize(n + 1);
-    mu.resize(n + 1);
+  sieve(int N) : vis(N + 1), spf(N + 1), phi(N + 1), mu(N + 1) {
     vis[0] = vis[1] = spf[1] = phi[1] = mu[1] = 1;
-    for (int i = 2; i <= n; i++) {
+    for (int i = 2; i <= N; i++) {
       if (!vis[i]) {
         prime.push_back(i);
         spf[i] = i;
@@ -126,7 +122,7 @@ struct sieve {
       }
       for (int p : prime) {
         int d = i * p;
-        if (d > n) break;
+        if (d > N) break;
         vis[d] = true;
         spf[d] = p;
         if (i % p == 0) {
