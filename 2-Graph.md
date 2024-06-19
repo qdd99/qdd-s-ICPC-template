@@ -180,36 +180,45 @@ i64 kruskal(vector<Edge>& es, int n) {
 ### Lowest Common Ancestor
 
 ```cpp
-// dfs(1, 0) or dfs(0, n), don't use dfs(0, -1)
-const int LOG = 22;  // 22 = ((int)log2(N) + 1)
-int dep[N], up[N][LOG];
+struct LCA {
+  int n, log;
+  vector<vector<int>> g;
+  vector<int> dep;
+  vector<vector<int>> up;
+  LCA(int n)
+      : n(n), log(__lg(n) + 1), g(n), dep(n), up(n, vector<int>(log, -1)) {}
 
-void dfs(int u, int pa) {
-  dep[u] = dep[pa] + 1;
-  up[u][0] = pa;
-  for (int i = 1; i < LOG; i++) {
-    up[u][i] = up[up[u][i - 1]][i - 1];
+  void add_edge(int u, int v) {
+    g[u].push_back(v);
+    g[v].push_back(u);
   }
-  for (int v : g[u]) {
-    if (v != pa) dfs(v, u);
-  }
-}
 
-int lca(int u, int v) {
-  if (dep[u] > dep[v]) swap(u, v);
-  int t = dep[v] - dep[u];
-  for (int i = 0; i < LOG; i++) {
-    if ((t >> i) & 1) v = up[v][i];
-  }
-  if (u == v) return u;
-  for (int i = LOG - 1; i >= 0; i--) {
-    if (up[u][i] != up[v][i]) {
-      u = up[u][i];
-      v = up[v][i];
+  void dfs(int u, int p) {
+    up[u][0] = p;
+    for (int i = 1; i < log; i++) {
+      up[u][i] = (up[u][i - 1] == -1 ? -1 : up[up[u][i - 1]][i - 1]);
+    }
+    for (int v : g[u]) {
+      if (v == p) continue;
+      dep[v] = dep[u] + 1;
+      dfs(v, u);
     }
   }
-  return up[u][0];
-}
+
+  void build(int root = 0) { dfs(root, -1); }
+
+  int lca(int u, int v) {
+    if (dep[u] < dep[v]) swap(u, v);
+    for (int i = log - 1; i >= 0; i--) {
+      if (dep[u] - (1 << i) >= dep[v]) u = up[u][i];
+    }
+    if (u == v) return u;
+    for (int i = log - 1; i >= 0; i--) {
+      if (up[u][i] != up[v][i]) u = up[u][i], v = up[v][i];
+    }
+    return up[u][0];
+  }
+};
 ```
 
 ### Network Flow
