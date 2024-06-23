@@ -452,6 +452,23 @@ vector<pair<T, int> > norm(vector<T>& v) {
 }
 ```
 
+### Rotate 2D Array
+
+```cpp
+// k = 1 clockwise, k = -1 counterclockwise
+template <class T>
+vector<vector<T>> rotate(const vector<vector<T>>& a, int k = 1) {
+  int n = a.size(), m = a[0].size();
+  vector<vector<T>> b(m, vector<T>(n));
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      b[i][j] = k == 1 ? a[n - j - 1][i] : a[j][m - i - 1];
+    }
+  }
+  return b;
+}
+```
+
 ### Priority Queue with Erase
 
 ```cpp
