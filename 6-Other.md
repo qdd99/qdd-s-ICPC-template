@@ -452,21 +452,20 @@ vector<pair<T, int> > norm(vector<T>& v) {
 }
 ```
 
-### Rotate 2D Array
+### 2D Transformation
 
 ```cpp
-// k = 1 clockwise, k = -1 counterclockwise
-template <class T>
-vector<vector<T>> rotate(const vector<vector<T>>& a, int k = 1) {
-  int n = a.size(), m = a[0].size();
-  vector<vector<T>> b(m, vector<T>(n));
-  for (int i = 0; i < m; i++) {
-    for (int j = 0; j < n; j++) {
-      b[i][j] = k == 1 ? a[n - j - 1][i] : a[j][m - i - 1];
-    }
-  }
-  return b;
-}
+struct Transformation {
+  int n, m;
+  Transformation(int n, int m) : n(n), m(m) {}
+  pair<int, int> rotate_90(int x, int y) const { return {y, n - x - 1}; }
+  pair<int, int> rotate_180(int x, int y) const { return {n - x - 1, m - y - 1}; }
+  pair<int, int> rotate_270(int x, int y) const { return {m - y - 1, x}; }
+  pair<int, int> flip_horizontal(int x, int y) const { return {x, m - y - 1}; }
+  pair<int, int> flip_vertical(int x, int y) const { return {n - x - 1, y}; }
+  pair<int, int> flip_diagonal(int x, int y) const { return {y, x}; }
+  pair<int, int> flip_antidiagonal(int x, int y) const { return {m - y - 1, n - x - 1}; }
+};
 ```
 
 ### Priority Queue with Erase
