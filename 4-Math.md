@@ -137,6 +137,8 @@ struct sieve {
     }
   }
 
+  bool is_prime(int x) { return !vis[x]; }
+
   vector<pair<int, int>> factorize(int x) {
     vector<pair<int, int>> v;
     while (x > 1) {
