@@ -239,7 +239,7 @@ struct Dinic {
   vector<vector<int>> g;
   vector<int> dis, cur;
 
-  Dinic(int n, int s, int t) : n(n), s(s), t(t), g(n + 1), dis(n + 1), cur(n + 1) {}
+  Dinic(int n, int s, int t) : n(n), s(s), t(t), g(n), dis(n), cur(n) {}
 
   void add_edge(int u, int v, int cap) {
     g[u].push_back(es.size());
@@ -249,7 +249,7 @@ struct Dinic {
   }
 
   bool bfs() {
-    dis.assign(n + 1, 0);
+    dis.assign(n, 0);
     queue<int> q;
     q.push(s);
     dis[s] = 1;
@@ -286,7 +286,7 @@ struct Dinic {
   i64 solve() {
     i64 flow = 0;
     while (bfs()) {
-      cur.assign(n + 1, 0);
+      cur.assign(n, 0);
       flow += dfs(s, INF);
     }
     return flow;
@@ -313,7 +313,7 @@ struct MCMF {
   vector<i64> d, a;  // dis, add, prev
   vector<int> p, in;
 
-  MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), g(n + 1), p(n + 1), a(n + 1) {}
+  MCMF(int n, int s, int t) : n(n), s(s), t(t), flow(0), cost(0), g(n), p(n), a(n) {}
 
   void add_edge(int u, int v, i64 cap, i64 cost) {
     g[u].push_back(es.size());
@@ -323,8 +323,8 @@ struct MCMF {
   }
 
   bool spfa() {
-    d.assign(n + 1, INF);
-    in.assign(n + 1, 0);
+    d.assign(n, INF);
+    in.assign(n, 0);
     d[s] = 0;
     in[s] = 1;
     a[s] = INF;
