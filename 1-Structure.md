@@ -200,18 +200,20 @@ void range_add(int l, int r, i64 x) {
 + Range Add, Range Sum
 
 ```cpp
-fenwick t1, t2;
-
-void range_add(int l, int r, i64 x) {
-  t1.add(l, x);
-  t2.add(l, l * x);
-  t1.add(r + 1, -x);
-  t2.add(r + 1, (r + 1) * -x);
-}
-
-i64 range_sum(int l, int r) {
-  return (r + 1) * t1.sum(r) - t2.sum(r) - l * t1.sum(l - 1) + t2.sum(l - 1);
-}
+template <class T>
+struct fenwick_range {
+  fenwick<T> t0, t1;
+  fenwick_range(int n) : t0(n), t1(n) {}
+  void range_add(int l, int r, T x) {
+    t0.add(l, x);
+    t1.add(l, l * x);
+    t0.add(r + 1, -x);
+    t1.add(r + 1, (r + 1) * -x);
+  }
+  T range_sum(int l, int r) {
+    return (r + 1) * t0.sum(r) - t1.sum(r) - l * t0.sum(l - 1) + t1.sum(l - 1);
+  }
+};
 ```
 
 + 2D
@@ -221,21 +223,17 @@ template <class T>
 struct fenwick_2d {
   int n, m;
   vector<vector<T>> t;
-
   fenwick_2d(int n, int m) : n(n), m(m), t(n, vector<T>(m)) {}
-
   void add(int x, int y, T d) {
     for (int i = x; i < n; i |= i + 1)
       for (int j = y; j < m; j |= j + 1) t[i][j] += d;
   }
-
   T sum(int x, int y) {
     T ans = 0;
     for (int i = x; i >= 0; i = (i & (i + 1)) - 1)
       for (int j = y; j >= 0; j = (j & (j + 1)) - 1) ans += t[i][j];
     return ans;
   }
-
   T range_sum(int x, int y, int xx, int yy) {
     return sum(xx, yy) - sum(x - 1, yy) - sum(xx, y - 1) + sum(x - 1, y - 1);
   }
@@ -245,32 +243,35 @@ struct fenwick_2d {
 + 2D Range Add, Range Sum
 
 ```cpp
-fenwick t0, t1, t2, t3;
+template <class T>
+struct fenwick_range_2d {
+  int n, m;
+  fenwick_2d<T> t0, t1, t2, t3;
+  fenwick_range_2d(int n, int m) : n(n), m(m), t0(n, m), t1(n, m), t2(n, m), t3(n, m) {}
+  void range_add(int x, int y, int xx, int yy, T d) {
+    add4(x, y, d);
+    add4(x, yy + 1, -d);
+    add4(xx + 1, y, -d);
+    add4(xx + 1, yy + 1, d);
+  }
+  T range_sum(int x, int y, int xx, int yy) {
+    return sum4(xx, yy) - sum4(x - 1, yy) - sum4(xx, y - 1) + sum4(x - 1, y - 1);
+  }
 
-void add4(int x, int y, i64 d) {
-  t0.add(x, y, d);
-  t1.add(x, y, d * x);
-  t2.add(x, y, d * y);
-  t3.add(x, y, d * x * y);
-}
-
-void range_add(int x, int y, int xx, int yy, i64 d) {
-  add4(x, y, d);
-  add4(x, yy + 1, -d);
-  add4(xx + 1, y, -d);
-  add4(xx + 1, yy + 1, d);
-}
-
-i64 sum4(int x, int y) {
-  return (x + 1) * (y + 1) * t0.sum(x, y)
-  - (y + 1) * t1.sum(x, y)
-  - (x + 1) * t2.sum(x, y)
-  + t3.sum(x, y);
-}
-
-i64 range_sum(int x, int y, int xx, int yy) {
-  return sum4(xx, yy) - sum4(x - 1, yy) - sum4(xx, y - 1) + sum4(x - 1, y - 1);
-}
+private:
+  void add4(int x, int y, T d) {
+    t0.add(x, y, d);
+    t1.add(x, y, d * x);
+    t2.add(x, y, d * y);
+    t3.add(x, y, d * x * y);
+  }
+  T sum4(int x, int y) {
+    return (x + 1) * (y + 1) * t0.sum(x, y)
+    - (y + 1) * t1.sum(x, y)
+    - (x + 1) * t2.sum(x, y)
+    + t3.sum(x, y);
+  }
+};
 ```
 
 ### Segment Tree
