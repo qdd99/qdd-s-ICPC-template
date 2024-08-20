@@ -1,28 +1,5 @@
 ## Graph Theory
 
-### Adjacency List
-
-```cpp
-int ecnt, mp[N];
-
-struct Edge {
-  int to, nxt;
-  Edge(int to = 0, int nxt = 0) : to(to), nxt(nxt) {}
-} es[M];
-
-void mp_init() {
-  memset(mp, -1, (n + 2) * sizeof(int));
-  ecnt = 0;
-}
-
-void mp_link(int u, int v) {
-  es[ecnt] = Edge(v, mp[u]);
-  mp[u] = ecnt++;
-}
-
-for (int i = mp[u]; i != -1; i = es[i].nxt)
-```
-
 ### Shortest Path
 
 + Dijkstra
