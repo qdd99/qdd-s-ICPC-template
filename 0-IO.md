@@ -36,6 +36,8 @@ unsigned int %u
 unsigned long long %llu
 
 cout << fixed << setprecision(15);
+
+format("{:04d}-{:02d}-{:02d}", y, m, d)  // 0001-01-01
 ```
 
 ### File and Stream Synchronization
