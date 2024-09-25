@@ -280,23 +280,28 @@ private:
 
 ```cpp
 struct segt {
-  int n;
-  vector<int> d;
-  segt(int n) : n(n), d(2 * n, (int)-2e9) {}
+  using S = int;
 
-  void set(int p, int x) {
+  S op(S a, S b) { return max(a, b); }
+  S e() { return (int)-2e9; }
+
+  int n;
+  vector<S> d;
+  segt(int n) : n(n), d(2 * n, e()) {}
+
+  void set(int p, S x) {
     for (d[p += n] = x; p > 1; p /= 2) {
-      d[p / 2] = max(d[p], d[p ^ 1]);
+      d[p / 2] = op(d[p], d[p ^ 1]);
     }
   }
 
-  int query(int l, int r) {
-    int lp = -2e9, rp = -2e9;
+  S query(int l, int r) {
+    S lp = e(), rp = e();
     for (l += n, r += n + 1; l < r; l /= 2, r /= 2) {
-      if (l & 1) lp = max(lp, d[l++]);
-      if (r & 1) rp = max(d[--r], rp);
+      if (l & 1) lp = op(lp, d[l++]);
+      if (r & 1) rp = op(d[--r], rp);
     }
-    return max(lp, rp);
+    return op(lp, rp);
   }
 };
 ```
