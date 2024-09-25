@@ -291,12 +291,12 @@ struct segt {
   }
 
   int query(int l, int r) {
-    int res = -2e9;
+    int lp = -2e9, rp = -2e9;
     for (l += n, r += n + 1; l < r; l /= 2, r /= 2) {
-      if (l & 1) res = max(res, d[l++]);
-      if (r & 1) res = max(res, d[--r]);
+      if (l & 1) lp = max(lp, d[l++]);
+      if (r & 1) rp = max(d[--r], rp);
     }
-    return res;
+    return max(lp, rp);
   }
 };
 ```
