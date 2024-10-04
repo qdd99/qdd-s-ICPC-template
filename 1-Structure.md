@@ -334,22 +334,22 @@ struct segtree {
     for (int i = size - 1; i >= 1; i--) pull(i);
   }
 
-  S ask(int ql, int qr, int p, int l, int r) {
-    if (ql > r || qr < l) return e();
-    if (ql <= l && qr >= r) return d[p];
-    S vl = ask(ql, qr, p * 2, l, (l + r) >> 1);
-    S vr = ask(ql, qr, p * 2 + 1, ((l + r) >> 1) + 1, r);
-    return op(vl, vr);
-  }
-
   void set(int p, S x) {
     p += size;
     d[p] = x;
     for (p >>= 1; p > 0; p >>= 1) pull(p);
   }
 
+  S query(int l, int r) {
+    S lp = e(), rp = e();
+    for (l += size, r += size + 1; l < r; l >>= 1, r >>= 1) {
+      if (l & 1) lp = op(lp, d[l++]);
+      if (r & 1) rp = op(d[--r], rp);
+    }
+    return op(lp, rp);
+  }
+
   S operator[](int i) { return d[i + size]; }
-  S query(int l, int r) { return ask(l, r, 1, 0, size - 1); }
 
   // f(e()) = false
   // find the smallest r such that f(sum([l...r])) = true
