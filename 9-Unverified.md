@@ -278,63 +278,6 @@ i64 dieInXturn(int n, int k, int x) {  // n people, count k, the X-th person die
 }
 ```
 
-### Lexicographically Smallest Solution of 2-SAT
-
-```cpp
-const int N = 1e5 + 10;
-struct TwoSatBF {  // Brute-force to find the lexicographically smallest solution
-  int n;
-  vector<int> G[N << 1];
-  bool slt[N << 1];
-  // Even points: false Odd points: true So x^1 is the opposite side
-  void init(int _n) {
-    n = _n;
-    for (int i = 0; i < (n << 1); ++i) {
-      G[i].clear();
-      slt[i] = false;
-    }
-  }
-  void addLimit(int x, int y) {
-    // If x is chosen, y must be chosen as well, depending on the situation
-    G[x].push_back(y);
-    G[y ^ 1].push_back(x ^ 1);
-  }
-  stack<int> st;
-  void clearst() {
-    while (st.size()) st.pop();
-  }
-  bool dfs(int u) {
-    if (slt[u ^ 1]) {
-      return false;
-    } else if (slt[u]) {
-      return true;
-    }
-    slt[u] = true;
-    st.push(u);
-    for (auto v : G[u]) {
-      if (!dfs(v)) {
-        return false;
-      }
-    }
-    return true;
-  }
-  bool solve() {
-    for (int u = 0; u < (n << 1); u += 2) {
-      if (!slt[u] && !slt[u ^ 1]) {
-        clearst();
-        if (!dfs(u)) {
-          clearst();
-          if (!dfs(u ^ 1)) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
-};
-```
-
 ### Weighted Bipartite Matching (KM Algorithm)
 
 ```cpp
