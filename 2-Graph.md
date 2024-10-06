@@ -593,57 +593,107 @@ void tarjan(int u, int pa) {
 + Strongly Connected Components (SCC)
 
 ```cpp
-int dfn[N], low[N], clk, tot, color[N];
-vector<int> scc[N];
+struct SCC {
+  int n, tot;
+  vector<vector<int>> g;
+  vector<int> color;
 
-void init() { tot = clk = 0; memset(dfn, 0, sizeof dfn); }
+  SCC(int n) : n(n), tot(0), g(n), color(n, -1) {}
 
-void tarjan(int u) {
-  static int st[N], p;
-  static bool in[N];
-  dfn[u] = low[u] = ++clk;
-  st[p++] = u;
-  in[u] = true;
-  for (int v : g[u]) {
-    if (!dfn[v]) {
-      tarjan(v);
-      low[u] = min(low[u], low[v]);
-    } else if (in[v]) {
-      low[u] = min(low[u], dfn[v]);
+  void add_edge(int u, int v) { g[u].push_back(v); }
+
+  void work() {
+    vector<int> dfn(n), low(n), st;
+    int clk = 0;
+    function<void(int)> dfs = [&](int u) {
+      dfn[u] = low[u] = ++clk;
+      st.push_back(u);
+      for (int v : g[u]) {
+        if (!dfn[v]) {
+          dfs(v);
+          low[u] = min(low[u], low[v]);
+        } else if (color[v] == -1) {
+          low[u] = min(low[u], dfn[v]);
+        }
+      }
+      if (dfn[u] == low[u]) {
+        for (;;) {
+          int x = st.back();
+          st.pop_back();
+          color[x] = tot;
+          if (x == u) break;
+        }
+        tot++;
+      }
+    };
+    for (int i = 0; i < n; i++) {
+      if (!dfn[i]) dfs(i);
+    }
+    for (int& x : color) {
+      x = tot - 1 - x;
     }
   }
-  if (dfn[u] == low[u]) {
-    ++tot;
-    for (;;) {
-      int x = st[--p];
-      in[x] = false;
-      color[x] = tot;
-      scc[tot].push_back(x);
-      if (x == u) break;
+
+  vector<vector<int>> scc() {
+    vector<vector<int>> res(tot);
+    for (int i = 0; i < n; i++) {
+      res[color[i]].push_back(i);
     }
+    return res;
   }
-}
+
+  vector<vector<int>> dag() {
+    vector<vector<int>> res(tot);
+    for (int i = 0; i < n; i++) {
+      for (int j : g[i]) {
+        if (color[i] != color[j]) {
+          res[color[i]].push_back(color[j]);
+        }
+      }
+    }
+    for (auto& v : res) {
+      sort(v.begin(), v.end());
+      v.erase(unique(v.begin(), v.end()), v.end());
+    }
+    return res;
+  }
+};
 ```
 
 + 2-SAT
 
 ```cpp
-// N doubled
-void two_sat() {
-  for (int i = 1; i <= n * 2; i++) {
-    if (!dfn[i]) tarjan(i);
+struct two_sat {
+  int n;
+  SCC scc;
+
+  two_sat(int n) : n(n), scc(n * 2) {}
+
+  void add_clause(int u, bool f, int v, bool g) {
+    u = u * 2 + f;
+    v = v * 2 + g;
+    scc.add_edge(u ^ 1, v);
+    scc.add_edge(v ^ 1, u);
   }
-  for (int i = 1; i <= n; i++) {
-    if (color[i] == color[i + n]) {
-      // impossible
+
+  bool solve() {
+    scc.work();
+    for (int i = 0; i < n; i++) {
+      if (scc.color[i * 2] == scc.color[i * 2 + 1]) {
+        return false;
+      }
     }
+    return true;
   }
-  for (int i = 1; i <= n; i++) {
-    if (color[i] < color[i + n]) {
-      // select
+
+  vector<bool> answer() {
+    vector<bool> res(n);
+    for (int i = 0; i < n; i++) {
+      res[i] = scc.color[i * 2 + 1] > scc.color[i * 2];
     }
+    return res;
   }
-}
+};
 ```
 
 ### Eulerian Path
