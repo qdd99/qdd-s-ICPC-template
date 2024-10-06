@@ -598,11 +598,13 @@ struct SCC {
   vector<vector<int>> g;
   vector<int> color;
 
-  SCC(int n) : n(n), tot(0), g(n), color(n, -1) {}
+  SCC(int n) : n(n), g(n) {}
 
   void add_edge(int u, int v) { g[u].push_back(v); }
 
   void work() {
+    tot = 0;
+    color.assign(n, -1);
     vector<int> dfn(n), low(n), st;
     int clk = 0;
     function<void(int)> dfs = [&](int u) {
