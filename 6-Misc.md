@@ -1,5 +1,20 @@
 ## Miscellaneous
 
+### Sliding Window
+
+```cpp
+// [start, end)
+// [l, r)
+void sliding_window(int start, int end,
+                    function<void(int)> add,
+                    function<void(int)> del,
+                    function<bool()> f,
+                    function<void(int, int)> callback) {
+  for (int l = start, r = start; r != end; callback(l, r))
+    for (add(r++); l != r && f(); del(l++));
+}
+```
+
 ### Binary Search
 
 ```cpp
