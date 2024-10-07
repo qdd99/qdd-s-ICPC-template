@@ -42,25 +42,29 @@ T max_right(T l, T r, F f) {
 
 ```cpp
 // for real numbers
-double l, r, mid1, mid2;
-for (int i = 0; i < 75; i++) {
-  mid1 = (l * 5 + r * 4) / 9;
-  mid2 = (l * 4 + r * 5) / 9;
-  if (f(mid1) > f(mid2)) r = mid2; // find the maximum, otherwise use '<'
-  else l = mid1;
+template <class F, class C = less<>>
+double ternary_search(double l, double r, F f, C cmp = C()) {
+  for (int i = 0; i < 75; i++) {
+    double x1 = (l * 5 + r * 4) / 9;
+    double x2 = (l * 4 + r * 5) / 9;
+    cmp(f(x1), f(x2)) ? r = x2 : l = x1;
+  }
+  return l;
 }
 
 // for integers
-int l, r, mid1, mid2;
-while (l < r - 2) {
-  mid1 = (l + r) / 2;
-  mid2 = mid1 + 1;
-  if (f(mid1) > f(mid2)) r = mid2; // find the maximum, otherwise use '<'
-  else l = mid1;
-}
-int maxval = f(l), ans = l;
-for (int i = l + 1; i <= r; i++) {
-  if (umax(maxval, f(i))) ans = i;
+template <class T, class F, class C = less<>>
+T ternary_search(T l, T r, F f, C cmp = C()) {
+  while (l < r - 2) {
+    T x = l + (r - l) / 2;
+    cmp(f(x), f(x + 1)) ? r = x + 1 : l = x;
+  }
+  auto bestval = f(l);
+  T ans = l;
+  for (T i = l + 1; i <= r; i++) {
+    if (cmp(f(i), bestval)) bestval = f(i), ans = i;
+  }
+  return ans;
 }
 ```
 
