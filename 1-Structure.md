@@ -312,8 +312,8 @@ struct segt {
 // Use const S& when necessary to optimize constants
 template <class S>
 struct segtree {
-  using OP = S (*)(S, S);
-  using E = S (*)();
+  using OP = function<S(S, S)>;
+  using E = function<S()>;
 
   int _n, size;
   vector<S> d;
@@ -410,11 +410,11 @@ segtree<int> st(n, op, e);
 ```cpp
 template <class S, class T>
 struct lazy_segtree {
-  using OP = S (*)(S, S);
-  using E = S (*)();
-  using MAP = S (*)(S, T);
-  using COM = T (*)(T, T);
-  using ID = T (*)();
+  using OP = function<S(S, S)>;
+  using E = function<S()>;
+  using MAP = function<S(S, T)>;
+  using COM = function<T(T, T)>;
+  using ID = function<T()>;
 
   int _n, size, log;
   vector<S> d;
